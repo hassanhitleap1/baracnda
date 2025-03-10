@@ -2,9 +2,9 @@
 
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost;dbname=yii2basic',
+    'dsn' => 'mysql:host=0.0.0.0;port=3307;dbname=bracanda', // Use the Windows IP address and correct port
     'username' => 'root',
-    'password' => '',
+    'password' => 'password',
     'charset' => 'utf8',
 
     // Schema cache options (for production environment)
