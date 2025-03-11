@@ -47,6 +47,10 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                'site/category/<slug>' => 'site/category',
+                // 'site/products/<slug>' => 'site/products',
+                'site/category/<slug>/<slug2>' => 'site/products',
+                'site/product/<id>' => 'site/product',
             ],
         ],
         

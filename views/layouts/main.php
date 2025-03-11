@@ -8,7 +8,6 @@ use app\models\categories\Categories;
 use app\models\pages\Pages;
 use app\models\settings\Settings;
 use yii\bootstrap5\Html;
-
 use yii\helpers\Url;
 
 ThemeAsset::register($this);
@@ -131,7 +130,7 @@ $about = Pages::find()->where(['key' => 'aboutus'])->one();
 
                                         <li><a href="<?= Url::to(["site/category/$category->slug"]) ?>"
                                                 class="dropdown-item" href="#">
-                                                <?= $category->name ?>
+                                                <?= $category->name_en ?>
                                             </a>
                                         </li>
                                     <?php endforeach; ?>
@@ -249,7 +248,7 @@ $about = Pages::find()->where(['key' => 'aboutus'])->one();
 
                                 <li><a href="<?= Url::to(["site/products/$category->slug"]) ?>" class="dropdown-item"
                                         href="#">
-                                        <?= $category->name_en ?>
+                                        <?= $category->name ?>
                                     </a></li>
                             <?php endforeach; ?>
                         </ul>

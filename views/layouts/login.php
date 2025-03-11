@@ -4,10 +4,9 @@
 /** @var string $content */
 
 use app\assets\ThemeAsset;
-use app\models\Categories\Categories;
-use app\models\Settings\Settings;
+use app\models\categories\Categories;
+use app\models\settings\Settings;
 use yii\bootstrap5\Html;
-use yii\helpers\Url;
 
 ThemeAsset::register($this);
 

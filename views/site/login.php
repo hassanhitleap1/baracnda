@@ -7,49 +7,55 @@
 
 use yii\bootstrap5\ActiveForm;
 use yii\bootstrap5\Html;
+use yii\helpers\Url;
 
 $this->title = 'Login';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="site-login">
-    <h1><?= Html::encode($this->title) ?></h1>
+<div>
+    <div class="container my-5">
+        <!-- <div class="breadcrumbs mb-3">
+            <span>
+                <a href="/" title="Go to Neutron sys web" class="home">Home</a>
+            </span>
+            <span><i class="fa fa-angle-right"></i></span>
+            <span>
+                <?= Html::encode($this->title) ?>
+            </span>
+        </div> -->
+        <a href="<?= Url::to(['site/index']) ?>">
+            <?= Html::img(Yii::getAlias('@web') . '/logo.png', ['alt' => 'Neutron sys logo', 'class' => 'animation__shake']) ?>
+        </a>
+        <div class="row login-page">
+            <div class="col-12">
+                <h1 class="my-5">
+                    <?= Html::encode($this->title) ?>
+                </h1>
 
-    <p>Please fill out the following fields to login:</p>
+                <?php $form = ActiveForm::begin([
+                    'id' => 'login-form',
+                ]); ?>
 
-    <div class="row">
-        <div class="col-lg-5">
+                <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
 
-            <?php $form = ActiveForm::begin([
-                'id' => 'login-form',
-                'fieldConfig' => [
-                    'template' => "{label}\n{input}\n{error}",
-                    'labelOptions' => ['class' => 'col-lg-1 col-form-label mr-lg-3'],
-                    'inputOptions' => ['class' => 'col-lg-3 form-control'],
-                    'errorOptions' => ['class' => 'col-lg-7 invalid-feedback'],
-                ],
-            ]); ?>
+                <?= $form->field($model, 'password')->passwordInput() ?>
 
-            <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
+                <?= $form->field($model, 'rememberMe')->checkbox([
+                    'template' => "<div class=\"custom-control custom-checkbox\">{input} {label}</div>\n<div class=\"col-lg-8\">{error}</div>",
+                ]) ?>
 
-            <?= $form->field($model, 'password')->passwordInput() ?>
-
-            <?= $form->field($model, 'rememberMe')->checkbox([
-                'template' => "<div class=\"custom-control custom-checkbox\">{input} {label}</div>\n<div class=\"col-lg-8\">{error}</div>",
-            ]) ?>
-
-            <div class="form-group">
-                <div>
-                    <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+                <div class="form-group">
+                    <div>
+                        <?= Html::submitButton('Login', ['class' => 'btn btn-primary btn-lg w-100', 'name' => 'login-button']) ?>
+                    </div>
                 </div>
+
+                <?php ActiveForm::end(); ?>
+
             </div>
-
-            <?php ActiveForm::end(); ?>
-
-            <div style="color:#999;">
-                You may login with <strong>admin/admin</strong> or <strong>demo/demo</strong>.<br>
-                To modify the username/password, please check out the code <code>app\models\User::$users</code>.
+            <div class="text-center my-5">
+                Copyright © 2024 sys. All rights reserved.
             </div>
-
         </div>
     </div>
 </div>
