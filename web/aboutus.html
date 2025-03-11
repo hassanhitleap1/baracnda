@@ -1,0 +1,164 @@
+<?php
+
+/** @var yii\web\View $this */
+/** @var string $content */
+
+use app\assets\ThemeAsset;
+use app\widgets\Alert;
+use yii\bootstrap5\Breadcrumbs;
+use yii\bootstrap5\Html;
+use yii\bootstrap5\Nav;
+use yii\bootstrap5\NavBar;
+use yii\helpers\Url;
+
+ThemeAsset::register($this);
+
+$this->registerCsrfMetaTags();
+$this->registerMetaTag(['charset' => Yii::$app->charset], 'charset');
+$this->registerMetaTag(['name' => 'viewport', 'content' => 'width=device-width, initial-scale=1, shrink-to-fit=no']);
+$this->registerMetaTag(['name' => 'description', 'content' => $this->params['meta_description'] ?? '']);
+$this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_keywords'] ?? '']);
+$this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii::getAlias('@web/favicon.ico')]);
+?>
+<?php $this->beginPage() ?>
+<!DOCTYPE html>
+<html lang="<?= Yii::$app->language ?>" class="h-100">
+
+<head>
+    <title>
+        <?= Html::encode($this->title) ?>
+    </title>
+    <?php $this->head() ?>
+</head>
+
+<body class="d-flex flex-column h-100">
+    <?php $this->beginBody() ?>
+
+    <header>
+        <div class="bg-primary text-white">
+            <div class="container">
+                <div class="d-flex align-items-center py-2">
+                    <div class="me-4">
+                        <i class="bi bi-geo-alt"></i>
+                        5415 King Avenue, Rosedale
+                        MD 21237, USA
+                    </div>
+                    <div>
+                        <i class="bi bi-telephone"></i>
+                        +1 (667) 294-0971
+                    </div>
+                </div>
+            </div>
+        </div>
+        <nav class="navbar navbar-expand-lg shadow-sm p-0">
+            <div class="container">
+                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas"
+                    data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar"
+                    aria-labelledby="offcanvasNavbarLabel">
+                    <div class="offcanvas-header">
+                        <div class="offcanvas-title" id="offcanvasNavbarLabel"><img src="logo.png"
+                                alt="Neutron sys logo" /></div>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body align-items-center">
+                        <div class="flex-grow-1 d-none d-lg-block my-2">
+                            <img src="/images/logo.png" alt="Neutron sys logo" width="150px" />
+                        </div>
+                        <div></div>
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a class="nav-link  <?= Yii::$app->controller->route == 'site/index' ? 'active' : '' ?>"
+                                    aria-current="page" href="<?= Url::to(['site/index']) ?>">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link  <?= Yii::$app->controller->route == 'site/about' ? 'active' : '' ?>"
+                                    href="<?= Url::to(['site/about']) ?>">About Us</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    Products
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#">Chemical Engineering</a></li>
+                                    <li><a class="dropdown-item" href="#">Electrical Engineering</a></li>
+                                    <li><a class="dropdown-item" href="#">Mechanical Engineering</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Contact Us</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container my-5">
+        <?= $content ?>
+    </div>
+
+    <footer class="bg-dark">
+        <div class="container">
+            <div class="pt-4">
+                <img src="/images/logo-white.png" alt="Neutron sys logo white" width="150px" />
+            </div>
+            <hr />
+            <div class="row mb-5">
+                <div class="col-4 text-white">
+                    <div class="mb-3">
+                        ABOUT
+                    </div>
+                    <div>
+                        Neutron sys is committed to efficient and effective student mastery of technical subject matter.
+                        We provide educators with innovative, cost-effective technical training systems.
+                    </div>
+                </div>
+                <div class="col-4 text-white">
+                    <div class="mb-3">
+                        CONTACT US
+                    </div>
+                    <div>
+                        <div>
+                            Address: 5415 King Avenue, Rosedale, MD 21237, USA
+                        </div>
+                        <div>
+                            Office Phone: +1 (667) 294-0971
+                        </div>
+                        <div>
+                            Mobile: +1 (667) 294-0971
+                        </div>
+                        <div>
+                            Email:sales@Neutron sys.com
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4 text-white">
+                    <div class="mb-3">
+                        QUICK LINKS
+                    </div>
+                    <div>
+                        <ul class="ps-3">
+                            <li>Chemical Engineering</li>
+                            <li>Electrical Engineering</li>
+                            <li>Mechanical Engineering</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="text-center text-white pb-3">
+                Copyright © 2024 sys. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <?php $this->endBody() ?>
+</body>
+
+</html>
+<?php $this->endPage() ?>
