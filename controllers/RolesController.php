@@ -11,7 +11,7 @@ use yii\filters\VerbFilter;
 /**
  * RolesController implements the CRUD actions for Roles model.
  */
-class RolesController extends Controller
+class RolesController extends BaseController
 {
     /**
      * @inheritDoc

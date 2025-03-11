@@ -11,7 +11,7 @@ use yii\filters\VerbFilter;
 /**
  * VariantAttributesController implements the CRUD actions for VariantAttributes model.
  */
-class VariantAttributesController extends Controller
+class VariantAttributesController extends BaseController
 {
     /**
      * @inheritDoc

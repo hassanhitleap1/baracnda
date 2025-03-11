@@ -11,7 +11,7 @@ use yii\filters\VerbFilter;
 /**
  * WarehousesController implements the CRUD actions for Warehouses model.
  */
-class WarehousesController extends Controller
+class WarehousesController extends BaseController
 {
     /**
      * @inheritDoc

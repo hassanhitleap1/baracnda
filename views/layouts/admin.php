@@ -68,10 +68,6 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
             </section>
         </div>
 
-
-
-
-
         <?php include "footer.php"; ?>
 
         <aside class="control-sidebar control-sidebar-dark">

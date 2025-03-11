@@ -11,7 +11,7 @@ use yii\filters\VerbFilter;
 /**
  * RegionsController implements the CRUD actions for Regions model.
  */
-class RegionsController extends Controller
+class RegionsController extends BaseController
 {
     /**
      * @inheritDoc

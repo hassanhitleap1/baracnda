@@ -11,7 +11,7 @@ use yii\filters\VerbFilter;
 /**
  * ShippingsController implements the CRUD actions for Shippings model.
  */
-class ShippingsController extends Controller
+class ShippingsController extends BaseController
 {
     /**
      * @inheritDoc

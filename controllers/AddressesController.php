@@ -11,7 +11,7 @@ use yii\filters\VerbFilter;
 /**
  * AddressesController implements the CRUD actions for Addresses model.
  */
-class AddressesController extends Controller
+class AddressesController extends BaseController
 {
     /**
      * @inheritDoc
