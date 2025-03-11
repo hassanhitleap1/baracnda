@@ -22,6 +22,29 @@ class m250309_003854_create_roles_tables extends Migration
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ], $tableOptions);
 
+        $data = [
+            [
+                'name' => 'admin',
+ 
+            ],
+            [
+                'name' => 'manager',
+            ]
+        ];
+
+
+        Yii::$app->db
+            ->createCommand()
+            ->batchInsert(
+                'roles',
+                [
+                    'name',
+                ],
+                $data
+            )
+            ->execute();
+
+
     }
 
     /**

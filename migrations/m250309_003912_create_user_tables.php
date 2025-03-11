@@ -27,13 +27,53 @@ class m250309_003912_create_user_tables extends Migration
             'birth_date' => $this->date()->null(),
             'role_id' => $this->integer()->notNull(),
             'address_id' => $this->integer()->null(),
+            'status' => $this->smallInteger()->notNull()->defaultValue(10),
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ], $tableOptions);
 
-
-        $this->addForeignKey('fk_users_role', 'users', 'role_id', 'roles', 'id', 'CASCADE');
+       $this->addForeignKey('fk_users_role', 'users', 'role_id', 'roles', 'id', 'CASCADE');
+       
         $this->addForeignKey('fk_users_address', 'users', 'address_id', 'addresses', 'id', 'CASCADE');
+
+        $data = [
+            [
+            'username' =>'0799263494',
+            'email' => '0799263494',
+            'phone' => '0799263494',
+            'password_hash' => Yii::$app->security->generatePasswordHash("079923494"),              
+            'auth_key' => Yii::$app->security->generateRandomString(),
+            'full_name' => "Admin",
+            'birth_date' => null,
+            'role_id' => 1,
+            'address_id' => null,
+            'status' => 10
+ 
+            ]
+        ];
+
+
+        Yii::$app->db
+            ->createCommand()
+            ->batchInsert(
+                'users',
+                [
+                    'username' ,
+                    'email' ,
+                    'phone' ,
+                    'password_hash',              
+                    'auth_key' ,
+                    'full_name' ,
+                    'birth_date',
+                    'role_id',
+                    'address_id' ,
+                    'status'
+                ],
+                $data
+            )
+            ->execute();
+
+
 
     }
 

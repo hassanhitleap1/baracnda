@@ -120,22 +120,6 @@ $about = Pages::find()->where(['key' => 'aboutus'])->one();
                                 <a class="nav-link  <?= Yii::$app->controller->route == 'site/about' ? 'active' : '' ?>"
                                     href="<?= Url::to(['site/about']) ?>">About Us</a>
                             </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                    Products
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <?php foreach ($categories as $category): ?>
-
-                                        <li><a href="<?= Url::to(["site/category/$category->slug"]) ?>"
-                                                class="dropdown-item" href="#">
-                                                <?= $category->name_en ?>
-                                            </a>
-                                        </li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="<?= Url::to(['site/contact']) ?>">Contact Us</a>
                             </li>
