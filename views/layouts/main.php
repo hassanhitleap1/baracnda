@@ -4,14 +4,11 @@
 /** @var string $content */
 
 use app\assets\ThemeAsset;
-use app\models\Categories\Categories;
-use app\models\Pages\Pages;
-use app\models\Settings\Settings;
-use app\widgets\Alert;
-use yii\bootstrap5\Breadcrumbs;
+use app\models\categories\Categories;
+use app\models\pages\Pages;
+use app\models\settings\Settings;
 use yii\bootstrap5\Html;
-use yii\bootstrap5\Nav;
-use yii\bootstrap5\NavBar;
+
 use yii\helpers\Url;
 
 ThemeAsset::register($this);
@@ -134,7 +131,7 @@ $about = Pages::find()->where(['key' => 'aboutus'])->one();
 
                                         <li><a href="<?= Url::to(["site/category/$category->slug"]) ?>"
                                                 class="dropdown-item" href="#">
-                                                <?= $category->name_en ?>
+                                                <?= $category->name ?>
                                             </a>
                                         </li>
                                     <?php endforeach; ?>
@@ -194,7 +191,7 @@ $about = Pages::find()->where(['key' => 'aboutus'])->one();
                         ABOUT
                     </div>
                     <div>
-                        <?php print(substr($about->desc_en, 0, 500))
+                        <?php print(substr($about->desc, 0, 500))
                             ?>
 
 

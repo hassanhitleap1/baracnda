@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\categories\Categories;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -9,6 +10,8 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\pages\Pages;
+use app\models\slider\Slider;
 
 class SiteController extends Controller
 {
@@ -61,7 +64,10 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        $categories = Categories::find()->where(['category_id' => null])->limit(3)->all();
+        $sliders = Slider::find()->all();
+        $about = Pages::find()->where(['key' => 'aboutus'])->one();
+        return $this->render('index', ['categories' => $categories, 'sliders' => $sliders, 'about' => $about]);
     }
 
     /**
