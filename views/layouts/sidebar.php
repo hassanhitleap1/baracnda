@@ -85,7 +85,7 @@ use yii\bootstrap5\Html;
                         </p>
                     </a>
                 </li>
-                <?php if (Yii::$app->user->identity->type == User::SUPER_ADMIN): ?>
+                <?php if (Yii::$app->user->identity->role_id == User::SUPER_ADMIN): ?>
                     <li class="nav-item">
                         <a href="<?= Url::to(['user/index']) ?>"
                             class="nav-link  <?= Yii::$app->controller->id == 'user' ? 'active' : '' ?>">
