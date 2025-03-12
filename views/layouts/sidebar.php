@@ -65,6 +65,49 @@ use yii\bootstrap5\Html;
                         </p>
                     </a>
                 </li>
+
+
+                <li class="nav-item">
+                    <a href="<?= Url::to(['attributes/index']) ?>"
+                        class="nav-link <?= Yii::$app->controller->id == 'attributes' ? 'active' : '' ?>">
+                        <i class="nav-icon far fa-calendar-alt"></i>
+                        <p>
+                         attributes
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= Url::to(['attribute-options/index']) ?>"
+                        class="nav-link <?= Yii::$app->controller->id == 'attribute-options' ? 'active' : '' ?>">
+                        <i class="nav-icon far fa-calendar-alt"></i>
+                        <p>
+                         attribute options
+                        </p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="<?= Url::to(['addresses/index']) ?>"
+                        class="nav-link <?= Yii::$app->controller->id == 'addresses' ? 'active' : '' ?>">
+                        <i class="nav-icon far fa-calendar-alt"></i>
+                        <p>
+                         addresses
+                        </p>
+                    </a>
+                </li>
+
+
+                <li class="nav-item">
+                    <a href="<?= Url::to(['categories/index']) ?>"
+                        class="nav-link <?= Yii::$app->controller->id == 'categories' ? 'active' : '' ?>">
+                        <i class="nav-icon far fa-calendar-alt"></i>
+                        <p>
+                            Categories
+                        </p>
+                    </a>
+                </li>
+
+
                 <li class="nav-item">
                     <a href="<?= Url::to(['pages/index']) ?>"
                         class="nav-link <?= Yii::$app->controller->id == 'pages' ? 'active' : '' ?>">
