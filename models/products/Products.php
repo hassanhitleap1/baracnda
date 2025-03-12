@@ -31,6 +31,9 @@ class Products extends \yii\db\ActiveRecord
 
     public $images;
 
+    const SCENARIO_CREATE = 'create';
+    const SCENARIO_UPDATE = 'update';
+    
     /**
      * {@inheritdoc}
      */

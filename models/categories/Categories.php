@@ -20,6 +20,11 @@ use Yii;
 class Categories extends \yii\db\ActiveRecord
 {
 
+    public $file;
+
+    const SCENARIO_CREATE = 'create';
+    const SCENARIO_UPDATE = 'update';
+
 
     /**
      * {@inheritdoc}
@@ -35,12 +40,13 @@ class Categories extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['category_id'], 'default', 'value' => null],
-            [['name'], 'required'],
-            [['category_id'], 'integer'],
-            [['created_at', 'updated_at'], 'safe'],
-            [['name'], 'string', 'max' => 255],
-            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Categories::class, 'targetAttribute' => ['category_id' => 'id']],
+            [['category_id'], 'default', 'value' => null,'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['name'], 'required','on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['category_id'], 'integer','on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['created_at', 'updated_at'], 'safe','on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['name'], 'string', 'max' => 255,'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Categories::class, 'targetAttribute' => ['category_id' => 'id'] ,'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['file'], 'image', 'skipOnEmpty' => true, 'extensions' => 'png,jpg,jpeg,gif,webp,webm', 'maxFiles' => 20, 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
         ];
     }
 

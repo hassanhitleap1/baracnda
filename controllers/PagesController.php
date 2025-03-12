@@ -4,8 +4,11 @@ namespace app\controllers;
 
 use app\models\pages\Pages;
 use app\models\pages\PagesSearch;
+use Yii;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\FileHelper;
+use yii\web\UploadedFile;
 
 /**
  * PagesController implements the CRUD actions for Pages model.
@@ -64,12 +67,35 @@ class PagesController extends BaseController
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return string|\yii\web\Response
      */
+
+
     public function actionCreate()
     {
         $model = new Pages();
 
+        $model->scenario = Pages::SCENARIO_CREATE;
+        $newId = Pages::find()->max('id') + 1;
+
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
+            if ($model->load($this->request->post()) && $model->validate()) {
+
+                $file = UploadedFile::getInstance($model, 'file');
+
+                if (!empty($file)) {
+                    $folder_path = "images/pages/$newId";
+                    FileHelper::createDirectory(
+                        "$folder_path",
+                        $mode = 0775,
+                        $recursive = true
+                    );
+
+                    $file_path = "$folder_path/" . "covor." . $file->extension;
+                    $file->saveAs($file_path);
+                    $model->image = $file_path;
+                }
+
+
+                $model->save();
                 return $this->redirect(['view', 'id' => $model->id]);
             }
         } else {
@@ -92,7 +118,30 @@ class PagesController extends BaseController
     {
         $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+        $model->scenario = Pages::SCENARIO_UPDATE;
+        $newId = $model->id;
+
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->validate()) {
+
+            $file = UploadedFile::getInstance($model, 'file');
+
+            if (!empty($file)) {
+                $folder_path = "images/pages/$newId";
+                FileHelper::createDirectory(
+                    "$folder_path",
+                    $mode = 0775,
+                    $recursive = true
+                );
+
+                $file_path = "$folder_path/" . "covor." . $file->extension;
+                $file->saveAs($file_path);
+                $model->image = $file_path;
+
+
+            }
+
+            $model->save();
+
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -100,6 +149,7 @@ class PagesController extends BaseController
             'model' => $model,
         ]);
     }
+
 
     /**
      * Deletes an existing Pages model.

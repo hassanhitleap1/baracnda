@@ -20,7 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <span><i class="fa fa-angle-right"></i></span>
             <?php if ($model->category->category): ?>
 
-                <a href="<?= Url::to(["site/category/" . $model->category->category->slug]) ?>"
+                <a href="<?= Url::to(["site/category/" . $model->category->category->id]) ?>"
                     title=" Go to Neutron sys web">
                     <?= Html::encode($model->category->category->name) ?>
                 </a>
@@ -31,7 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php if ($model->category): ?>
 
 
-                <a href="<?= Url::to(["site/category/" . $model->category->slug]) ?>" title=" Go to Neutron sys web">
+                <a href="<?= Url::to(["site/category/" . $model->category->id]) ?>" title=" Go to Neutron sys web">
                     <?= Html::encode($model->category->name) ?>
                 </a>
                 <span><i class="fa fa-angle-right"></i></span>

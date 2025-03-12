@@ -230,7 +230,7 @@ $about = Pages::find()->where(['key' => 'aboutus'])->one();
 
                             <?php foreach ($categories as $category): ?>
 
-                                <li><a href="<?= Url::to(["site/products/$category->slug"]) ?>" class="dropdown-item"
+                                <li><a href="<?= Url::to(["site/products/$category->id"]) ?>" class="dropdown-item"
                                         href="#">
                                         <?= $category->name ?>
                                     </a></li>

@@ -35,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php foreach ($categories as $categor): ?>
 
             <div class="col-12 col-md-6 col-lg-4 mb-4">
-                <a href="<?= Url::to(["site/category/$category->slug/$categor->slug"]) ?>">
+                <a href="<?= Url::to(["site/category/$category->id/$categor->id"]) ?>">
                     <div class="card">
                         <div style="height: 200px; text-align: center;">
                             <?= Html::img(Yii::getAlias('@web') . "/" . $categor->image, ['alt' => 'Card image cap', 'width' => 'auto', 'style' => 'max-height: 100%; margin: auto;']) ?>

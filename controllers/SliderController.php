@@ -4,9 +4,11 @@ namespace app\controllers;
 
 use app\models\slider\Slider;
 use app\models\slider\SliderSearch;
-use yii\web\Controller;
+use Yii;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\FileHelper;
+use yii\web\UploadedFile;
 
 /**
  * SliderController implements the CRUD actions for Slider model.
@@ -69,8 +71,30 @@ class SliderController extends BaseController
     {
         $model = new Slider();
 
+        $model->scenario = Slider::SCENARIO_CREATE;
+        $newId = Slider::find()->max('id') + 1;
+
+
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
+            if ($model->load($this->request->post()) && $model->validate()) {
+
+                $file = UploadedFile::getInstance($model, 'file');
+
+                if (!empty($file)) {
+                    $folder_path = "images/slider/$newId";
+                    FileHelper::createDirectory(
+                        "$folder_path",
+                        $mode = 0775,
+                        $recursive = true
+                    );
+
+                    $file_path = "$folder_path/" . "image." . $file->extension;
+                    $file->saveAs($file_path);
+                    $model->src = $file_path;
+
+
+                }
+                $model->save();
                 return $this->redirect(['view', 'id' => $model->id]);
             }
         } else {
@@ -93,7 +117,30 @@ class SliderController extends BaseController
     {
         $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+        $model->scenario = Slider::SCENARIO_UPDATE;
+        $newId = $model->id;
+
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->validate()) {
+
+            $file = UploadedFile::getInstance($model, 'file');
+
+            if (!empty($file)) {
+                $folder_path = "images/slider/$newId";
+                FileHelper::createDirectory(
+                    "$folder_path",
+                    $mode = 0775,
+                    $recursive = true
+                );
+
+                $file_path = "$folder_path/" . "image." . $file->extension;
+                $file->saveAs($file_path);
+                $model->src = $file_path;
+
+
+            }
+
+            $model->save();
+
             return $this->redirect(['view', 'id' => $model->id]);
         }
 

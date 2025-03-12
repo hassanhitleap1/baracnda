@@ -4,9 +4,12 @@ namespace app\controllers;
 
 use app\models\categories\Categories;
 use app\models\categories\CategoriesSearch;
+use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\FileHelper;
+use yii\web\UploadedFile;
 
 /**
  * CategoriesController implements the CRUD actions for Categories model.
@@ -64,13 +67,35 @@ class CategoriesController extends BaseController
      * Creates a new Categories model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return string|\yii\web\Response
-     */
+     */  
     public function actionCreate()
     {
         $model = new Categories();
 
+        $model->scenario = Categories::SCENARIO_CREATE;
+        $newId = Categories::find()->max('id') + 1;
+
+
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
+            if ($model->load($this->request->post()) && $model->validate()) {
+
+                $file = UploadedFile::getInstance($model, 'file');
+
+                if (!empty($file)) {
+                    $folder_path = "images/categories/$newId";
+                    FileHelper::createDirectory(
+                        "$folder_path",
+                        $mode = 0775,
+                        $recursive = true
+                    );
+
+                    $file_path = "$folder_path/" . "covor." . $file->extension;
+                    $file->saveAs($file_path);
+                    $model->image = $file_path;
+                }
+
+
+                $model->save();
                 return $this->redirect(['view', 'id' => $model->id]);
             }
         } else {
@@ -81,7 +106,6 @@ class CategoriesController extends BaseController
             'model' => $model,
         ]);
     }
-
     /**
      * Updates an existing Categories model.
      * If update is successful, the browser will be redirected to the 'view' page.
@@ -89,11 +113,34 @@ class CategoriesController extends BaseController
      * @return string|\yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
+       public function actionUpdate($id)
     {
         $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+        $model->scenario = Categories::SCENARIO_UPDATE;
+        $newId = $model->id;
+
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->validate()) {
+
+            $file = UploadedFile::getInstance($model, 'file');
+
+            if (!empty($file)) {
+                $folder_path = "images/categories/$newId";
+                FileHelper::createDirectory(
+                    "$folder_path",
+                    $mode = 0775,
+                    $recursive = true
+                );
+
+                $file_path = "$folder_path/" . "covor." . $file->extension;
+                $file->saveAs($file_path);
+                $model->image = $file_path;
+
+
+            }
+
+            $model->save();
+
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -101,6 +148,7 @@ class CategoriesController extends BaseController
             'model' => $model,
         ]);
     }
+
 
     /**
      * Deletes an existing Categories model.

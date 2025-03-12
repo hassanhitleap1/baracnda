@@ -18,6 +18,9 @@ use Yii;
 class Pages extends \yii\db\ActiveRecord
 {
 
+    public $file;
+    const SCENARIO_CREATE = 'create';
+    const SCENARIO_UPDATE = 'update';
 
     /**
      * {@inheritdoc}
@@ -33,12 +36,14 @@ class Pages extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'desc', 'image'], 'default', 'value' => null],
-            [['key'], 'required'],
-            [['desc'], 'string'],
-            [['created_at', 'updated_at'], 'safe'],
-            [['key', 'title', 'image'], 'string', 'max' => 255],
-            [['key'], 'unique'],
+            [['title', 'desc', 'image'], 'default', 'value' => null,'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['key'], 'required','on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['desc'], 'string','on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['created_at', 'updated_at'], 'safe','on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['key', 'title', 'image'], 'string', 'max' => 255,'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['key'], 'unique','on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['file'], 'image', 'skipOnEmpty' => true, 'extensions' => 'png,jpg,jpeg,gif,webp,webm', 'maxFiles' => 20, 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+
         ];
     }
 

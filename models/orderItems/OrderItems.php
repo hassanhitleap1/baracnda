@@ -24,6 +24,8 @@ class OrderItems extends \yii\db\ActiveRecord
 {
 
 
+    const SCENARIO_CREATE = 'create';
+    const SCENARIO_UPDATE = 'update';
     /**
      * {@inheritdoc}
      */

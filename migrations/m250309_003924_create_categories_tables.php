@@ -20,6 +20,7 @@ class m250309_003924_create_categories_tables extends Migration
             'id' => $this->primaryKey(),
             'name' => $this->string()->notNull(),
             'category_id' => $this->integer()->null(),
+            'image' => $this->string()->null(),
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ], $tableOptions);

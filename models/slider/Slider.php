@@ -18,6 +18,11 @@ use Yii;
 class Slider extends \yii\db\ActiveRecord
 {
 
+    public $file;
+    const SCENARIO_CREATE = 'create';
+    const SCENARIO_UPDATE = 'update';
+
+
 
     /**
      * {@inheritdoc}
@@ -33,10 +38,11 @@ class Slider extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'sub_title', 'text'], 'default', 'value' => null],
-            [['src'], 'required'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['title', 'sub_title', 'text'], 'default', 'value' => null ,'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['src'], 'required','on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['created_at', 'updated_at'], 'safe', 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
             [['src', 'title', 'sub_title', 'text'], 'string', 'max' => 255],
+            [['file'], 'file', 'skipOnEmpty' => true, 'extensions' => ['png', 'jpg', 'jpeg', 'gif','webm','webp'], 'maxFiles' => 20, 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
         ];
     }
 
