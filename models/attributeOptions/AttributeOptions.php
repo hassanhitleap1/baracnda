@@ -2,6 +2,7 @@
 
 namespace app\models\attributeOptions;
 
+use Attribute;
 use Yii;
 
 /**
@@ -37,7 +38,7 @@ class AttributeOptions extends \yii\db\ActiveRecord
             [['attribute_id'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['value'], 'string', 'max' => 255],
-            [['attribute_id'], 'exist', 'skipOnError' => true, 'targetClass' => Attribute::class, 'targetAttribute' => ['attribute_id' => 'id']],
+           // [['attribute_id'], 'exist', 'skipOnError' => true, 'targetClass' => Attribute::class, 'targetAttribute' => ['attribute_id' => 'id']],
         ];
     }
 

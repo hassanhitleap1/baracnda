@@ -96,6 +96,16 @@ use yii\bootstrap5\Html;
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a href="<?= Url::to(['status/index']) ?>"
+                        class="nav-link <?= Yii::$app->controller->id == 'status' ? 'active' : '' ?>">
+                        <i class="nav-icon far fa-calendar-alt"></i>
+                        <p>
+                        status
+                        </p>
+                    </a>
+                </li>
+
 
                 <li class="nav-item">
                     <a href="<?= Url::to(['categories/index']) ?>"

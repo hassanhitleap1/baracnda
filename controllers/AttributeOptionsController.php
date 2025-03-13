@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\attributeOptions\AttributeOptions;
 use app\models\attributeOptions\AttributeOptionsSearch;
+use Faker\Provider\Base;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -11,7 +12,7 @@ use yii\filters\VerbFilter;
 /**
  * AttributeOptionsController implements the CRUD actions for AttributeOptions model.
  */
-class AttributeOptionsController extends Controller
+class AttributeOptionsController extends BaseController
 {
     /**
      * @inheritDoc

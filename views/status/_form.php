@@ -1,5 +1,6 @@
 <?php
 
+use kartik\color\ColorInput;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -14,7 +15,10 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'color')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'color')->widget(ColorInput::classname(), [
+    'options' => ['placeholder' => 'Select color ...'],
+        ]);?>
 
 
 
