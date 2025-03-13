@@ -56,6 +56,30 @@ use yii\bootstrap5\Html;
                         </p>
                     </a>
                 </li>
+
+        
+                <li class="nav-item">
+                    <a href="<?= Url::to(['variants/index']) ?>"
+                        class="nav-link  <?= Yii::$app->controller->id == 'variants' ? 'active' : '' ?>">
+                        <i class="nav-icon far fa-calendar-alt"></i>
+                        <p>
+                        variants
+                        </p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="<?= Url::to(['variant-attributes/index']) ?>"
+                        class="nav-link  <?= Yii::$app->controller->id == 'variant-attributes' ? 'active' : '' ?>">
+                        <i class="nav-icon far fa-calendar-alt"></i>
+                        <p>
+                        variant attributes
+                        </p>
+                    </a>
+                </li>
+
+
+
                 <li class="nav-item">
                     <a href="<?= Url::to(['categories/index']) ?>"
                         class="nav-link <?= Yii::$app->controller->id == 'categories' ? 'active' : '' ?>">
@@ -135,6 +159,16 @@ use yii\bootstrap5\Html;
                         <p>
                             Slider
 
+                        </p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="<?= Url::to(['warehouses/index']) ?>"
+                        class="nav-link  <?= Yii::$app->controller->id == 'warehouses' ? 'active' : '' ?>">
+                        <i class="nav-icon far fa-calendar-alt"></i>
+                        <p>
+                        warehouses
                         </p>
                     </a>
                 </li>
