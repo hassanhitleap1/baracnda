@@ -8,7 +8,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 
 
-$this->title = $category->name_en ?? '';
+$this->title = $category->name?? '';
 $this->params['breadcrumbs'][] = $this->title;
 
 
@@ -51,7 +51,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         </div>
                         <div class="card-body text-center">
                             <h5 class="card-title">
-                                <?= $product->name_en ?>
+                                <?= $product->name ?>
                             </h5>
                             <p class="card-text mt-4">
                                 <button class="btn btn-dark readmore-btn">

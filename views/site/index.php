@@ -72,11 +72,11 @@ $this->title = 'neutron sys';
                 <div class="position-relative col-12 col-lg-3">
                     <div class="">
                         <a href="<?= Url::to(["site/category/$category->id"]) ?>" class="products-box">
-                            <img src="<?= Yii::getAlias('@web') . "/$category->image" ?>" alt="<?= $category->name_en ?>"
+                            <img src="<?= Yii::getAlias('@web') . "/$category->image" ?>" alt="<?= $category->name ?>"
                                 width="100%" height="100%"/>
                             <div class="read-more">
                                 <h5>
-                                    <?= $category->name_en ?>
+                                    <?= $category->name ?>
                                 </h5>
                                 <div>
                                     Read more

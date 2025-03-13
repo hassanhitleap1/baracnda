@@ -38,7 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         </div>
                         <div class="card-body text-center">
                             <h5 class="card-title">
-                                <?= $category->name_en ?>
+                                <?= $category->name ?>
                             </h5>
                             <p class="card-text mt-4">
                                 <button class="btn btn-dark readmore-btn">

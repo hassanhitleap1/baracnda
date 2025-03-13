@@ -19,14 +19,13 @@ $attributes=ArrayHelper::map(Attributes::find()->all(),'id','name');
 
     <?= $form->field($model, 'value')->textInput(['maxlength' => true]) ?>
 
-    <?=  $form->field($model, 'attribute_id')->widget(Select2::classname(), [
-                'data' => $attributes,
-                'options' => ['placeholder' => 'Select a attributes'],
-                'pluginOptions' => [
-                    'allowClear' => true
-                ],
-        ]);?>
-
+    <?=   $form->field($model, 'attribute_id')->widget(Select2::classname(), [
+    'data' => ArrayHelper::map(Attributes::find()->all(), 'id', 'name'),
+    'options' => ['placeholder' => 'Select a attribute'],
+    'pluginOptions' => [
+        'allowClear' => true
+    ],
+]); ?>
     <div class="form-group">
         <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
     </div>

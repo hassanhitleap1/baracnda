@@ -7,7 +7,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 
 
-$this->title = $category->name_en;
+$this->title = $category->name;
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
