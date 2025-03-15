@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\products\Products;
 use app\models\products\ProductsSearch;
+use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -131,4 +132,49 @@ class ProductsController extends BaseController
 
         throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
+
+
+
+
+    public function actionGenerateVariants()
+{
+    Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+    $attributes = Yii::$app->request->post('attributes', []);
+    
+    if (empty($attributes)) {
+        return ['status' => 'error', 'message' => 'Please select at least one attribute.'];
+    }
+
+    $variants = $this->generateCombinations($attributes);
+
+    return [
+        'status' => 'success',
+        'variants' => $variants
+    ];
+}
+
+private function generateCombinations($attributes)
+{
+    if (count($attributes) == 0) {
+        return [];
+    }
+
+    if (count($attributes) == 1) {
+        return array_map(fn($attr) => [$attr], $attributes[0]);
+    }
+
+    $combinations = [];
+    $firstSet = array_shift($attributes);
+    $remainingCombinations = $this->generateCombinations($attributes);
+
+    foreach ($firstSet as $firstValue) {
+        foreach ($remainingCombinations as $combination) {
+            $combinations[] = array_merge([$firstValue], $combination);
+        }
+    }
+
+    return $combinations;
+}
+
 }

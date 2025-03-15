@@ -28,6 +28,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     <title>
         <?= Html::encode($this->title) ?>
     </title>
+  
     <?php $this->head() ?>
 </head>
 

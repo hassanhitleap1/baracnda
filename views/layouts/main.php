@@ -19,9 +19,12 @@ $this->registerMetaTag(['name' => 'description', 'content' => $this->params['met
 $this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_keywords'] ?? '']);
 $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii::getAlias('@web/favicon.ico')]);
 
+
 $categories = Categories::find()->where(['category_id' => null])->limit(3)->all();
 $settings = Settings::find()->one();
 $about = Pages::find()->where(['key' => 'aboutus'])->one();
+
+
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -31,6 +34,8 @@ $about = Pages::find()->where(['key' => 'aboutus'])->one();
     <title>
         <?= Html::encode($this->title) ?>
     </title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <?php $this->head() ?>
 </head>
 

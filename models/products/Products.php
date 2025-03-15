@@ -33,6 +33,9 @@ class Products extends \yii\db\ActiveRecord
 
     const SCENARIO_CREATE = 'create';
     const SCENARIO_UPDATE = 'update';
+
+    const SIMPLE = 'simple';
+    const VARIANT = 'variant';
     
     /**
      * {@inheritdoc}
@@ -50,7 +53,7 @@ class Products extends \yii\db\ActiveRecord
         return [
             [['description', 'image_path'], 'default', 'value' => null],
             [['warehouse_id'], 'default', 'value' => 1],
-            [['creator_id', 'name', 'price', 'cost'], 'required'],
+            [['creator_id', 'name', 'price', 'cost','type'], 'required'],
             [['creator_id', 'category_id', 'warehouse_id'], 'integer'],
             [['description'], 'string'],
             [['price', 'cost'], 'number'],
@@ -59,6 +62,7 @@ class Products extends \yii\db\ActiveRecord
             [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::class, 'targetAttribute' => ['category_id' => 'id']],
             [['creator_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['creator_id' => 'id']],
             [['warehouse_id'], 'exist', 'skipOnError' => true, 'targetClass' => Warehouse::class, 'targetAttribute' => ['warehouse_id' => 'id']],
+            ['type', 'in', 'range' => array_keys(self::productType())],
         ];
     }
 
@@ -149,6 +153,16 @@ class Products extends \yii\db\ActiveRecord
     public static function find()
     {
         return new ProductsQuery(get_called_class());
+    }
+
+
+
+    public static function productType()
+    {
+        return [
+            self::SIMPLE => Yii::t('app', 'simple'),
+            self::VARIANT => Yii::t('app', 'variant'),
+        ];
     }
 
 }
