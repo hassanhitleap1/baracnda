@@ -2,6 +2,7 @@
 
 namespace app\models\attributes;
 
+use app\models\attributeOptions\AttributeOptions;
 use Yii;
 
 /**
@@ -196,5 +197,11 @@ class Attributes extends \yii\db\ActiveRecord
     public function setTypeToDropdown()
     {
         $this->type = self::TYPE_DROPDOWN;
+    }
+
+
+
+    public function getOptions(){
+        return $this->hasMany(AttributeOptions::className(), ['attribute_id' => 'id']);
     }
 }

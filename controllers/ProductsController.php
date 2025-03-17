@@ -177,4 +177,14 @@ private function generateCombinations($attributes)
     return $combinations;
 }
 
+
+
+public function actionModalContent()
+{
+    return $this->renderPartial('_modal-content');
+}
+
+
+
+
 }

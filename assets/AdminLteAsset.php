@@ -24,9 +24,10 @@ class AdminLteAsset extends AssetBundle
     public $js = [
         'plugins/jquery-ui/jquery-ui.min.js',
         'plugins/bootstrap/js/bootstrap.bundle.min.js',
-        'js/main.js',
+        // 'js/main.js',
+        // 'js/index.js',
         'plugins/chart.js/Chart.min.js',
-        'plugins/sparklines/sparkline.js',
+        // 'plugins/sparklines/sparkline.js',
         'plugins/jqvmap/jquery.vmap.min.js',
         'plugins/jqvmap/maps/jquery.vmap.usa.js',
         'plugins/jquery-knob/jquery.knob.min.js',
@@ -36,8 +37,8 @@ class AdminLteAsset extends AssetBundle
         'plugins/summernote/summernote-bs4.min.js',
         'plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js',
         'dist/js/adminlte.js',
-        //\ 'dist/js/demo.js',
-        'dist/js/pages/dashboard.js',
+        'dist/js/demo.js',
+        // 'dist/js/pages/dashboard.js',
 
     ];
     public $depends = [

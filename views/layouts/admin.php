@@ -23,7 +23,6 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>" class="h-100">
-
 <head>
     <title>
         <?= Html::encode($this->title) ?>
@@ -90,6 +89,9 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         </aside>
 
     </div>
+
+    <!-- تحميل jQuery UI -->
+<script src="<?= Yii::getAlias('@web') ?>/AdminLTE/js/main.js?<?=rand()?>" ></script>
     <?php $this->endBody() ?>
 </body>
 
