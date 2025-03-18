@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\attributeOptions\AttributeOptions;
 use app\models\products\Products;
 use app\models\products\ProductsSearch;
 use Yii;
@@ -136,53 +137,84 @@ class ProductsController extends BaseController
 
 
 
+    
     public function actionGenerateVariants()
 {
     Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
-    $attributes = Yii::$app->request->post('attributes', []);
-    
-    if (empty($attributes)) {
-        return ['status' => 'error', 'message' => 'Please select at least one attribute.'];
+    $attributes = Yii::$app->request->post('attributes');
+    $productId = Yii::$app->request->post('productId');
+
+    if (empty($attributes) || empty($productId)) {
+        return ['success' => false, 'message' => 'Invalid input data.'];
     }
 
-    $variants = $this->generateCombinations($attributes);
-
-    return [
-        'status' => 'success',
-        'variants' => $variants
-    ];
-}
-
-private function generateCombinations($attributes)
-{
-    if (count($attributes) == 0) {
-        return [];
+    $product = Products::findOne($productId);
+    if (!$product) {
+        return ['success' => false, 'message' => 'Product not found.'];
     }
 
-    if (count($attributes) == 1) {
-        return array_map(fn($attr) => [$attr], $attributes[0]);
-    }
+    // Generate variants based on selected attributes
+    $variants = $this->generateVariants($attributes);
 
-    $combinations = [];
-    $firstSet = array_shift($attributes);
-    $remainingCombinations = $this->generateCombinations($attributes);
+    foreach ($variants as $variantData) {
+        $variant = new Variants();
+        $variant->product_id = $productId;
+        $variant->name = implode(' ', $variantData);
+        $variant->price = $product->price; // Set price based on product or other logic
+        $variant->quantity = 1; // Default quantity
 
-    foreach ($firstSet as $firstValue) {
-        foreach ($remainingCombinations as $combination) {
-            $combinations[] = array_merge([$firstValue], $combination);
+        if (!$variant->save()) {
+            return ['success' => false, 'message' => 'Failed to save variant: ' . json_encode($variant->errors)];
+        }
+
+        // Save variant attributes
+        foreach ($variantData as $attributeId => $optionValue) {
+            $variantAttribute = new VariantAttributes();
+            $variantAttribute->variant_id = $variant->id;
+            $variantAttribute->attribute_id = $attributeId;
+            $variantAttribute->option_id = $this->findOptionId($attributeId, $optionValue);
+
+            if (!$variantAttribute->save()) {
+                return ['success' => false, 'message' => 'Failed to save variant attribute: ' . json_encode($variantAttribute->errors)];
+            }
         }
     }
 
-    return $combinations;
+    return ['success' => true];
 }
 
+            private function generateVariants($attributes)
+            {
+                // This function should generate all possible combinations of selected attribute options
+                // For simplicity, this example assumes a flat structure
+                $variants = [];
+                $this->combineAttributes($attributes, [], $variants);
+                return $variants;
+            }
 
+            private function combineAttributes($attributes, $current, &$variants)
+            {
+                if (empty($attributes)) {
+                    $variants[] = $current;
+                    return;
+                }
 
-public function actionModalContent()
-{
-    return $this->renderPartial('_modal-content');
-}
+                $attributeId = key($attributes);
+                $options = array_shift($attributes);
+
+                foreach ($options as $option) {
+                    $current[$attributeId] = $option;
+                    $this->combineAttributes($attributes, $current, $variants);
+                }
+            }
+
+            private function findOptionId($attributeId, $optionValue)
+            {
+                $option = AttributeOptions::findOne(['attribute_id' => $attributeId, 'value' => $optionValue]);
+                return $option ? $option->id : null;
+            }
+
 
 
 

@@ -58,7 +58,7 @@ if (!$model->isNewRecord) {
 
 <?= $this->render('@app/views/products/_modal-dialog') ?>
 
-<div class="products-form">
+<div class="products-form" id="products-form" data-product-id="<?= $model->id ?>">
 
     <?php $form = ActiveForm::begin(); ?>
     <div class="row">
@@ -110,7 +110,8 @@ if (!$model->isNewRecord) {
 
         </div>
     </div>
-
+        <div class="row" id="variants-generated">
+        </div>
     <div class="row">
         <div class="col-6">
            <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>

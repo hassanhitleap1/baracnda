@@ -10,91 +10,41 @@ function getSiteUrl() {
 }
 
 
+$(document).ready(function() {
+    $('#generateVariants').on('click', function() {
+        var selectedAttributes = [];
 
-$(document).ready(function () {
-    $('#openVariantModal').click(function () {
-        $('#variantModal').modal('show');
+        // Loop through all checked checkboxes
+        $('input[type="checkbox"]:checked').each(function() {
+            var attributeId = $(this).attr('data-attribute-id'); // Get the attribute ID
+            var attributeOptionId = $(this).attr('data-attribute-option-id'); // Get the attribute option ID
+            var price = $("#products-price").val()??0;
+            var optionValue = $(this).val(); // Get the option value
+            // Add the selected attribute to the array
+            if (attributeId && attributeOptionId && optionValue) {
+                selectedAttributes.push({
+                    attributeId: attributeId,
+                    attributeOptionId: attributeOptionId,
+                    value: optionValue
+                }); 
+
+                $('#variants-generated').html(`
+                    <div class="row">
+                        <input type="text" name="Product[variant_name][1]" value="${optionValue}">
+                        <input type="text" name="Product[variant_price][1]" value="${price}">
+                        <input type="text" name="Product[variant_quantity][1]" value="1">
+                        <input type="text" name="Product[variant_is_default][1]" value="${attributeId}">
+                        <input type="text" name="Product[variant_attribute_id][1]" value="${attributeId}">
+                        <input type="text" name="Product[variant_attribute_option_id][1]" value="${attributeOptionId}">
+                        
+                    </div>
+                `);
+            }
+        
+        });
+
+
+
+        
     });
-
-    $('#attributeSelect').change(function () {
-        let attributeId = $(this).val();
-        if (attributeId) {
-            $.ajax({
-                url: 'product/get-options',
-                type: 'GET',
-                data: { attribute_id: attributeId },
-                success: function (data) {
-                    let options = JSON.parse(data);
-                    $('#optionSelect').html('<option value="">اختر الخيار</option>');
-                    options.forEach(option => {
-                        $('#optionSelect').append(`<option value="${option.id}">${option.name}</option>`);
-                    });
-                }
-            });
-        }
-    });
-
-    $('#addVariant').click(function () {
-
-        let attributeName = $("#attributeSelect option:selected").text();
-        let attributeId = $("#attributeSelect").val();
-        let optionName = $("#optionSelect option:selected").text();
-        let optionId = $("#optionSelect").val();
-
-        if (!attributeId || !optionId) {
-            alert("يرجى اختيار الخاصية والخيار");
-            return;
-        }
-
-        let variantHtml = `
-            <div class="variant-item">
-                <input type="hidden" name="variants[${attributeId}][attribute]" value="${attributeId}">
-                <input type="hidden" name="variants[${attributeId}][option]" value="${optionId}">
-                
-                <label>المتغير:</label>
-                <input type="text" name="variants[${attributeId}][name]" class="form-control" value="${attributeName} - ${optionName}">
-
-                <label>السعر:</label>
-                <input type="number" name="variants[${attributeId}][price]" class="form-control">
-                
-                <button type="button" class="btn btn-danger remove-variant">حذف</button>
-            </div>
-        `;
-
-        $('#variantsContainer').append(variantHtml);
-        $('#variantModal').modal('hide');
-    });
-   
 });
-
-$(document).on('click', '#addVariant', function () {
-    let attributeId = $("#attributeSelect").val();
-    let optionId = $("#optionSelect").val();
-
-    if (!attributeId || !optionId) {
-        alert("يرجى اختيار الخاصية والخيار");
-        return;
-    }
-
-    let attributeName = $("#attributeSelect option:selected").text();
-    let optionName = $("#optionSelect option:selected").text();
-
-    let variantHtml = `
-        <div class="variant-item">
-            <input type="hidden" name="variants[${attributeId}][attribute]" value="${attributeId}">
-            <input type="hidden" name="variants[${attributeId}][option]" value="${optionId}">
-            
-            <label>المتغير:</label>
-            <input type="text" name="variants[${attributeId}][name]" class="form-control" value="${attributeName} - ${optionName}">
-
-            <label>السعر:</label>
-            <input type="number" name="variants[${attributeId}][price]" class="form-control">
-            
-            <button type="button" class="btn btn-danger remove-variant">حذف</button>
-        </div>
-    `;
-
-    $('#variantsContainer').append(variantHtml);
-    $('#variantModal').modal('hide');
-});
-
