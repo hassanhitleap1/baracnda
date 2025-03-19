@@ -106,7 +106,7 @@ if (!$model->isNewRecord) {
 
         <div class="col-3">
 
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">Select Attributes & Generate Variants</button>
+            <button type="button" class="btn btn-primary" id="btn-modal-open" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">Select Attributes & Generate Variants</button>
 
         </div>
     </div>

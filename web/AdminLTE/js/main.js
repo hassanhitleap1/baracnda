@@ -118,3 +118,13 @@ function generateCombinations(selectedAttributes) {
     combine([], 0); // Start combining from the first attribute group
     return combinations;
 }
+
+
+$('#products-type').on('click', function () {
+    if($(this).val()==='variant'){
+       $('#btn-modal-open').css('display', 'block');
+    }else{
+        $('#btn-modal-open').css('display', 'none');
+    }
+
+})

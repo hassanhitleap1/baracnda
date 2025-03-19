@@ -19,7 +19,7 @@ class VariantsSearch extends Variants
         return [
             [['id', 'product_id', 'quantity'], 'integer'],
             [['name', 'created_at', 'updated_at'], 'safe'],
-            [['price'], 'number'],
+            [['price','cost'], 'number'],
         ];
     }
 
@@ -63,6 +63,7 @@ class VariantsSearch extends Variants
             'id' => $this->id,
             'product_id' => $this->product_id,
             'price' => $this->price,
+            'cost'=>$this->cost,
             'quantity' => $this->quantity,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

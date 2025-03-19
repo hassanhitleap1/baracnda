@@ -7,9 +7,7 @@ use app\assets\AdminLteAsset;
 use app\widgets\Alert;
 use yii\bootstrap5\Breadcrumbs;
 use yii\bootstrap5\Html;
-
-
-
+use yii\helpers\Url;
 
 AdminLteAsset::register($this);
 
@@ -39,7 +37,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 <!-- تحميل CSS الخاص بـ jQuery UI -->
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
-
+<link href="<?= Url::to('@web/AdminLTE/css/main.css') ?>" rel="stylesheet">
 
 
     <?php $this->head() ?>
