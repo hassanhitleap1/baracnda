@@ -1,6 +1,5 @@
 let SITE_URL = getSiteUrl();
 
-
 function getSiteUrl() {
     let site_url = window.location.host;
     if (site_url == 'localhost:8080') {
@@ -15,61 +14,66 @@ $(document).ready(function () {
         var selectedAttributes = {};
         var price = $("#products-price").val() ?? 0;
         var quantity = $("#products-quantity").val() ?? 0;
+
         // Loop through all checked checkboxes
         $('input[type="checkbox"].attribute-option:checked').each(function () {
             var attributeId = $(this).attr('data-attribute-id'); // Get the attribute ID
             var attributeOptionId = $(this).attr('data-attribute-option-id'); // Get the attribute option ID
-
             var optionValue = $(this).val(); // Get the option value
-            // Add the selected attribute to the array
+
+            // Group attributes by their ID
             if (!selectedAttributes[attributeId]) {
                 selectedAttributes[attributeId] = [];
-                if (attributeOptionId && optionValue) {
-                    selectedAttributes[attributeId].push({
-                        attributeOptionId: attributeOptionId,
-                        value: optionValue
-                    });
-                }
-            } else {
-                if (attributeOptionId && optionValue) {
-                    selectedAttributes[attributeId].push({
-                        attributeOptionId: attributeOptionId,
-                        value: optionValue
-                    });
-                }
             }
-
+            selectedAttributes[attributeId].push({
+                attributeOptionId: attributeOptionId,
+                value: optionValue
+            });
         });
 
+        // Generate all combinations of selected attributes
         var variants = generateCombinations(selectedAttributes);
+
+        // Clear previous variants
         $('#variants-generated').html('');
+
+        // Create input fields for each variant
         variants.forEach((variant, index) => {
             let variantName = variant.map(attr => attr.value).join(' '); // Combine attribute values for the variant name
             let variantId = index + 1; // Unique ID for each variant
+
             $('#variants-generated').append(`
-                <div class="row">
+                <div class="row mb-3">
                     <div class="col-3">
-                      <input type="radio" class="form-control" name="Product[variant_is_default]" value="${index == 1 ? 1 : 0}">
-                    <div class="form-group field-products-variant_name required">
-                    <label class="control-label" for="products-variant_name">variant name</label>
-                    <input type="number"  class="form-control" name="Product[variant_name][${variantId}]" value="${variantName}" aria-required="true" aria-invalid="true" />
-                    <div class="help-block"></div>
+                        <div class="form-group">
+                            <label class="control-label">Variant Name</label>
+                            <input type="text" class="form-control" name="Product[variant_name][${variantId}]" value="${variantName}" aria-required="true">
+                            <div class="help-block"></div>
+                        </div>
                     </div>
-                     </div>
-                       <div class="col-3">
-                    <div class="form-group field-products-variant_price required">
-                        <label class="control-label" for="products-variant_price">variant price</label>
-                        <input type="number"  class="form-control" name="Product[variant_price][${variantId}]" value="${price}" aria-required="true" aria-invalid="true" />
-                        <div class="help-block"></div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <label class="control-label">Variant Price</label>
+                            <input type="number" class="form-control" name="Product[variant_price][${variantId}]" value="${price}" aria-required="true">
+                            <div class="help-block"></div>
+                        </div>
                     </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <label class="control-label">Variant Quantity</label>
+                            <input type="number" class="form-control" name="Product[variant_quantity][${variantId}]" value="${quantity}" aria-required="true">
+                            <div class="help-block"></div>
+                        </div>
                     </div>
-                     <div class="col-3">
-                    <div class="form-group field-products-variant_quantity required">
-                        <label class="control-label" for="products-variant_price">variant quantity</label>
-                        <input type="number"  class="form-control" name="Product[variant_quantity][${variantId}]" value="${quantity}" aria-required="true" aria-invalid="true" />
-                        <div class="help-block"></div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <label class="control-label">Set as Default</label>
+                            <div class="form-check">
+                                <input type="radio" class="form-check-input" name="Product[variant_is_default]" value="${variantId}">
+                                <label class="form-check-label">Default</label>
+                            </div>
+                        </div>
                     </div>
-                     </div>
                     ${variant.map(attr => `
                         <input type="hidden" name="Product[variant_attribute_id][${variantId}][]" value="${attr.attributeId}">
                         <input type="hidden" name="Product[variant_attribute_option_id][${variantId}][]" value="${attr.attributeOptionId}">
@@ -77,13 +81,15 @@ $(document).ready(function () {
                 </div>
             `);
         });
+
+        // Close the modal
         $('#exampleModal').modal('hide');
-        $('#exampleModal').hide();
-        $('#exampleModal').fadeOut();
-        $('#exampleModal').slideUp();
+        $('.btn-secondary[data-bs-dismiss="modal"]').trigger('click');
+
+   
+
     });
 });
-
 
 function generateCombinations(selectedAttributes) {
     var attributeGroups = Object.values(selectedAttributes); // Convert object to array of attribute groups
