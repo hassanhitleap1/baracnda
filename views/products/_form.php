@@ -126,20 +126,37 @@ if (!$model->isNewRecord) {
 
         </div>
     </div>
-    <div class="row" id="variants-generated">
-    </div>
-    <div class="row">
-        
-        <div class="col-6">
-            <?= $form->field($model, 'images[]')->widget(FileInput::classname(), [
-                'options' => ['accept' => 'image/*', 'multiple' => true],
-            ]); ?>
+    <div class="card-body">
+        <div class="card-header">
+            <?=Yii::t('app', 'Product_Variants')?> 
+        </div>
+        <div class="card-body">
+            <div class="row" id="variants-generated">
+            </div>
         </div>
     </div>
 
-    <div class="form-group">
-        <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
+
+    <div class="card-body">
+        <div class="card-header">
+            <?=Yii::t('app', 'Product_Variants')?> 
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12">
+                    <?= $form->field($model, 'images[]')->widget(FileInput::classname(), [
+                        'options' => ['accept' => 'image/*', 'multiple' => true],
+                    ]); ?>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
 
     <?php ActiveForm::end(); ?>
 
