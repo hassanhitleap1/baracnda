@@ -1,22 +1,30 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css">
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
+
+<!-- include summernote css/js-->
+<link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.css" rel="stylesheet">
+<script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.js" defer></script>
+
 <?php
 
 use app\models\categories\Categories;
-use app\models\users\Users;
+
 use app\models\warehouses\Warehouses;
+use kartik\editors\Summernote;
 use kartik\file\FileInput;
 use kartik\select2\Select2;
-use yii\bootstrap5\Modal;
+
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
-use yii\helpers\Url;
-use yii\widgets\ActiveForm;
-use yii\widgets\Pjax;
 
-$categories=ArrayHelper::map(Categories::find()->all(),'id','name');
-$users=ArrayHelper::map(Users::find()->all(),'id','name');
-$warehouses=ArrayHelper::map(Warehouses::find()->all(),'id','name');
+use kartik\form\ActiveForm;
+
+$categories = ArrayHelper::map(Categories::find()->all(), 'id', 'name');
+
+$warehouses = ArrayHelper::map(Warehouses::find()->all(), 'id', 'name');
 $dataImages = [];
 
 
@@ -61,47 +69,55 @@ if (!$model->isNewRecord) {
 <div class="products-form" id="products-form" data-product-id="<?= $model->id ?>">
 
     <?php $form = ActiveForm::begin(); ?>
-    <div class="row">
-        <div class="col-3">
-        <?=  $form->field($model, 'creator_id')->widget(Select2::classname(), [
-                'data' => $users,
-                'options' => ['placeholder' => 'Select a creator'],
-                'pluginOptions' => [
-                    'allowClear' => true
-                ],
-        ]);?>
+
+
+    <div class="card">
+        <div class="card-header">
+            <?=Yii::t('app', 'Product_Information')?> 
         </div>
-        <div class="col-3">
-            <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-        </div>
-        <div class="col-3">
-        <?=  $form->field($model, 'category_id')->widget(Select2::classname(), [
-                'data' => $categories,
-                'options' => ['placeholder' => 'Select a categories'],
-                'pluginOptions' => [
-                    'allowClear' => true
-                ],
-        ]);?>
-        </div>
-        <div class="col-3">
-        <?=  $form->field($model, 'warehouse_id')->widget(Select2::classname(), [
-                'data' => $warehouses,
-                'options' => ['placeholder' => 'Select a warehouses'],
-                'pluginOptions' => [
-                    'allowClear' => true
-                ],
-        ]);?>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-3">
+                    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+                </div>
+                <div class="col-3">
+                    <?= $form->field($model, 'category_id')->widget(Select2::classname(), [
+                        'data' => $categories,
+                        'options' => ['placeholder' => 'Select a categories'],
+                        'pluginOptions' => [
+                            'allowClear' => true
+                        ],
+                    ]); ?>
+                </div>
+                <div class="col-3">
+                    <?= $form->field($model, 'warehouse_id')->widget(Select2::classname(), [
+                        'data' => $warehouses,
+                        'options' => ['placeholder' => 'Select a warehouses'],
+                        'pluginOptions' => [
+                            'allowClear' => true
+                        ],
+                    ]); ?>
+                </div>
+                <div class="col-3">
+                <?= $form->field($model, 'cost')->textInput(['maxlength' => true]) ?>
+            </div>
+            <div class="col-3">
+                <?= $form->field($model, 'price')->textInput(['maxlength' => true]) ?>
+            </div>
+            </div>
+           
+            <div class="row">
+                <div class="col-12">
+                    <?= $form->field($model, 'description')->textarea(['id' => 'summernote']) ?>
+                </div>
+            </div>
         </div>
     </div>
+   
     <div class="row">
+     
         <div class="col-3">
-        <?= $form->field($model, 'cost')->textInput(['maxlength' => true]) ?>
-        </div>
-        <div class="col-3">
-        <?= $form->field($model, 'price')->textInput(['maxlength' => true]) ?>
-        </div>
-        <div class="col-3">
-        <?= $form->field($model, 'type')->dropDownList([ 'simple' => 'Simple', 'variant' => 'variant']) ?>
+            <?= $form->field($model, 'type')->dropDownList(['simple' => 'Simple', 'variant' => 'variant']) ?>
         </div>
 
         <div class="col-3">
@@ -110,19 +126,17 @@ if (!$model->isNewRecord) {
 
         </div>
     </div>
-        <div class="row" id="variants-generated">
-        </div>
+    <div class="row" id="variants-generated">
+    </div>
     <div class="row">
+        
         <div class="col-6">
-           <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
-        </div>
-        <div class="col-6">
-        <?= $form->field($model, 'images[]')->widget(FileInput::classname(), [
+            <?= $form->field($model, 'images[]')->widget(FileInput::classname(), [
                 'options' => ['accept' => 'image/*', 'multiple' => true],
             ]); ?>
         </div>
     </div>
-  
+
     <div class="form-group">
         <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
     </div>
@@ -132,3 +146,55 @@ if (!$model->isNewRecord) {
 </div>
 
 
+<script>
+
+    $(document).ready(function() {
+        $('#summernote').summernote({
+            lang: 'fr-FR', // <= nobody is perfect :)
+            height: 300,
+            toolbar : [
+                ['style',['bold','italic','underline','clear']],
+                ['font',['fontsize']],
+                ['color',['color']],
+                ['para',['ul','ol','paragraph']],
+                ['link',['link']],
+                ['picture',['picture']]
+            ],
+            callbacks : {
+                onImageUpload: function(image) {
+                    uploadImage(image[0]);
+                }
+            }
+        });
+    });
+
+
+
+
+    function uploadImage(image) {
+        var data = new FormData();
+        data.append("image",image);
+        $.ajax ({
+            data: data,
+            type: "POST",
+            url: `${SITE_URL}/index.php?r=medialibrary/upload`,
+            // returns a chain containing the path
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function(url) {
+
+                var image = document.location.origin + url;
+                setTimeout(function(){
+                    $('#summernote').summernote("insertImage", image);
+                }, 500);
+
+            },
+            error: function(data) {
+                console.log(data);
+            }
+        });
+    }
+
+
+</script>
