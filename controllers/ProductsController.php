@@ -5,10 +5,14 @@ namespace app\controllers;
 use app\models\attributeOptions\AttributeOptions;
 use app\models\products\Products;
 use app\models\products\ProductsSearch;
+use app\models\variantAttributes\VariantAttributes;
+use app\models\variants\Variants;
 use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\FileHelper;
+use yii\web\UploadedFile;
 
 /**
  * ProductsController implements the CRUD actions for Products model.
@@ -71,10 +75,44 @@ class ProductsController extends BaseController
     {
         $model = new Products();
 
+        
+        $model->scenario = Products::SCENARIO_CREATE;
+        $newId = Products::find()->max('id') + 1;
+
+
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+            if ($model->load($this->request->post()) && $model->validate()) {
+                $file = UploadedFile::getInstance($model, 'file');
+
+                if (!empty($file)) {
+                    $folder_path = "images/products/$newId";
+                    FileHelper::createDirectory(
+                        "$folder_path",
+                        $mode = 0775,
+                        $recursive = true
+                    );
+
+                    $file_path = "$folder_path/" . "covor." . $file->extension;
+                    $file->saveAs($file_path);
+                    $model->image = $file_path;
+                }
+
+                if ($model->save()) {
+                    // Handle variants and attributes if any
+                    $this->saveVariantsAndAttributes($model);
+
+                    $transaction->commit();
+                    return $this->redirect(['view', 'id' => $model->id]);
+                }
+                
                 return $this->redirect(['view', 'id' => $model->id]);
             }
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            Yii::$app->session->setFlash('error', $e->getMessage());
+        }
         } else {
             $model->loadDefaultValues();
         }
@@ -84,6 +122,35 @@ class ProductsController extends BaseController
         ]);
     }
 
+
+
+
+    protected function saveVariantsAndAttributes($model)
+{
+    // Assuming you have a form that submits variants and attributes data
+    $variantsData = Yii::$app->request->post('Variants', []);
+    $attributesData = Yii::$app->request->post('VariantAttributes', []);
+
+    // Save variants
+    foreach ($variantsData as $variantData) {
+        $variant = new Variants();
+        $variant->load($variantData, '');
+        $variant->product_id = $model->id;
+        if (!$variant->save()) {
+            throw new \Exception('Failed to save variant: ' . implode(', ', $variant->getFirstErrors()));
+        }
+    
+        // Save variant attributes
+        foreach ($attributesData as $attributeData) {
+            $variantAttribute = new VariantAttributes();
+            $variantAttribute->load($attributeData, '');
+            $variantAttribute->variant_id = $variant->id;
+            if (!$variantAttribute->save()) {
+                throw new \Exception('Failed to save variant attribute: ' . implode(', ', $variantAttribute->getFirstErrors()));
+            }
+        }
+    }
+}
     /**
      * Updates an existing Products model.
      * If update is successful, the browser will be redirected to the 'view' page.
@@ -95,7 +162,32 @@ class ProductsController extends BaseController
     {
         $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+        $model->scenario = Products::SCENARIO_UPDATE;
+        $newId = $model->id;
+
+
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->validate()) {
+
+            $file = UploadedFile::getInstance($model, 'file');
+
+            if (!empty($file)) {
+                $folder_path = "images/products/$newId";
+                FileHelper::createDirectory(
+                    "$folder_path",
+                    $mode = 0775,
+                    $recursive = true
+                );
+
+                $file_path = "$folder_path/" . "covor." . $file->extension;
+                $file->saveAs($file_path);
+                $model->image = $file_path;
+
+
+            }
+
+            $model->save();
+
+
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -134,86 +226,6 @@ class ProductsController extends BaseController
         throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
 
-
-
-
-    
-    public function actionGenerateVariants()
-{
-    Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-    $attributes = Yii::$app->request->post('attributes');
-    $productId = Yii::$app->request->post('productId');
-
-    if (empty($attributes) || empty($productId)) {
-        return ['success' => false, 'message' => 'Invalid input data.'];
-    }
-
-    $product = Products::findOne($productId);
-    if (!$product) {
-        return ['success' => false, 'message' => 'Product not found.'];
-    }
-
-    // Generate variants based on selected attributes
-    $variants = $this->generateVariants($attributes);
-
-    foreach ($variants as $variantData) {
-        $variant = new Variants();
-        $variant->product_id = $productId;
-        $variant->name = implode(' ', $variantData);
-        $variant->price = $product->price; // Set price based on product or other logic
-        $variant->quantity = 1; // Default quantity
-
-        if (!$variant->save()) {
-            return ['success' => false, 'message' => 'Failed to save variant: ' . json_encode($variant->errors)];
-        }
-
-        // Save variant attributes
-        foreach ($variantData as $attributeId => $optionValue) {
-            $variantAttribute = new VariantAttributes();
-            $variantAttribute->variant_id = $variant->id;
-            $variantAttribute->attribute_id = $attributeId;
-            $variantAttribute->option_id = $this->findOptionId($attributeId, $optionValue);
-
-            if (!$variantAttribute->save()) {
-                return ['success' => false, 'message' => 'Failed to save variant attribute: ' . json_encode($variantAttribute->errors)];
-            }
-        }
-    }
-
-    return ['success' => true];
-}
-
-            private function generateVariants($attributes)
-            {
-                // This function should generate all possible combinations of selected attribute options
-                // For simplicity, this example assumes a flat structure
-                $variants = [];
-                $this->combineAttributes($attributes, [], $variants);
-                return $variants;
-            }
-
-            private function combineAttributes($attributes, $current, &$variants)
-            {
-                if (empty($attributes)) {
-                    $variants[] = $current;
-                    return;
-                }
-
-                $attributeId = key($attributes);
-                $options = array_shift($attributes);
-
-                foreach ($options as $option) {
-                    $current[$attributeId] = $option;
-                    $this->combineAttributes($attributes, $current, $variants);
-                }
-            }
-
-            private function findOptionId($attributeId, $optionValue)
-            {
-                $option = AttributeOptions::findOne(['attribute_id' => $attributeId, 'value' => $optionValue]);
-                return $option ? $option->id : null;
-            }
 
 
 

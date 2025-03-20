@@ -2,6 +2,12 @@
 
 namespace app\models\products;
 
+use app\models\categories\Categories;
+use app\models\images\Images;
+use app\models\orderItems\OrderItems;
+use app\models\users\Users;
+use app\models\variants\Variants;
+use app\models\warehouses\Warehouses;
 use Yii;
 
 /**
@@ -51,18 +57,19 @@ class Products extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['description', 'image_path'], 'default', 'value' => null],
-            [['warehouse_id'], 'default', 'value' => 1],
-            [['creator_id', 'name', 'price', 'cost','type'], 'required'],
-            [['creator_id', 'category_id', 'warehouse_id'], 'integer'],
-            [['description'], 'string'],
-            [['price', 'cost'], 'number'],
+            [['description', 'image_path'], 'default', 'value' => null, 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['warehouse_id','creator_id'], 'default', 'value' => 1, 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['creator_id', 'name', 'price', 'cost','type'], 'required', 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['creator_id', 'category_id', 'warehouse_id'], 'integer', 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['description'], 'string', 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['price', 'cost'], 'number', 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
             [['created_at', 'updated_at'], 'safe'],
-            [['name', 'image_path'], 'string', 'max' => 255],
-            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::class, 'targetAttribute' => ['category_id' => 'id']],
-            [['creator_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['creator_id' => 'id']],
-            [['warehouse_id'], 'exist', 'skipOnError' => true, 'targetClass' => Warehouse::class, 'targetAttribute' => ['warehouse_id' => 'id']],
+            [['name', 'image_path'], 'string', 'max' => 255, 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Categories::class, 'targetAttribute' => ['category_id' => 'id'], 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['creator_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['creator_id' => 'id'], 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['warehouse_id'], 'exist', 'skipOnError' => true, 'targetClass' => Warehouses::class, 'targetAttribute' => ['warehouse_id' => 'id'], 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
             ['type', 'in', 'range' => array_keys(self::productType())],
+            [['file'], 'image', 'skipOnEmpty' => true, 'extensions' => 'png,jpg,jpeg,gif,webp,webm', 'maxFiles' => 20, 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
         ];
     }
 
@@ -73,7 +80,7 @@ class Products extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'creator_id' => Yii::t('app', 'Creator ID'),
+            // 'creator_id' => Yii::t('app', 'Creator ID'),
             'name' => Yii::t('app', 'Name'),
             'description' => Yii::t('app', 'Description'),
             'price' => Yii::t('app', 'Price'),
@@ -93,7 +100,7 @@ class Products extends \yii\db\ActiveRecord
      */
     public function getCategories()
     {
-        return $this->hasOne(Category::class, ['id' => 'category_id']);
+        return $this->hasOne(Categories::class, ['id' => 'category_id']);
     }
 
     /**
@@ -103,7 +110,7 @@ class Products extends \yii\db\ActiveRecord
      */
     public function getImages()
     {
-        return $this->hasMany(Image::class, ['product_id' => 'id']);
+        return $this->hasMany(Images::class, ['product_id' => 'id']);
     }
 
     /**
@@ -113,7 +120,7 @@ class Products extends \yii\db\ActiveRecord
      */
     public function getOrderItems()
     {
-        return $this->hasMany(OrderItem::class, ['product_id' => 'id']);
+        return $this->hasMany(OrderItems::class, ['product_id' => 'id']);
     }
 
     /**
@@ -123,7 +130,7 @@ class Products extends \yii\db\ActiveRecord
      */
     public function getUsers()
     {
-        return $this->hasOne(User::class, ['id' => 'creator_id']);
+        return $this->hasOne(Users::class, ['id' => 'creator_id']);
     }
 
     /**
@@ -133,7 +140,7 @@ class Products extends \yii\db\ActiveRecord
      */
     public function getVariants()
     {
-        return $this->hasMany(Variant::class, ['product_id' => 'id']);
+        return $this->hasMany(Variants::class, ['product_id' => 'id']);
     }
 
     /**
@@ -143,7 +150,7 @@ class Products extends \yii\db\ActiveRecord
      */
     public function getWarehouses()
     {
-        return $this->hasOne(Warehouse::class, ['id' => 'warehouse_id']);
+        return $this->hasOne(Warehouses::class, ['id' => 'warehouse_id']);
     }
 
     /**

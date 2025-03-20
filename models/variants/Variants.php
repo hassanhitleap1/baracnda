@@ -2,6 +2,10 @@
 
 namespace app\models\variants;
 
+use app\models\images\Images;
+use app\models\orderItems\OrderItems;
+use app\models\products\Products;
+use app\models\variantAttributes\VariantAttributes;
 use Yii;
 
 /**
@@ -44,7 +48,7 @@ class Variants extends \yii\db\ActiveRecord
             [['price','cost'], 'number'],
             [['created_at', 'updated_at'], 'safe'],
             [['name'], 'string', 'max' => 255],
-            [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::class, 'targetAttribute' => ['product_id' => 'id']],
+            [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Products::class, 'targetAttribute' => ['product_id' => 'id']],
         ];
     }
 
@@ -72,7 +76,7 @@ class Variants extends \yii\db\ActiveRecord
      */
     public function getImages()
     {
-        return $this->hasMany(Image::class, ['variant_id' => 'id']);
+        return $this->hasMany(Images::class, ['variant_id' => 'id']);
     }
 
     /**
@@ -82,7 +86,7 @@ class Variants extends \yii\db\ActiveRecord
      */
     public function getOrderItems()
     {
-        return $this->hasMany(OrderItem::class, ['variant_id' => 'id']);
+        return $this->hasMany(OrderItems::class, ['variant_id' => 'id']);
     }
 
     /**
@@ -92,7 +96,7 @@ class Variants extends \yii\db\ActiveRecord
      */
     public function getProducts()
     {
-        return $this->hasOne(Product::class, ['id' => 'product_id']);
+        return $this->hasOne(Products::class, ['id' => 'product_id']);
     }
 
     /**
@@ -102,7 +106,7 @@ class Variants extends \yii\db\ActiveRecord
      */
     public function getVariantAttributes()
     {
-        return $this->hasMany(VariantAttribute::class, ['variant_id' => 'id']);
+        return $this->hasMany(VariantAttributes::class, ['variant_id' => 'id']);
     }
 
     /**

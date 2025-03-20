@@ -74,7 +74,7 @@ class Attributes extends \yii\db\ActiveRecord
      */
     public function getAttributeOptions()
     {
-        return $this->hasMany(AttributeOption::class, ['attribute_id' => 'id']);
+        return $this->hasMany(AttributeOptions::class, ['attribute_id' => 'id']);
     }
 
     /**
@@ -84,7 +84,7 @@ class Attributes extends \yii\db\ActiveRecord
      */
     public function getVariantAttributes()
     {
-        return $this->hasMany(VariantAttribute::class, ['attribute_id' => 'id']);
+        return $this->hasMany(VariantAttributes::class, ['attribute_id' => 'id']);
     }
 
     /**

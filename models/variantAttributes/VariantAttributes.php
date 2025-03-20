@@ -2,6 +2,8 @@
 
 namespace app\models\variantAttributes;
 
+use app\models\attributes\Attributes;
+use app\models\variants\Variants;
 use Yii;
 
 /**
@@ -40,8 +42,8 @@ class VariantAttributes extends \yii\db\ActiveRecord
             [['is_default', 'variant_id', 'attribute_id', 'option_id'], 'integer'],
             [['variant_id', 'attribute_id', 'option_id'], 'required'],
             [['created_at', 'updated_at'], 'safe'],
-            [['attribute_id'], 'exist', 'skipOnError' => true, 'targetClass' => Attribute::class, 'targetAttribute' => ['attribute_id' => 'id']],
-            [['variant_id'], 'exist', 'skipOnError' => true, 'targetClass' => Variant::class, 'targetAttribute' => ['variant_id' => 'id']],
+            [['attribute_id'], 'exist', 'skipOnError' => true, 'targetClass' => Attributes::class, 'targetAttribute' => ['attribute_id' => 'id']],
+            [['variant_id'], 'exist', 'skipOnError' => true, 'targetClass' => Variants::class, 'targetAttribute' => ['variant_id' => 'id']],
         ];
     }
 
@@ -68,7 +70,7 @@ class VariantAttributes extends \yii\db\ActiveRecord
      */
     public function getAttribute0()
     {
-        return $this->hasOne(Attribute::class, ['id' => 'attribute_id']);
+        return $this->hasOne(Attributes::class, ['id' => 'attribute_id']);
     }
 
     /**
@@ -78,7 +80,7 @@ class VariantAttributes extends \yii\db\ActiveRecord
      */
     public function getVariant()
     {
-        return $this->hasOne(Variant::class, ['id' => 'variant_id']);
+        return $this->hasOne(Variants::class, ['id' => 'variant_id']);
     }
 
     /**
