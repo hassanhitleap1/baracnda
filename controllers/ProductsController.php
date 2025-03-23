@@ -75,19 +75,23 @@ class ProductsController extends BaseController
     public function actionCreate()
     {
         $model = new Products();
-
-
         $model->scenario = Products::SCENARIO_CREATE;
         $newId = Products::find()->max('id') + 1;
 
-
         if ($this->request->isPost) {
             $transaction = Yii::$app->db->beginTransaction();
+
+
             try {
+
+
                 if ($model->load($this->request->post()) && $model->validate()) {
+
+
                     $files = UploadedFile::getInstance($model, 'files');
 
                     if (!empty($files)) {
+
                         $folder_path = "images/products/$newId";
                         FileHelper::createDirectory(
                             "$folder_path",
@@ -97,10 +101,10 @@ class ProductsController extends BaseController
 
                         foreach ($files as $key => $file) {
                             $modelImagesProduct = new  Images();
-                            $file_path = "$folder_path/images/$key" . "." . $image_product->extension;
+                            $file_path = "$folder_path/images/$key" . "." . $file->extension;
                             $modelImagesProduct->product_id = $newId;
                             $modelImagesProduct->path = $file_path;
-                            $image_product->saveAs($file_path);
+                            $file->saveAs($file_path);
 
                             if ($key == 0) {
                                 $model->image = $file_path;
@@ -182,27 +186,55 @@ class ProductsController extends BaseController
         $newId = $model->id;
 
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->validate()) {
+        if ($this->request->isPost) {
+            $transaction = Yii::$app->db->beginTransaction();
 
-            $file = UploadedFile::getInstance($model, 'file');
 
-            if (!empty($file)) {
-                $folder_path = "images/products/$newId";
-                FileHelper::createDirectory(
-                    "$folder_path",
-                    $mode = 0775,
-                    $recursive = true
-                );
+            try {
 
-                $file_path = "$folder_path/" . "covor." . $file->extension;
-                $file->saveAs($file_path);
-                $model->image = $file_path;
+
+                if ($model->load($this->request->post()) && $model->validate()) {
+
+
+                    $files = UploadedFile::getInstance($model, 'files');
+
+                    if (!empty($files)) {
+
+                        $folder_path = "images/products/$newId";
+                        FileHelper::createDirectory(
+                            "$folder_path",
+                            $mode = 0775,
+                            $recursive = true
+                        );
+
+                        foreach ($files as $key => $file) {
+                            $modelImagesProduct = new  Images();
+                            $file_path = "$folder_path/images/$key" . "." . $file->extension;
+                            $modelImagesProduct->product_id = $newId;
+                            $modelImagesProduct->path = $file_path;
+                            $file->saveAs($file_path);
+
+                            if ($key == 0) {
+                                $model->image = $file_path;
+                            }
+
+                            $modelImagesProduct->save(false);
+                        }
+                    }
+
+                    if ($model->save()) {
+                        // Handle variants and attributes if any
+                        $this->saveVariantsAndAttributes($model);
+
+                        $transaction->commit();
+                        return $this->redirect(['view', 'id' => $model->id]);
+                    }
+                }
+                
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                Yii::$app->session->setFlash('error', $e->getMessage());
             }
-
-            $model->save();
-
-
-            return $this->redirect(['view', 'id' => $model->id]);
         }
 
         return $this->render('update', [
