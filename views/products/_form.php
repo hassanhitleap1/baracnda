@@ -59,6 +59,8 @@ if (!$model->isNewRecord) {
 /** @var app\models\products\Products $model */
 /** @var yii\widgets\ActiveForm $form */
 ?>
+
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
@@ -73,7 +75,7 @@ if (!$model->isNewRecord) {
 
     <div class="card">
         <div class="card-header">
-            <?=Yii::t('app', 'Product_Information')?> 
+            <?= Yii::t('app', 'Product_Information') ?>
         </div>
         <div class="card-body">
             <div class="row">
@@ -99,13 +101,13 @@ if (!$model->isNewRecord) {
                     ]); ?>
                 </div>
                 <div class="col-3">
-                <?= $form->field($model, 'cost')->textInput(['maxlength' => true]) ?>
+                    <?= $form->field($model, 'cost')->textInput(['maxlength' => true]) ?>
+                </div>
+                <div class="col-3">
+                    <?= $form->field($model, 'price')->textInput(['maxlength' => true]) ?>
+                </div>
             </div>
-            <div class="col-3">
-                <?= $form->field($model, 'price')->textInput(['maxlength' => true]) ?>
-            </div>
-            </div>
-           
+
             <div class="row">
                 <div class="col-12">
                     <?= $form->field($model, 'description')->textarea(['id' => 'summernote']) ?>
@@ -113,9 +115,9 @@ if (!$model->isNewRecord) {
             </div>
         </div>
     </div>
-   
+
     <div class="row">
-     
+
         <div class="col-3">
             <?= $form->field($model, 'type')->dropDownList(['simple' => 'Simple', 'variant' => 'variant']) ?>
         </div>
@@ -128,10 +130,73 @@ if (!$model->isNewRecord) {
     </div>
     <div class="card-body">
         <div class="card-header">
-            <?=Yii::t('app', 'Product_Variants')?> 
+            <?= Yii::t('app', 'Product_Variants') ?>
         </div>
         <div class="card-body">
             <div class="row" id="variants-generated">
+                <?php
+                $variantNames = Yii::$app->request->post('Product', [])['variant_name'] ?? [];
+                $variantPrices = Yii::$app->request->post('Product', [])['variant_price'] ?? [];
+                $variantCosts = Yii::$app->request->post('Product', [])['variant_cost'] ?? [];
+                $variantQuantities = Yii::$app->request->post('Product', [])['variant_quantity'] ?? [];
+                $variantDefaults = Yii::$app->request->post('Product', [])['variant_is_default'] ?? [];
+
+                $variantAttributeIds = Yii::$app->request->post('Product', [])['variant_attribute_id'] ?? [];
+                $variantAttributeOptionIds = Yii::$app->request->post('Product', [])['variant_attribute_option_id'] ?? [];
+
+
+                foreach ($variantNames as $index => $name): ?>
+                    <div class="row mb-3">
+                        <div class="col-3">
+                            <div class="form-group">
+                                <label class="control-label">Variant Name</label>
+                                <input type="text" class="form-control" name="Product[variant_name][<?= $index ?>]" value="<?= $name ?>">
+                                <?= Html::error($model, "variant_name_{$index}", ['class' => 'help-block text-danger']) ?>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label class="control-label">Variant Price</label>
+                                <input type="text" class="form-control" name="Product[variant_price][<?= $index ?>]" value="<?= $variantPrices[$index] ?? '' ?>">
+                                <?= Html::error($model, "variant_price_{$index}", ['class' => 'help-block text-danger']) ?>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label class="control-label">Variant Cost</label>
+                                <input type="text" class="form-control" name="Product[variant_cost][<?= $index ?>]" value="<?= $variantCosts[$index] ?? '' ?>">
+                                <?= Html::error($model, "variant_price_{$index}", ['class' => 'help-block text-danger']) ?>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                <label class="control-label">Variant Quantity</label>
+                                <input type="text" class="form-control" name="Product[variant_quantity][<?= $index ?>]" value="<?= $variantQuantities[$index] ?? '' ?>">
+                                <?= Html::error($model, "variant_quantity_{$index}", ['class' => 'help-block text-danger']) ?>
+                            </div>
+                        </div>
+
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label class="control-label">Set as Default</label>
+                                <div class="form-check">
+                                    <input type="radio" class="form-check-input" name="Product[variant_is_default][<?= $index ?>]" <?= isset($variantDefaults[$index]) && $variantDefaults[$index] == 1 ? 'checked' : '' ?>>
+                                    <label class="form-check-label">Default</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <?php foreach ($variantAttributeIds[$index] ?? [] as $attrIndex => $attrId): ?>
+                            <input type="hidden" name="Product[variant_attribute_id][<?= $index ?>][]" value="<?= $attrId ?>">
+                        <?php endforeach; ?>
+
+                        <?php foreach ($variantAttributeOptionIds[$index] ?? [] as $attributeOptionIdIndex => $optionId): ?>
+                            <input type="hidden" name="Product[variant_attribute_option_id][<?= $index ?>][]" value="<?= $optionId ?>">
+                        <?php endforeach; ?>
+
+
+                    </div>
+                <?php endforeach; ?>
             </div>
         </div>
     </div>
@@ -139,12 +204,12 @@ if (!$model->isNewRecord) {
 
     <div class="card-body">
         <div class="card-header">
-            <?=Yii::t('app', 'Product_Variants')?> 
+            <?= Yii::t('app', 'Product_Variants') ?>
         </div>
         <div class="card-body">
             <div class="row">
                 <div class="col-12">
-                    <?= $form->field($model, 'images[]')->widget(FileInput::classname(), [
+                    <?= $form->field($model, 'files[]')->widget(FileInput::classname(), [
                         'options' => ['accept' => 'image/*', 'multiple' => true],
                     ]); ?>
                 </div>
@@ -164,20 +229,19 @@ if (!$model->isNewRecord) {
 
 
 <script>
-
     $(document).ready(function() {
         $('#summernote').summernote({
             lang: 'fr-FR', // <= nobody is perfect :)
             height: 300,
-            toolbar : [
-                ['style',['bold','italic','underline','clear']],
-                ['font',['fontsize']],
-                ['color',['color']],
-                ['para',['ul','ol','paragraph']],
-                ['link',['link']],
-                ['picture',['picture']]
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['font', ['fontsize']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['link', ['link']],
+                ['picture', ['picture']]
             ],
-            callbacks : {
+            callbacks: {
                 onImageUpload: function(image) {
                     uploadImage(image[0]);
                 }
@@ -190,8 +254,8 @@ if (!$model->isNewRecord) {
 
     function uploadImage(image) {
         var data = new FormData();
-        data.append("image",image);
-        $.ajax ({
+        data.append("image", image);
+        $.ajax({
             data: data,
             type: "POST",
             url: `${SITE_URL}/index.php?r=medialibrary/upload`,
@@ -202,7 +266,7 @@ if (!$model->isNewRecord) {
             success: function(url) {
 
                 var image = document.location.origin + url;
-                setTimeout(function(){
+                setTimeout(function() {
                     $('#summernote').summernote("insertImage", image);
                 }, 500);
 
@@ -212,6 +276,4 @@ if (!$model->isNewRecord) {
             }
         });
     }
-
-
 </script>

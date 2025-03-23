@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\attributeOptions\AttributeOptions;
+use app\models\images\Images;
 use app\models\products\Products;
 use app\models\products\ProductsSearch;
 use app\models\variantAttributes\VariantAttributes;
@@ -75,7 +76,7 @@ class ProductsController extends BaseController
     {
         $model = new Products();
 
-        
+
         $model->scenario = Products::SCENARIO_CREATE;
         $newId = Products::find()->max('id') + 1;
 
@@ -83,38 +84,53 @@ class ProductsController extends BaseController
         if ($this->request->isPost) {
             $transaction = Yii::$app->db->beginTransaction();
             try {
-            if ($model->load($this->request->post()) && $model->validate()) {
-                $file = UploadedFile::getInstance($model, 'file');
+                if ($model->load($this->request->post()) && $model->validate()) {
+                    $files = UploadedFile::getInstance($model, 'files');
 
-                if (!empty($file)) {
-                    $folder_path = "images/products/$newId";
-                    FileHelper::createDirectory(
-                        "$folder_path",
-                        $mode = 0775,
-                        $recursive = true
-                    );
+                    if (!empty($files)) {
+                        $folder_path = "images/products/$newId";
+                        FileHelper::createDirectory(
+                            "$folder_path",
+                            $mode = 0775,
+                            $recursive = true
+                        );
 
-                    $file_path = "$folder_path/" . "covor." . $file->extension;
-                    $file->saveAs($file_path);
-                    $model->image = $file_path;
-                }
+                        foreach ($files as $key => $file) {
+                            $modelImagesProduct = new  Images();
+                            $file_path = "$folder_path/images/$key" . "." . $image_product->extension;
+                            $modelImagesProduct->product_id = $newId;
+                            $modelImagesProduct->path = $file_path;
+                            $image_product->saveAs($file_path);
 
-                if ($model->save()) {
-                    // Handle variants and attributes if any
-                    $this->saveVariantsAndAttributes($model);
+                            if ($key == 0) {
+                                $model->image = $file_path;
+                            }
 
-                    $transaction->commit();
+                            $modelImagesProduct->save(false);
+                        }
+                    }
+
+
+
+                    if ($model->save()) {
+                        // Handle variants and attributes if any
+                        $this->saveVariantsAndAttributes($model);
+
+                        $transaction->commit();
+                        return $this->redirect(['view', 'id' => $model->id]);
+                    }
+
                     return $this->redirect(['view', 'id' => $model->id]);
                 }
-                
-                return $this->redirect(['view', 'id' => $model->id]);
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                Yii::$app->session->setFlash('error', $e->getMessage());
             }
-        } catch (\Exception $e) {
-            $transaction->rollBack();
-            Yii::$app->session->setFlash('error', $e->getMessage());
-        }
         } else {
             $model->loadDefaultValues();
+            return $this->render('create', [
+                'model' => $model,
+            ]);
         }
 
         return $this->render('create', [
@@ -126,31 +142,31 @@ class ProductsController extends BaseController
 
 
     protected function saveVariantsAndAttributes($model)
-{
-    // Assuming you have a form that submits variants and attributes data
-    $variantsData = Yii::$app->request->post('Variants', []);
-    $attributesData = Yii::$app->request->post('VariantAttributes', []);
+    {
+        // Assuming you have a form that submits variants and attributes data
+        $variantsData = Yii::$app->request->post('Variants', []);
+        $attributesData = Yii::$app->request->post('VariantAttributes', []);
 
-    // Save variants
-    foreach ($variantsData as $variantData) {
-        $variant = new Variants();
-        $variant->load($variantData, '');
-        $variant->product_id = $model->id;
-        if (!$variant->save()) {
-            throw new \Exception('Failed to save variant: ' . implode(', ', $variant->getFirstErrors()));
-        }
-    
-        // Save variant attributes
-        foreach ($attributesData as $attributeData) {
-            $variantAttribute = new VariantAttributes();
-            $variantAttribute->load($attributeData, '');
-            $variantAttribute->variant_id = $variant->id;
-            if (!$variantAttribute->save()) {
-                throw new \Exception('Failed to save variant attribute: ' . implode(', ', $variantAttribute->getFirstErrors()));
+        // Save variants
+        foreach ($variantsData as $variantData) {
+            $variant = new Variants();
+            $variant->load($variantData, '');
+            $variant->product_id = $model->id;
+            if (!$variant->save()) {
+                throw new \Exception('Failed to save variant: ' . implode(', ', $variant->getFirstErrors()));
             }
+
+            // Save variant attributes
+            // foreach ($attributesData as $attributeData) {
+            //     $variantAttribute = new VariantAttributes();
+            //     $variantAttribute->load($attributeData, '');
+            //     $variantAttribute->variant_id = $variant->id;
+            //     if (!$variantAttribute->save()) {
+            //         throw new \Exception('Failed to save variant attribute: ' . implode(', ', $variantAttribute->getFirstErrors()));
+            //     }
+            // }
         }
     }
-}
     /**
      * Updates an existing Products model.
      * If update is successful, the browser will be redirected to the 'view' page.
@@ -181,8 +197,6 @@ class ProductsController extends BaseController
                 $file_path = "$folder_path/" . "covor." . $file->extension;
                 $file->saveAs($file_path);
                 $model->image = $file_path;
-
-
             }
 
             $model->save();
@@ -225,10 +239,4 @@ class ProductsController extends BaseController
 
         throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
-
-
-
-
-
-
 }

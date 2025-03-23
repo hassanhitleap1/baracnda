@@ -9,6 +9,8 @@ use app\models\users\Users;
 use app\models\variants\Variants;
 use app\models\warehouses\Warehouses;
 use Yii;
+use yii\base\DynamicModel;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%products}}".
@@ -35,8 +37,9 @@ use Yii;
 class Products extends \yii\db\ActiveRecord
 {
 
-    public $images;
+    public $files;
 
+    public $variant_name;
     const SCENARIO_CREATE = 'create';
     const SCENARIO_UPDATE = 'update';
 
@@ -69,10 +72,78 @@ class Products extends \yii\db\ActiveRecord
             [['creator_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['creator_id' => 'id'], 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
             [['warehouse_id'], 'exist', 'skipOnError' => true, 'targetClass' => Warehouses::class, 'targetAttribute' => ['warehouse_id' => 'id'], 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
             ['type', 'in', 'range' => array_keys(self::productType())],
-            [['file'], 'image', 'skipOnEmpty' => true, 'extensions' => 'png,jpg,jpeg,gif,webp,webm', 'maxFiles' => 20, 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['files'], 'image', 'skipOnEmpty' => true, 'extensions' => 'png,jpg,jpeg,gif,webp,webm', 'maxFiles' => 20, 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            ['type', 'validateVariants','on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
         ];
     }
 
+
+    /**
+     * Validates that the product type is consistent with the existence of variants.
+     *
+     * Simple products cannot have variants, and variant products must have at least 2 variants.
+     *
+     * @param string $attribute the attribute currently being validated
+     * @param array $params the validation parameters
+     */
+    public function validateVariants($attribute, $params)
+    {
+       
+        if ($this->type === self::SIMPLE && !empty($this->variant_name)) {
+            $this->addError($attribute, 'Simple products cannot have variants.');
+        }
+
+        if ($this->type === self::VARIANT) {
+            // Validate variant fields
+            $postData = Yii::$app->request->post('Product');
+            $variantNames = ArrayHelper::getValue($postData, 'variant_name', []);
+            $variantPrices = ArrayHelper::getValue($postData, 'variant_price', []);
+            $variantQuantities = ArrayHelper::getValue($postData, 'variant_quantity', []);
+            $variantCosts = ArrayHelper::getValue($postData, 'variant_cost', []);
+
+            // Ensure at least 2 variants are provided
+            if (count($variantNames) < 2) {
+                $this->addError($attribute, 'Variant products must have at least 2 variants.');
+                return;
+            }
+
+            // Validate each variant field
+            foreach ($variantNames as $index => $name) {
+                $dynamicModel = DynamicModel::validateData([
+                    'name' => $name,
+                    'price' => $variantPrices[$index],
+                    'quantity' => $variantQuantities[$index],
+                    'cost' => $variantCosts[$index],
+                ], [
+                    [['name', 'price', 'quantity'], 'required'],
+                    [['price', 'quantity'], 'number', 'min' => 0],
+                ]);
+
+                if ($dynamicModel->hasErrors()) {
+                    foreach ($dynamicModel->errors as $field => $errors) {
+                        $this->addError("variant_{$field}_{$index}", implode(', ', $errors));
+                    }
+                }
+            }
+        }
+    }
+
+        /**
+     * {@inheritdoc}
+     */
+    public function validate($attributeNames = null, $clearErrors = true)
+    {
+        // Run default validation
+        $isValid = parent::validate($attributeNames, $clearErrors);
+
+        // Run custom validation for variants
+        if ($this->type === self::VARIANT) {
+            $isValid = $this->validateVariants('type', []) && $isValid;
+        }
+
+        return $isValid;
+    }
+    
     /**
      * {@inheritdoc}
      */

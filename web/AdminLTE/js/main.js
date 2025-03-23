@@ -41,7 +41,7 @@ let isDefaultChecked = ''
         // Create input fields for each variant
         variants.forEach((variant, index) => {
             let variantName = variant.map(attr => attr.value).join(' '); // Combine attribute values for the variant name
-            let variantId = index + 1; // Unique ID for each variant
+            let variantId = index ; // Unique ID for each variant
 
         isDefaultChecked=index === 0 ? 'checked' : ''
             $('#variants-generated').append(`
