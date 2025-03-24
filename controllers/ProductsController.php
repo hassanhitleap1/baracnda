@@ -12,6 +12,7 @@ use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
 use yii\web\UploadedFile;
 
@@ -79,15 +80,10 @@ class ProductsController extends BaseController
         $newId = Products::find()->max('id') + 1;
 
         if ($this->request->isPost) {
+         
             $transaction = Yii::$app->db->beginTransaction();
-
-
             try {
-
-
                 if ($model->load($this->request->post()) && $model->validate()) {
-
-
                     $files = UploadedFile::getInstance($model, 'files');
 
                     if (!empty($files)) {
@@ -113,28 +109,27 @@ class ProductsController extends BaseController
                             $modelImagesProduct->save(false);
                         }
                     }
-
-
-
-                    if ($model->save()) {
+                    if ($model->save(false) ) {
                         // Handle variants and attributes if any
-                        $this->saveVariantsAndAttributes($model);
-
-                        $transaction->commit();
-                        return $this->redirect(['view', 'id' => $model->id]);
+                        if($this->saveVariantsAndAttributes($model)){
+                            $transaction->commit();
+                            return $this->redirect(['view', 'id' => $model->id]);
+                        }
+            
+                    }else{
+                        Yii::$app->session->setFlash('error', $this->getErrorMessages($model));
                     }
-
-                    return $this->redirect(['view', 'id' => $model->id]);
+                }else{
+                  
+                    Yii::$app->session->setFlash('error', $this->getErrorMessages($model));
                 }
             } catch (\Exception $e) {
                 $transaction->rollBack();
-                Yii::$app->session->setFlash('error', $e->getMessage());
+                Yii::$app->session->setFlash('error', $this->getErrorMessages($model));
             }
         } else {
             $model->loadDefaultValues();
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+        
         }
 
         return $this->render('create', [
@@ -149,26 +144,38 @@ class ProductsController extends BaseController
     {
         // Assuming you have a form that submits variants and attributes data
         $variantsData = Yii::$app->request->post('Variants', []);
-        $attributesData = Yii::$app->request->post('VariantAttributes', []);
 
-        // Save variants
-        foreach ($variantsData as $variantData) {
+
+        $postData = Yii::$app->request->post('Product');
+        $variantNames = ArrayHelper::getValue($postData, 'variant_name', []);
+        $variantPrices = ArrayHelper::getValue($postData, 'variant_price', []);
+        $variantQuantities = ArrayHelper::getValue($postData, 'variant_quantity', []);
+        $variantCosts = ArrayHelper::getValue($postData, 'variant_cost', []);
+        
+        // Ensure at least 2 variants are provided
+      
+        foreach ($variantNames as $index => $name) {
             $variant = new Variants();
-            $variant->load($variantData, '');
+            $variant->name = $name;
+            $variant->price = $variantPrices[$index];
+            $variant->quantity = $variantQuantities[$index];
+            $variant->cost =$variantCosts[$index];
             $variant->product_id = $model->id;
-            if (!$variant->save()) {
-                throw new \Exception('Failed to save variant: ' . implode(', ', $variant->getFirstErrors()));
+            if (!$variant->save(false)) {
+                Yii::$app->session->setFlash('error', $variant->getFirstErrors());
+                return false;
             }
-
-            // Save variant attributes
-            // foreach ($attributesData as $attributeData) {
+            // $attributes = json_decode($variantData->attributes);
+            // foreach ($attributes as $attributeData) {
             //     $variantAttribute = new VariantAttributes();
-            //     $variantAttribute->load($attributeData, '');
+            //     $variantAttribute->attribute_id = $attributeData->attribute_id;
+            //     $variantAttribute->option_id = $attributeData->option_id;
             //     $variantAttribute->variant_id = $variant->id;
             //     if (!$variantAttribute->save()) {
             //         throw new \Exception('Failed to save variant attribute: ' . implode(', ', $variantAttribute->getFirstErrors()));
             //     }
             // }
+            return true;
         }
     }
     /**

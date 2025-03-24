@@ -26,6 +26,11 @@ class m250309_003924_create_categories_tables extends Migration
         ], $tableOptions);
 
         $this->addForeignKey('fk_categories_category', 'categories', 'category_id', 'categories', 'id', 'CASCADE');
+        $this->insert('categories', [
+            'name' => 'Category One',
+            'category_id' => null,
+            'image' => 'image.jpg',
+        ]);
     }
 
     /**

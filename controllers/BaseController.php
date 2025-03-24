@@ -18,4 +18,14 @@ class BaseController extends Controller
         // }
         return $action;
     }
+
+
+    protected function getErrorMessages($model)
+    {
+        $errors = [];
+        foreach ($model->getErrors() as $attribute => $messages) {
+            $errors[] = implode('<br>', $messages);
+        }
+        return implode('<br>', $errors);
+    }
 }

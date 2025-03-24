@@ -23,6 +23,16 @@ class m250309_013805_create_attributes_tables extends Migration
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ], $tableOptions);
 
+        $this->insert('attributes', [
+            'name' => 'Color',
+            'type' => 'color',
+        ]);
+
+        $this->insert('attributes', [
+            'name' => 'Size',
+            'type' => 'select',
+        ]);
+
     }
 
     /**

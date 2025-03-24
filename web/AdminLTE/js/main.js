@@ -13,35 +13,43 @@ $(document).ready(function () {
     $('#generateVariants').on('click', function () {
         var selectedAttributes = {};
         var price = $("#products-price").val() ?? 0;
-        var quantity = $("#products-quantity").val() ?? 0;
-        var cost = 0;
+        var cost = $("#products-cost").val() ?? 0; 
+        var quantity = $("#products-quantity").val() ?? 0; 
         // Loop through all checked checkboxes
         $('input[type="checkbox"].attribute-option:checked').each(function () {
             var attributeId = $(this).attr('data-attribute-id'); // Get the attribute ID
             var attributeOptionId = $(this).attr('data-attribute-option-id'); // Get the attribute option ID
             var optionValue = $(this).val(); // Get the option value
            
-
+           
             // Group attributes by their ID
             if (!selectedAttributes[attributeId]) {
                 selectedAttributes[attributeId] = [];
             }
             selectedAttributes[attributeId].push({
                 attributeOptionId: attributeOptionId,
-                value: optionValue
+                value: optionValue,
+                attributeId: attributeId
             });
         });
 
         // Generate all combinations of selected attributes
         var variants = generateCombinations(selectedAttributes);
-
+        console.log(variants)
         // Clear previous variants
         $('#variants-generated').html('');
-let isDefaultChecked = ''
+        let isDefaultChecked = ''
         // Create input fields for each variant
         variants.forEach((variant, index) => {
             let variantName = variant.map(attr => attr.value).join(' '); // Combine attribute values for the variant name
             let variantId = index ; // Unique ID for each variant
+
+            const variantAttributes = variant.map(attr => ({
+                attributeId: attr.attributeId,
+                optionId: attr.attributeOptionId
+            }));
+            const variantAttributesJson = JSON.stringify(variantAttributes);
+        
 
         isDefaultChecked=index === 0 ? 'checked' : ''
             $('#variants-generated').append(`
@@ -83,10 +91,7 @@ let isDefaultChecked = ''
                             </div>
                         </div>
                     </div>
-                    ${variant.map(attr => `
-                        <input type="hidden" name="Product[variant_attribute_id][${variantId}][]" value="${attr.attributeId}">
-                        <input type="hidden" name="Product[variant_attribute_option_id][${variantId}][]" value="${attr.attributeOptionId}">
-                    `).join('')}
+                  <input type="hidden" name="Product[variants][${variantId}][attributes]" value='${variantAttributesJson}'>
                 </div>
             `);
         });

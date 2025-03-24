@@ -65,7 +65,7 @@ class Products extends \yii\db\ActiveRecord
             [['creator_id', 'name', 'price', 'cost','type'], 'required', 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
             [['creator_id', 'category_id', 'warehouse_id'], 'integer', 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
             [['description'], 'string', 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
-            [['price', 'cost'], 'number', 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['price', 'cost','quantity'], 'number', 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
             [['created_at', 'updated_at'], 'safe'],
             [['name', 'image_path'], 'string', 'max' => 255, 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
             [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Categories::class, 'targetAttribute' => ['category_id' => 'id'], 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
@@ -89,10 +89,10 @@ class Products extends \yii\db\ActiveRecord
     public function validateVariants($attribute, $params)
     {
        
-        if ($this->type === self::SIMPLE && !empty($this->variant_name)) {
+        if ($this->type === self::SIMPLE) {
             $this->addError($attribute, 'Simple products cannot have variants.');
         }
-
+       
         if ($this->type === self::VARIANT) {
             // Validate variant fields
             $postData = Yii::$app->request->post('Product');
@@ -100,14 +100,13 @@ class Products extends \yii\db\ActiveRecord
             $variantPrices = ArrayHelper::getValue($postData, 'variant_price', []);
             $variantQuantities = ArrayHelper::getValue($postData, 'variant_quantity', []);
             $variantCosts = ArrayHelper::getValue($postData, 'variant_cost', []);
-
+            
             // Ensure at least 2 variants are provided
             if (count($variantNames) < 2) {
                 $this->addError($attribute, 'Variant products must have at least 2 variants.');
-                return;
+                return false;
             }
 
-            // Validate each variant field
             foreach ($variantNames as $index => $name) {
                 $dynamicModel = DynamicModel::validateData([
                     'name' => $name,
@@ -115,16 +114,25 @@ class Products extends \yii\db\ActiveRecord
                     'quantity' => $variantQuantities[$index],
                     'cost' => $variantCosts[$index],
                 ], [
-                    [['name', 'price', 'quantity'], 'required'],
-                    [['price', 'quantity'], 'number', 'min' => 0],
+                    [
+                        ['name', 
+                        'price',
+                        'quantity'
+                    ]
+                    , 'required'
+                    ],
+                    [['name'], 'string', 'max' => 255],
+                    [['price', 'quantity','cost'], 'number'],
                 ]);
-
                 if ($dynamicModel->hasErrors()) {
                     foreach ($dynamicModel->errors as $field => $errors) {
                         $this->addError("variant_{$field}_{$index}", implode(', ', $errors));
+                        
                     }
+                    return false;
                 }
             }
+            return true;
         }
     }
 
@@ -158,7 +166,8 @@ class Products extends \yii\db\ActiveRecord
             'cost' => Yii::t('app', 'Cost'),
             'category_id' => Yii::t('app', 'Category ID'),
             'warehouse_id' => Yii::t('app', 'Warehouse ID'),
-            'image_path' => Yii::t('app', 'Image Path'),
+            'image_path' => Yii::t('app', 'Image Path'), 
+            'quantity' => Yii::t('app', 'Quantity'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];

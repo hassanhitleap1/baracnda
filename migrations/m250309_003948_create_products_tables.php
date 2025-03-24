@@ -22,6 +22,7 @@ class m250309_003948_create_products_tables extends Migration
             'description' => $this->text(),
             'price' => $this->decimal(10,2)->notNull(),
             'cost' => $this->decimal(10,2)->notNull(),
+            'quantity' => $this->integer()->notNull()->defaultValue(0),
             'category_id' => $this->integer()->notNull()->defaultValue(1),
             'warehouse_id' => $this->integer()->notNull()->defaultValue(1),
             'image_path' => $this->string()->null(),

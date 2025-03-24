@@ -106,6 +106,9 @@ if (!$model->isNewRecord) {
                 <div class="col-3">
                     <?= $form->field($model, 'price')->textInput(['maxlength' => true]) ?>
                 </div>
+                <div class="col-3">
+                    <?= $form->field($model, 'quantity')->textInput(['maxlength' => true]) ?>
+                </div>
             </div>
 
             <div class="row">
@@ -140,11 +143,9 @@ if (!$model->isNewRecord) {
                 $variantCosts = Yii::$app->request->post('Product', [])['variant_cost'] ?? [];
                 $variantQuantities = Yii::$app->request->post('Product', [])['variant_quantity'] ?? [];
                 $variantDefaults = Yii::$app->request->post('Product', [])['variant_is_default'] ?? [];
-
                 $variantAttributeIds = Yii::$app->request->post('Product', [])['variant_attribute_id'] ?? [];
                 $variantAttributeOptionIds = Yii::$app->request->post('Product', [])['variant_attribute_option_id'] ?? [];
-
-
+                $variantAttributes = Yii::$app->request->post('Product', [])['attributes'] ?? [];
                 foreach ($variantNames as $index => $name): ?>
                     <div class="row mb-3">
                         <div class="col-3">
@@ -186,19 +187,10 @@ if (!$model->isNewRecord) {
                             </div>
                         </div>
 
-                        <?php foreach ($variantAttributeIds[$index] ?? [] as $attrIndex => $attrId): ?>
-                            <input type="hidden" name="Product[variant_attribute_id][<?= $index ?>][]" value="<?= $attrId ?>">
-                        <?php endforeach; ?>
-
-                        <?php foreach ($variantAttributeOptionIds[$index] ?? [] as $attributeOptionIdIndex => $optionId): ?>
-                            <input type="hidden" name="Product[variant_attribute_option_id][<?= $index ?>][]" value="<?= $optionId ?>">
-                        <?php endforeach; ?>
-
-
                     </div>
                 <?php endforeach; ?>
             </div>
-        </div>
+        </d>
     </div>
 
 

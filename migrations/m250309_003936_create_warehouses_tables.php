@@ -22,6 +22,12 @@ class m250309_003936_create_warehouses_tables extends Migration
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ], $tableOptions);
 
+
+        $this->insert('warehouses', [
+            'name' => 'Warehouse One',
+            'location' => 'Location One',
+        ]);
+
     }
 
     /**
