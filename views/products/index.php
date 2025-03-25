@@ -30,14 +30,22 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'id',
-            'creator_id',
+            // 'id',
+            'creator.full_name',
             'name',
-            'description:ntext',
+            // 'description:ntext',
             'price',
-            //'cost',
-            //'category_id',
-            //'warehouse_id',
+            'cost',
+            'category.name',
+            'warehouse.name',
+            [
+                'attribute' => 'image_path',
+                'format' => 'raw',
+                'value' => function ($model) {
+                        return Html::img($model->getImageUrl(), ['width' => '100']);
+                    },
+            ],
+
             //'image_path',
             //'created_at',
             //'updated_at',

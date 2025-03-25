@@ -252,4 +252,25 @@ class Products extends \yii\db\ActiveRecord
         ];
     }
 
+    public function getCreator()
+    {
+        return $this->hasOne(Users::class, ['id' => 'creator_id']);
+    }
+
+    public function getCategory()
+    {
+        return $this->hasOne(Categories::class, ['id' => 'category_id']);
+    }
+
+    public function getWarehouse()
+    {
+        return $this->hasOne(Warehouses::class, ['id' => 'warehouse_id']);
+    }
+
+
+    public function getImageUrl()
+    {
+        // Assuming your imageFile attribute stores the path to the image
+        return \Yii::getAlias('@web/' . $this->image_path);
+    }
 }
