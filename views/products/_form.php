@@ -199,44 +199,42 @@ if (!$model->isNewRecord) {
                             <div class="col-3">
                                 <div class="form-group">
                                     <label class="control-label">Variant Name</label>
-                                    <input type="text" class="form-control" name="Product[variants][<?= $variant->id ?>][name]" value="<?= Html::encode($variant->name) ?>">
+                                    <input type="text" class="form-control" name="Product[variant_name][<?= $variant->id ?>]" value="<?= Html::encode($variant->name) ?>">
                                 </div>
                             </div>
                             <div class="col-2">
                                 <div class="form-group">
                                     <label class="control-label">Variant Price</label>
-                                    <input type="text" class="form-control" name="Product[variants][<?= $variant->id ?>][price]" value="<?= Html::encode($variant->price) ?>">
+                                    <input type="text" class="form-control" name="Product[variant_price][<?= $variant->id ?>]" value="<?= Html::encode($variant->price) ?>">
                                 </div>
                             </div>
                             <div class="col-2">
                                 <div class="form-group">
                                     <label class="control-label">Variant Cost</label>
-                                    <input type="text" class="form-control" name="Product[variants][<?= $variant->id ?>][cost]" value="<?= Html::encode($variant->cost) ?>">
+                                    <input type="text" class="form-control" name="Product[variant_cost][<?= $variant->id ?>]" value="<?= Html::encode($variant->cost) ?>">
                                 </div>
                             </div>
                             <div class="col-3">
                                 <div class="form-group">
                                     <label class="control-label">Variant Quantity</label>
-                                    <input type="text" class="form-control" name="Product[variants][<?= $variant->id ?>][quantity]" value="<?= Html::encode($variant->quantity) ?>">
+                                    <input type="text" class="form-control" name="Product[variant_quantity][<?= $variant->id ?>]" value="<?= Html::encode($variant->quantity) ?>">
                                 </div>
                             </div>
                             <div class="col-2">
                                 <div class="form-group">
                                     <label class="control-label">Set as Default</label>
                                     <div class="form-check">
-                                        <input type="radio" class="form-check-input" name="Product[default_variant]" value="<?= $variant->id ?>" <?= $variant->is_default ? 'checked' : '' ?>>
+                                        <input type="radio" class="form-check-input" name="Product[variant_is_default][<?= $variant->id ?>]" value="<?= $variant->id ?>" <?= $variant->is_default ? 'checked' : '' ?>>
                                         <label class="form-check-label">Default</label>
                                     </div>
                                 </div>
                             </div>
-
 
                             <?php foreach ($variant->variantAttributes as $attribute): ?>
                                 <?php 
                                
                                 if(!isset($options[$attribute->attribute_id])){
                                     $options[$attribute->attribute_id] = AttributeOptions::find()->where(['attribute_id' => $attribute->attribute_id])->all();
-                                    
                                 }
                                 ?>
                                 <div class="col-2">
