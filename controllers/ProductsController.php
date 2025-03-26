@@ -142,42 +142,45 @@ class ProductsController extends BaseController
 
     protected function saveVariantsAndAttributes($model)
     {
-        // Assuming you have a form that submits variants and attributes data
-        $variantsData = Yii::$app->request->post('Variants', []);
-
-
         $postData = Yii::$app->request->post('Product');
         $variantNames = ArrayHelper::getValue($postData, 'variant_name', []);
         $variantPrices = ArrayHelper::getValue($postData, 'variant_price', []);
         $variantQuantities = ArrayHelper::getValue($postData, 'variant_quantity', []);
         $variantCosts = ArrayHelper::getValue($postData, 'variant_cost', []);
-        
-        // Ensure at least 2 variants are provided
-      
+        $variantAttributes = ArrayHelper::getValue($postData, 'variants', []);
+
         foreach ($variantNames as $index => $name) {
             $variant = new Variants();
             $variant->name = $name;
             $variant->price = $variantPrices[$index];
             $variant->quantity = $variantQuantities[$index];
-            $variant->cost =$variantCosts[$index];
+            $variant->cost = $variantCosts[$index];
             $variant->product_id = $model->id;
+
             if (!$variant->save(false)) {
                 Yii::$app->session->setFlash('error', $variant->getFirstErrors());
                 return false;
             }
-            // $attributes = json_decode($variantData->attributes);
-            // foreach ($attributes as $attributeData) {
-            //     $variantAttribute = new VariantAttributes();
-            //     $variantAttribute->attribute_id = $attributeData->attribute_id;
-            //     $variantAttribute->option_id = $attributeData->option_id;
-            //     $variantAttribute->variant_id = $variant->id;
-            //     if (!$variantAttribute->save()) {
-            //         throw new \Exception('Failed to save variant attribute: ' . implode(', ', $variantAttribute->getFirstErrors()));
-            //     }
-            // }
-            return true;
+
+            // Save attributes for the variant
+            if (isset($variantAttributes[$index]['attributes'])) {
+                $attributes = json_decode($variantAttributes[$index]['attributes'], true);
+                foreach ($attributes as $attributeData) {
+                    $variantAttribute = new VariantAttributes();
+                    $variantAttribute->attribute_id = $attributeData['attributeId'];
+                    $variantAttribute->option_id = $attributeData['optionId'];
+                    $variantAttribute->variant_id = $variant->id;
+
+                    if (!$variantAttribute->save(false)) {
+                        Yii::$app->session->setFlash('error', $variantAttribute->getFirstErrors());
+                        return false;
+                    }
+                }
+            }
         }
+        return true;
     }
+
     /**
      * Updates an existing Products model.
      * If update is successful, the browser will be redirected to the 'view' page.
