@@ -45,7 +45,7 @@ class Variants extends \yii\db\ActiveRecord
             [['quantity'], 'default', 'value' => 1],
             [['product_id', 'name', 'price'], 'required'],
             [['product_id', 'quantity'], 'integer'],
-            [['price','cost'], 'number'],
+            [['price','cost','is_default'], 'number'],
             [['created_at', 'updated_at'], 'safe'],
             [['name'], 'string', 'max' => 255],
             [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Products::class, 'targetAttribute' => ['product_id' => 'id']],

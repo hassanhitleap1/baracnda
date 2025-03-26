@@ -19,6 +19,7 @@ class m250309_003949_create_variants_tables  extends Migration
         $this->createTable('variants', [
             'id' => $this->primaryKey(),
             'product_id' => $this->integer()->notNull(),
+            'is_default' => $this->boolean()->defaultValue(false),
             'name' => $this->string()->notNull(),
             'price' => $this->decimal(10,2)->notNull(),
             'cost'=>  $this->decimal(10,2)->notNull(),

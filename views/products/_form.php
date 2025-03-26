@@ -10,6 +10,8 @@
 
 <?php
 
+use app\models\attributeOptions\AttributeOptions;
+use app\models\attributes\Attributes;
 use app\models\categories\Categories;
 
 use app\models\warehouses\Warehouses;
@@ -26,7 +28,7 @@ $categories = ArrayHelper::map(Categories::find()->all(), 'id', 'name');
 
 $warehouses = ArrayHelper::map(Warehouses::find()->all(), 'id', 'name');
 $dataImages = [];
-
+$options=[];
 
 if (!$model->isNewRecord) {
     foreach ($model->images as $key => $value) {
@@ -138,6 +140,7 @@ if (!$model->isNewRecord) {
         <div class="card-body">
             <div class="row" id="variants-generated">
                 <?php
+                
                 $variantNames = Yii::$app->request->post('Product', [])['variant_name'] ?? [];
                 $variantPrices = Yii::$app->request->post('Product', [])['variant_price'] ?? [];
                 $variantCosts = Yii::$app->request->post('Product', [])['variant_cost'] ?? [];
@@ -189,6 +192,69 @@ if (!$model->isNewRecord) {
 
                     </div>
                 <?php endforeach; ?>
+
+                <?php if (!$model->isNewRecord && $model->type == 'variant'): ?>
+                    <?php foreach ($model->variants as $variant): ?>
+                        <div class="row mb-3">
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <label class="control-label">Variant Name</label>
+                                    <input type="text" class="form-control" name="Product[variants][<?= $variant->id ?>][name]" value="<?= Html::encode($variant->name) ?>">
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label class="control-label">Variant Price</label>
+                                    <input type="text" class="form-control" name="Product[variants][<?= $variant->id ?>][price]" value="<?= Html::encode($variant->price) ?>">
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label class="control-label">Variant Cost</label>
+                                    <input type="text" class="form-control" name="Product[variants][<?= $variant->id ?>][cost]" value="<?= Html::encode($variant->cost) ?>">
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <label class="control-label">Variant Quantity</label>
+                                    <input type="text" class="form-control" name="Product[variants][<?= $variant->id ?>][quantity]" value="<?= Html::encode($variant->quantity) ?>">
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label class="control-label">Set as Default</label>
+                                    <div class="form-check">
+                                        <input type="radio" class="form-check-input" name="Product[default_variant]" value="<?= $variant->id ?>" <?= $variant->is_default ? 'checked' : '' ?>>
+                                        <label class="form-check-label">Default</label>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <?php foreach ($variant->variantAttributes as $attribute): ?>
+                                <?php 
+                               
+                                if(!isset($options[$attribute->attribute_id])){
+                                    $options[$attribute->attribute_id] = AttributeOptions::find()->where(['attribute_id' => $attribute->attribute_id])->all();
+                                    
+                                }
+                                ?>
+                                <div class="col-2">
+                                    <div class="form-group">
+                                        <label class="control-label">options</label>
+                                        <select class="form-control" name="Product[variants][<?= $variant->id ?>][attributes][<?= $attribute->id ?>]">
+                                            <?php foreach ($options[$attribute->attribute_id] as $option): ?>
+                                                <option value="<?= $option->id ?>" <?= $option->id == $attribute->option_id ? 'selected' : '' ?>><?= $option->value ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+
+                        
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </d>
     </div>
