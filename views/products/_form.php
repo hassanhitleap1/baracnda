@@ -148,7 +148,14 @@ if (!$model->isNewRecord) {
                 $variantDefaults = Yii::$app->request->post('Product', [])['variant_is_default'] ?? [];
                 $variantAttributeIds = Yii::$app->request->post('Product', [])['variant_attribute_id'] ?? [];
                 $variantAttributeOptionIds = Yii::$app->request->post('Product', [])['variant_attribute_option_id'] ?? [];
-                $variantAttributes = Yii::$app->request->post('Product', [])['attributes'] ?? [];
+                $variantAttributes=[];
+                $options=[];
+
+                if($model->isNewRecord && Yii::$app->request->isPost){
+                    $variantAttributes = Yii::$app->request->post('Product', [])['attributes'] ?? [];
+ 
+                }
+
                 foreach ($variantNames as $index => $name): ?>
                     <div class="row mb-3">
                         <div class="col-3">
@@ -190,13 +197,40 @@ if (!$model->isNewRecord) {
                             </div>
                         </div>
 
+
+                        <?php foreach ($variantAttributes as $attribute): ?>
+                             <?php 
+                       
+                                if(!isset($options[$attribute->attribute_id])){
+                                    $options[$attribute->attribute_id] = AttributeOptions::find()->where(['attribute_id' => $attribute->attribute_id])->all();
+                                }
+                            ?>
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label class="control-label">options</label>
+                                    <select class="form-control" name="Product[variants][<?= $variant->id ?>][attributes][<?= $attribute->id ?>]">
+                                        <?php foreach ($options[$attribute->attribute_id] as $option): ?>
+                                            <option value="<?= $option->id ?>" <?= $option->id == $attribute->option_id ? 'selected' : '' ?>><?= $option->value ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+
                     </div>
                 <?php endforeach; ?>
 
                 <?php if (!$model->isNewRecord && $model->type == 'variant'): ?>
                     <?php foreach ($model->variants as $variant): ?>
+                        
                         <div class="row mb-3">
-                            <div class="col-3">
+                            <div  class="col-2">
+                                <div class="form-group">
+                                    <label class="control-label">id</label>
+                                    <input type="text" class="form-control" name="Product[variant_id][<?= $variant->id ?>]" value="<?= $variant->id ?>">
+                                </div>
+                            </div>
+                            <div class="col-2">
                                 <div class="form-group">
                                     <label class="control-label">Variant Name</label>
                                     <input type="text" class="form-control" name="Product[variant_name][<?= $variant->id ?>]" value="<?= Html::encode($variant->name) ?>">
@@ -214,7 +248,7 @@ if (!$model->isNewRecord) {
                                     <input type="text" class="form-control" name="Product[variant_cost][<?= $variant->id ?>]" value="<?= Html::encode($variant->cost) ?>">
                                 </div>
                             </div>
-                            <div class="col-3">
+                            <div class="col-2">
                                 <div class="form-group">
                                     <label class="control-label">Variant Quantity</label>
                                     <input type="text" class="form-control" name="Product[variant_quantity][<?= $variant->id ?>]" value="<?= Html::encode($variant->quantity) ?>">
