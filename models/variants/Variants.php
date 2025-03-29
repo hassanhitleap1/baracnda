@@ -16,6 +16,8 @@ use Yii;
  * @property string $name
  * @property float $price
  * @property int $quantity
+ * @property float|null $cost
+ * @property int|null $is_default
  * @property string|null $created_at
  * @property string|null $updated_at
  *

@@ -119,7 +119,7 @@ $(document).ready(function () {
                         <div class="form-group">
                             <label class="control-label">Set as Default</label>
                             <div class="form-check">
-                                <input type="radio" class="form-check-input" name="Product[variant_is_default]" value="${variantId}" ${isDefaultChecked}>
+                                <input type="radio" class="form-check-input" name="Product[variant_is_default][${variantId}]"  ${isDefaultChecked}>
                                 <label class="form-check-label">Default</label>
                             </div>
                         </div>

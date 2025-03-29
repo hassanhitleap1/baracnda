@@ -146,16 +146,11 @@ if (!$model->isNewRecord) {
                 $variantCosts = Yii::$app->request->post('Product', [])['variant_cost'] ?? [];
                 $variantQuantities = Yii::$app->request->post('Product', [])['variant_quantity'] ?? [];
                 $variantDefaults = Yii::$app->request->post('Product', [])['variant_is_default'] ?? [];
-                $variantAttributeIds = Yii::$app->request->post('Product', [])['variant_attribute_id'] ?? [];
-                $variantAttributeOptionIds = Yii::$app->request->post('Product', [])['variant_attribute_option_id'] ?? [];
-                $variantAttributes=[];
+                $variantAttributes = Yii::$app->request->post('Product', [])['attributes'] ?? [];
+                    dump($variantDefaults);
                 $options=[];
 
-                if($model->isNewRecord && Yii::$app->request->isPost){
-                    $variantAttributes = Yii::$app->request->post('Product', [])['attributes'] ?? [];
- 
-                }
-
+    
                 foreach ($variantNames as $index => $name): ?>
                     <div class="row mb-3">
                         <div class="col-3">
@@ -191,8 +186,8 @@ if (!$model->isNewRecord) {
                             <div class="form-group">
                                 <label class="control-label">Set as Default</label>
                                 <div class="form-check">
-                                    <input type="radio" class="form-check-input" name="Product[variant_is_default][<?= $index ?>]" <?= isset($variantDefaults[$index]) && $variantDefaults[$index] == 1 ? 'checked' : '' ?>>
-                                    <label class="form-check-label">Default</label>
+                                    <input type="radio" class="form-check-input variant-default-radio" name="Product[variant_is_default][<?= $index ?>]"  <?= isset($variantDefaults[$index]) && $variantDefaults[$index] == "on" ? 'checked' : '' ?>>
+                                    <?= Html::error($model, "variant_is_default", ['class' => 'help-block text-danger']) ?>
                                 </div>
                             </div>
                         </div>
@@ -258,7 +253,7 @@ if (!$model->isNewRecord) {
                                 <div class="form-group">
                                     <label class="control-label">Set as Default</label>
                                     <div class="form-check">
-                                        <input type="radio" class="form-check-input" name="Product[variant_is_default][<?= $variant->id ?>]" value="<?= $variant->id ?>" <?= $variant->is_default ? 'checked' : '' ?>>
+                                        <input type="radio" class="form-check-input variant-default-radio" name="Product[variant_is_default]" value="<?= $variant->id ?>" <?= $variant->is_default ? 'checked' : '' ?>>
                                         <label class="form-check-label">Default</label>
                                     </div>
                                 </div>
@@ -337,10 +332,13 @@ if (!$model->isNewRecord) {
                 }
             }
         });
+
+        // Capture the selected variant_is_default index
+        $('.variant-default-radio').on('change', function() {
+            const selectedIndex = $(this).val();
+            console.log('Selected variant_is_default index:', selectedIndex);
+        });
     });
-
-
-
 
     function uploadImage(image) {
         var data = new FormData();

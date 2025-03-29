@@ -143,6 +143,7 @@ class ProductsController extends BaseController
     protected function saveVariantsAndAttributes($model)
     {
         $postData = Yii::$app->request->post('Product');
+        $variantDefaults = ArrayHelper::getValue($postData, 'variant_is_default', []);
         $variantNames = ArrayHelper::getValue($postData, 'variant_name', []);
         $variantPrices = ArrayHelper::getValue($postData, 'variant_price', []);
         $variantQuantities = ArrayHelper::getValue($postData, 'variant_quantity', []);
@@ -156,6 +157,7 @@ class ProductsController extends BaseController
             $variant->quantity = $variantQuantities[$index];
             $variant->cost = $variantCosts[$index];
             $variant->product_id = $model->id;
+            $variant->is_default = isset($variantDefaults[$index]) && $variantDefaults[$index] == 1 ? 1 : 0;
 
             if (!$variant->save(false)) {
                 Yii::$app->session->setFlash('error', $variant->getFirstErrors());
@@ -164,12 +166,11 @@ class ProductsController extends BaseController
 
             // Save attributes for the variant
             if (isset($variantAttributes[$index]['attributes'])) {
-                $attributes = json_decode($variantAttributes[$index]['attributes'], true);
-                foreach ($attributes as $attributeData) {
+                foreach ($variantAttributes[$index]['attributes'] as $attributeId => $optionId) {
                     $variantAttribute = new VariantAttributes();
-                    $variantAttribute->attribute_id = $attributeData['attributeId'];
-                    $variantAttribute->option_id = $attributeData['optionId'];
                     $variantAttribute->variant_id = $variant->id;
+                    $variantAttribute->attribute_id = $attributeId;
+                    $variantAttribute->option_id = $optionId;
 
                     if (!$variantAttribute->save(false)) {
                         Yii::$app->session->setFlash('error', $variantAttribute->getFirstErrors());
