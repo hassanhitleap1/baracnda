@@ -142,6 +142,32 @@ class ProductsController extends BaseController
 
     protected function saveVariantsAndAttributes($model)
     {
+        
+        if($model->type == Products::SIMPLE){
+            
+            if (!$model->isNewRecord) {
+                $variant = Variants::findOne(['product_id' => $model->id]);
+                if (!$variant) {
+                    $variant = new Variants();
+                }
+            } else {
+                $variant = new Variants();
+            }
+
+            $variant->name = $model->name;
+            $variant->price = $model->price;
+            $variant->quantity = $model->quantity;
+            $variant->cost = $model->cost;
+            $variant->product_id = $model->id;
+            $variant->is_default = 1;
+            if (!$variant->save(false)) {
+                Yii::$app->session->setFlash('error', $variant->getFirstErrors());
+                return false;
+            }
+
+            return true;
+        }
+        
         $postData = Yii::$app->request->post('Product');
         $variantDefaults = ArrayHelper::getValue($postData, 'variant_is_default', []);
         $variantNames = ArrayHelper::getValue($postData, 'variant_name', []);

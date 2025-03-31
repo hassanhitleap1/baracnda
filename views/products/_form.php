@@ -15,6 +15,7 @@ use app\models\attributes\Attributes;
 use app\models\categories\Categories;
 
 use app\models\warehouses\Warehouses;
+use Dom\Attr;
 use kartik\editors\Summernote;
 use kartik\file\FileInput;
 use kartik\select2\Select2;
@@ -28,7 +29,7 @@ $categories = ArrayHelper::map(Categories::find()->all(), 'id', 'name');
 
 $warehouses = ArrayHelper::map(Warehouses::find()->all(), 'id', 'name');
 $dataImages = [];
-$options=[];
+$options = [];
 
 if (!$model->isNewRecord) {
     foreach ($model->images as $key => $value) {
@@ -124,34 +125,34 @@ if (!$model->isNewRecord) {
     <div class="row">
 
         <div class="col-3">
-            <?= $form->field($model, 'type')->dropDownList(['simple' => 'Simple', 'variant' => 'variant']) ?>
+            <?= $form->field($model, 'type')->dropDownList(['simple' => 'Simple']) ?>
         </div>
 
         <div class="col-3">
 
-            <button type="button" class="btn btn-primary" id="btn-modal-open" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">Select Attributes & Generate Variants</button>
+            <button type="button" class="btn btn-primary" id="btn-modal-open" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo0" style="display: none;">Select Attributes & Generate Variants</button>
 
         </div>
     </div>
-    <div class="card-body">
+    <div class="card-body" style="display: none;">
         <div class="card-header">
             <?= Yii::t('app', 'Product_Variants') ?>
         </div>
         <div class="card-body">
             <div class="row" id="variants-generated">
                 <?php
-                
                 $variantNames = Yii::$app->request->post('Product', [])['variant_name'] ?? [];
                 $variantPrices = Yii::$app->request->post('Product', [])['variant_price'] ?? [];
                 $variantCosts = Yii::$app->request->post('Product', [])['variant_cost'] ?? [];
                 $variantQuantities = Yii::$app->request->post('Product', [])['variant_quantity'] ?? [];
                 $variantDefaults = Yii::$app->request->post('Product', [])['variant_is_default'] ?? [];
-                $variantAttributes = Yii::$app->request->post('Product', [])['attributes'] ?? [];
-                    dump($variantDefaults);
-                $options=[];
+                $variantAttributes = Yii::$app->request->post('Product', [])['variant_attribute_option'] ?? [];
+                $attributeOptions = [];
+                $options = [];
+                ?>
 
-    
-                foreach ($variantNames as $index => $name): ?>
+
+                <?php foreach ($variantNames as $index => $name): ?>
                     <div class="row mb-3">
                         <div class="col-3">
                             <div class="form-group">
@@ -186,26 +187,50 @@ if (!$model->isNewRecord) {
                             <div class="form-group">
                                 <label class="control-label">Set as Default</label>
                                 <div class="form-check">
-                                    <input type="radio" class="form-check-input variant-default-radio" name="Product[variant_is_default][<?= $index ?>]"  <?= isset($variantDefaults[$index]) && $variantDefaults[$index] == "on" ? 'checked' : '' ?>>
+                                    <input type="radio" class="form-check-input variant-default-radio" name="Product[variant_is_default][<?= $index ?>]" <?= isset($variantDefaults[$index]) && $variantDefaults[$index] == "on" ? 'checked' : '' ?>>
                                     <?= Html::error($model, "variant_is_default", ['class' => 'help-block text-danger']) ?>
                                 </div>
                             </div>
                         </div>
+                        <?php
+                        // foreach ($variantAttributes as $key => $variantAttribute){
+                        //     dump($variantAttribute[1]);
+                        // }
+                        // dd('variantAttributes');
+                        ?>
+                        <?php foreach ($variantAttributes[$index] as $variantAttribute): ?>
+                            <?php
+
+                            $options = AttributeOptions::find()->where(['attribute_id' =>  $variantAttributes[1]])->all();
+
+                            ?>
 
 
-                        <?php foreach ($variantAttributes as $attribute): ?>
-                             <?php 
-                       
-                                if(!isset($options[$attribute->attribute_id])){
-                                    $options[$attribute->attribute_id] = AttributeOptions::find()->where(['attribute_id' => $attribute->attribute_id])->all();
-                                }
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label class="control-label"><?= '' ?></label>
+                                    <select class="form-control" name="Product[variant_attribute_option][<?= $index ?>][<?= $variantAttribute[1] ?>]">
+                                        <?php foreach ($options as $option): ?>
+                                            <option value="<?= $option->id ?>" <?= $option->id == $variantAttribute[2]  ? 'selected' : '' ?>><?= $option->value ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+
+
+                        <?php endforeach; ?>
+                        <?php foreach ($attributeOptions as $attributeOption): ?>
+                            <?php
+                            if (!isset($options[$attributeOption->attribute_id])) {
+                                $options[$attributeOption->attribute_id] = AttributeOptions::find()->where(['attribute_id' => $attributeOption->attribute_id])->all();
+                            }
                             ?>
                             <div class="col-2">
                                 <div class="form-group">
-                                    <label class="control-label">options</label>
-                                    <select class="form-control" name="Product[variants][<?= $variant->id ?>][attributes][<?= $attribute->id ?>]">
-                                        <?php foreach ($options[$attribute->attribute_id] as $option): ?>
-                                            <option value="<?= $option->id ?>" <?= $option->id == $attribute->option_id ? 'selected' : '' ?>><?= $option->value ?></option>
+                                    <label class="control-label"><?= $attributeOption->attr->name ?></label>
+                                    <select class="form-control" name="Product[variant_attribute_option][<?= $index ?>]">
+                                        <?php foreach ($options[$attributeOption->attribute_id] as $option): ?>
+                                            <option value="<?= $option->id ?>" <?= $option->id == $attributeOption->id ? 'selected' : '' ?>><?= $option->value ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
@@ -217,9 +242,9 @@ if (!$model->isNewRecord) {
 
                 <?php if (!$model->isNewRecord && $model->type == 'variant'): ?>
                     <?php foreach ($model->variants as $variant): ?>
-                        
+
                         <div class="row mb-3">
-                            <div  class="col-2">
+                            <div class="col-2">
                                 <div class="form-group">
                                     <label class="control-label">id</label>
                                     <input type="text" class="form-control" name="Product[variant_id][<?= $variant->id ?>]" value="<?= $variant->id ?>">
@@ -260,9 +285,9 @@ if (!$model->isNewRecord) {
                             </div>
 
                             <?php foreach ($variant->variantAttributes as $attribute): ?>
-                                <?php 
-                               
-                                if(!isset($options[$attribute->attribute_id])){
+                                <?php
+
+                                if (!isset($options[$attribute->attribute_id])) {
                                     $options[$attribute->attribute_id] = AttributeOptions::find()->where(['attribute_id' => $attribute->attribute_id])->all();
                                 }
                                 ?>
@@ -279,89 +304,88 @@ if (!$model->isNewRecord) {
                             <?php endforeach; ?>
                         </div>
 
-                        
+
                     <?php endforeach; ?>
                 <?php endif; ?>
             </div>
-        </d>
+            </d>
+        </div>
     </div>
 
 
     <div class="card-body">
-        <div class="card-header">
-            <?= Yii::t('app', 'Product_Variants') ?>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-12">
-                    <?= $form->field($model, 'files[]')->widget(FileInput::classname(), [
-                        'options' => ['accept' => 'image/*', 'multiple' => true],
-                    ]); ?>
-                </div>
-                <div class="col-12">
-                    <div class="form-group">
-                        <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
+            <div class="card-header">
+                                                
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <?= $form->field($model, 'files[]')->widget(FileInput::classname(), [
+                            'options' => ['accept' => 'image/*', 'multiple' => true],
+                        ]); ?>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-group">
+                            <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
 
     <?php ActiveForm::end(); ?>
 
-</div>
 
-
-<script>
-    $(document).ready(function() {
-        $('#summernote').summernote({
-            lang: 'fr-FR', // <= nobody is perfect :)
-            height: 300,
-            toolbar: [
-                ['style', ['bold', 'italic', 'underline', 'clear']],
-                ['font', ['fontsize']],
-                ['color', ['color']],
-                ['para', ['ul', 'ol', 'paragraph']],
-                ['link', ['link']],
-                ['picture', ['picture']]
-            ],
-            callbacks: {
-                onImageUpload: function(image) {
-                    uploadImage(image[0]);
+    <script>
+        $(document).ready(function() {
+            $('#summernote').summernote({
+                lang: 'fr-FR', // <= nobody is perfect :)
+                height: 300,
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['font', ['fontsize']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['link', ['link']],
+                    ['picture', ['picture']]
+                ],
+                callbacks: {
+                    onImageUpload: function(image) {
+                        uploadImage(image[0]);
+                    }
                 }
-            }
+            });
+
+            // Capture the selected variant_is_default index
+            $('.variant-default-radio').on('change', function() {
+                const selectedIndex = $(this).val();
+                console.log('Selected variant_is_default index:', selectedIndex);
+            });
         });
 
-        // Capture the selected variant_is_default index
-        $('.variant-default-radio').on('change', function() {
-            const selectedIndex = $(this).val();
-            console.log('Selected variant_is_default index:', selectedIndex);
-        });
-    });
+        function uploadImage(image) {
+            var data = new FormData();
+            data.append("image", image);
+            $.ajax({
+                data: data,
+                type: "POST",
+                url: `${SITE_URL}/index.php?r=medialibrary/upload`,
+                // returns a chain containing the path
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function(url) {
 
-    function uploadImage(image) {
-        var data = new FormData();
-        data.append("image", image);
-        $.ajax({
-            data: data,
-            type: "POST",
-            url: `${SITE_URL}/index.php?r=medialibrary/upload`,
-            // returns a chain containing the path
-            cache: false,
-            contentType: false,
-            processData: false,
-            success: function(url) {
+                    var image = document.location.origin + url;
+                    setTimeout(function() {
+                        $('#summernote').summernote("insertImage", image);
+                    }, 500);
 
-                var image = document.location.origin + url;
-                setTimeout(function() {
-                    $('#summernote').summernote("insertImage", image);
-                }, 500);
-
-            },
-            error: function(data) {
-                console.log(data);
-            }
-        });
-    }
-</script>
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+        }
+    </script>

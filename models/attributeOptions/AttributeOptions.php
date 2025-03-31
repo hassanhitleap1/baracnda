@@ -2,6 +2,7 @@
 
 namespace app\models\attributeOptions;
 
+use app\models\attributes\Attributes;
 use Attribute;
 use Yii;
 
@@ -61,9 +62,9 @@ class AttributeOptions extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery|AttributeQuery
      */
-    public function getAttributes0()
+    public function getAttr()
     {
-        return $this->hasOne(Attribute::class, ['id' => 'attribute_id']);
+        return $this->hasOne(Attributes::class, ['id' => 'attribute_id']);
     }
 
     /**

@@ -22,6 +22,7 @@ $(document).ready(function () {
             var attributeId = $(this).attr('data-attribute-id');
             var attributeOptionId = $(this).attr('data-attribute-option-id');
             var optionValue = $(this).val();
+            var attributeName = $(this).attr('data-attribute-name');
            
             // Initialize array for this attribute if it doesn't exist
             if (!options[attributeId]) {
@@ -32,7 +33,8 @@ $(document).ready(function () {
             options[attributeId].push({
                 attributeOptionId: attributeOptionId,
                 value: optionValue,
-                attributeId: attributeId
+                attributeId: attributeId,
+                attributeName: attributeName
             });
 
             // Group attributes by their ID
@@ -42,7 +44,8 @@ $(document).ready(function () {
             selectedAttributes[attributeId].push({
                 attributeOptionId: attributeOptionId,
                 value: optionValue,
-                attributeId: attributeId
+                attributeId: attributeId,
+                attributeName: attributeName
             });
         });
 
@@ -59,19 +62,18 @@ $(document).ready(function () {
         variants.forEach((variant, index) => {
             let variantName = variant.map(attr => attr.value).join(' ');
             let variantId = index;
-            const variantAttributes = variant.map(attr => ({
-                attributeId: attr.attributeId,
-                optionId: attr.attributeOptionId
-            }));
-            const variantAttributesJson = JSON.stringify(variantAttributes);
-
+            // const variantAttributes = variant.map(attr => ({
+            //     attributeId: attr.attributeId,
+            //     optionId: attr.attributeOptionId
+            // }));
+    
             let attributeDropdowns = '';
             variant.forEach(attr => {
                 attributeDropdowns += `
                     <div class="col-2">
                         <div class="form-group">
-                            <label class="control-label">${attr.attributeId} options</label>
-                            <select class="form-control"  disabled name="Product[variants][${variantId}][attributes][${attr.attributeId}]">
+                            <label class="control-label">${attr.attributeName}</label>
+                            <select class="form-control"  name="Product[variant_attribute_option][${variantId}][${attr.attributeId}]">
                                 ${options[attr.attributeId].map(opt => 
                                     `<option value="${opt.attributeOptionId}" ${opt.attributeOptionId == attr.attributeOptionId ? 'selected' : ''}>
                                         ${opt.value}

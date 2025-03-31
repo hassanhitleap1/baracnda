@@ -62,7 +62,7 @@ class Products extends \yii\db\ActiveRecord
         return [
             [['description', 'image_path'], 'default', 'value' => null, 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
             [['warehouse_id','creator_id'], 'default', 'value' => 1, 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
-            [['creator_id', 'name', 'price', 'cost','type'], 'required', 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['creator_id', 'name', 'price', 'quantity','cost','type'], 'required', 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
             [['creator_id', 'category_id', 'warehouse_id'], 'integer', 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
             [['description'], 'string', 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
             [['price', 'cost','quantity'], 'number', 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
@@ -88,52 +88,56 @@ class Products extends \yii\db\ActiveRecord
      */
     public function validateVariants($attribute, $params)
     {
+
+
+        $postData = Yii::$app->request->post('Product');
+        $variantNames = ArrayHelper::getValue($postData, 'variant_name', []);
        
-        if ($this->type === self::SIMPLE) {
+        if ($this->type === self::SIMPLE && count($variantNames) > 0) {
             $this->addError($attribute, 'Simple products cannot have variants.');
         }
        
-        if ($this->type === self::VARIANT) {
-            // Validate variant fields
-            $postData = Yii::$app->request->post('Product');
-            $variantNames = ArrayHelper::getValue($postData, 'variant_name', []);
-            $variantPrices = ArrayHelper::getValue($postData, 'variant_price', []);
-            $variantQuantities = ArrayHelper::getValue($postData, 'variant_quantity', []);
-            $variantCosts = ArrayHelper::getValue($postData, 'variant_cost', []);
+        // if ($this->type === self::VARIANT) {
+        //     // Validate variant fields
+        //     $postData = Yii::$app->request->post('Product');
+        //     $variantNames = ArrayHelper::getValue($postData, 'variant_name', []);
+        //     $variantPrices = ArrayHelper::getValue($postData, 'variant_price', []);
+        //     $variantQuantities = ArrayHelper::getValue($postData, 'variant_quantity', []);
+        //     $variantCosts = ArrayHelper::getValue($postData, 'variant_cost', []);
             
-            // Ensure at least 2 variants are provided
-            if (count($variantNames) < 2) {
-                $this->addError($attribute, 'Variant products must have at least 2 variants.');
-                return false;
-            }
+        //     // Ensure at least 2 variants are provided
+        //     if (count($variantNames) < 2) {
+        //         $this->addError($attribute, 'Variant products must have at least 2 variants.');
+        //         return false;
+        //     }
 
-            foreach ($variantNames as $index => $name) {
-                $dynamicModel = DynamicModel::validateData([
-                    'name' => $name,
-                    'price' => $variantPrices[$index],
-                    'quantity' => $variantQuantities[$index],
-                    'cost' => $variantCosts[$index],
-                ], [
-                    [
-                        ['name', 
-                        'price',
-                        'quantity'
-                    ]
-                    , 'required'
-                    ],
-                    [['name'], 'string', 'max' => 255],
-                    [['price', 'quantity','cost'], 'number'],
-                ]);
-                if ($dynamicModel->hasErrors()) {
-                    foreach ($dynamicModel->errors as $field => $errors) {
-                        $this->addError("variant_{$field}_{$index}", implode(', ', $errors));
+        //     foreach ($variantNames as $index => $name) {
+        //         $dynamicModel = DynamicModel::validateData([
+        //             'name' => $name,
+        //             'price' => $variantPrices[$index],
+        //             'quantity' => $variantQuantities[$index],
+        //             'cost' => $variantCosts[$index],
+        //         ], [
+        //             [
+        //                 ['name', 
+        //                 'price',
+        //                 'quantity'
+        //             ]
+        //             , 'required'
+        //             ],
+        //             [['name'], 'string', 'max' => 255],
+        //             [['price', 'quantity','cost'], 'number'],
+        //         ]);
+        //         if ($dynamicModel->hasErrors()) {
+        //             foreach ($dynamicModel->errors as $field => $errors) {
+        //                 $this->addError("variant_{$field}_{$index}", implode(', ', $errors));
                         
-                    }
-                    return false;
-                }
-            }
-            return true;
-        }
+        //             }
+        //             return false;
+        //         }
+        //     }
+        //     return true;
+        // }
     }
 
         /**

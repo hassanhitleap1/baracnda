@@ -27,8 +27,8 @@ $attributes = Attributes::find()->all();
               <?php foreach($attribute->options as $option): ?>
                 <?php $checkboxId = 'option_' . $attribute->id . '_' . $option->id; ?>
                   <div class="checkbox-inline">
-                    <input class="form-check-input attribute-option" type="checkbox" data-attribute-id="<?= $attribute->id ?>" data-attribute-option-id="<?= $option->id ?>" id="<?= $checkboxId ?>" name="attributes[<?= $attribute->id ?>][]" value="<?= Html::encode($option->value) ?>">
-                    <label class="form-check-label" for="<?= $checkboxId ?>"><?= Html::encode($option->value) ?></label>
+                    <input class="form-check-input attribute-option" type="checkbox" data-attribute-id="<?= $attribute->id ?>"  data-attribute-name="<?= $attribute->name ?>" data-attribute-option-id="<?= $option->id ?>" id="<?= $checkboxId ?>" name="attributes[<?= $attribute->id ?>][]" value="<?= Html::encode($option->value) ?>">
+                    <label class="form-check-label" for="<?= $checkboxId ?>"><?= Html::encode($option->value) ?>  ( <?= $option->id ?>) </label>
                   </div>
               <?php endforeach; ?>
             </div>  
