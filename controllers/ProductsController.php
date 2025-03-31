@@ -88,53 +88,26 @@ class ProductsController extends BaseController
 
                     $files = UploadedFile::getInstances($model, 'files');
                     if (!empty($files)) {
+                        $files = UploadedFile::getInstances($model, 'files');
                         $folder_path = "images/products/$newId";
+            
                         FileHelper::createDirectory(
                             "$folder_path",
                             $mode = 0775,
                             $recursive = true
                         );
-
-                        
-
-
+            
                         foreach ($files as $key => $file) {
                             $modelFile = new Images();
                             $file_path = "$folder_path/$key" . "." . $file->extension;
                             $modelFile->product_id = $newId;
                             $modelFile->image_path = $file_path;
                             $file->saveAs($file_path);
-                            if ($key == 0) {
-                                $model->image_path = $file_path;
-                            }
                             $modelFile->save(false);
                         }
-                        
-                        // foreach ($files as $key => $file) {
-                          
-                        //     $modelImagesProduct = new  Images();
-                        //     $file_path = "$folder_path/$key" . "." . $file->extension;
-                        //     $modelImagesProduct->product_id = $newId;
-                        //     $modelImagesProduct->image_path = $file_path;
-                        //     // $modelImagesProduct->variant_id = $model->id;
-                        //     $modelImagesProduct->created_at = date('Y-m-d H:i:s');
-                        //     $modelImagesProduct->updated_at = date('Y-m-d H:i:s');
-                        //     $modelImagesProduct->save(false);
-                        //     $file->saveAs($file_path);
-
-                        
-                        //     dd($modelImagesProduct->save(false));
-                        //     if ($key == 0) {
-                        //         $model->image_path = $file_path;
-                        //     }
-
-                           
-                          
-                        // }
-                    
-
-
                     }
+
+
                     if ($model->save(false) ) {
                         // Handle variants and attributes if any
                        
@@ -245,65 +218,39 @@ class ProductsController extends BaseController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
         $model->scenario = Products::SCENARIO_UPDATE;
-        $newId = $model->id;
+        $newId = $id;
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->validate()) {
 
+            $files = UploadedFile::getInstances($model, 'files');
+            $folder_path = "images/products/$newId";
 
-        if ($this->request->isPost) {
-            $transaction = Yii::$app->db->beginTransaction();
+            FileHelper::createDirectory(
+                "$folder_path",
+                $mode = 0775,
+                $recursive = true
+            );
 
-
-            try {
-
-
-                if ($model->load($this->request->post()) && $model->validate()) {
-
-
-                    $files = UploadedFile::getInstance($model, 'files');
-
-                    if (!empty($files)) {
-
-                        $folder_path = "images/products/$newId";
-                        FileHelper::createDirectory(
-                            "$folder_path",
-                            $mode = 0775,
-                            $recursive = true
-                        );
-
-                        foreach ($files as $key => $file) {
-                            $modelImagesProduct = new  Images();
-                            $file_path = "$folder_path/images/$key" . "." . $file->extension;
-                            $modelImagesProduct->product_id = $newId;
-                            $modelImagesProduct->image_path = $file_path;
-                            $file->saveAs($file_path);
-
-                            if ($key == 0) {
-                                $model->image_path = $file_path;
-                            }
-
-                            $modelImagesProduct->save(false);
-                        }
-                    }
-
-                    if ($model->save()) {
-                        // Handle variants and attributes if any
-                        $this->saveVariantsAndAttributes($model);
-
-                        $transaction->commit();
-                        return $this->redirect(['view', 'id' => $model->id]);
-                    }
-                }
-                
-            } catch (\Exception $e) {
-                $transaction->rollBack();
-                Yii::$app->session->setFlash('error', $e->getMessage());
+            foreach ($files as $key => $file) {
+                $modelFile = new Images();
+                $file_path = "$folder_path/$key" . "." . $file->extension;
+                $modelFile->product_id = $newId;
+                $modelFile->image_path = $file_path;
+                $file->saveAs($file_path);
+                $modelFile->save(false);
             }
+
+            $model->save();
+            $this->saveVariantsAndAttributes($model);
+            return $this->render('view', [
+                'model' => $model,
+            ]);
         }
 
         return $this->render('update', [
             'model' => $model,
         ]);
+  
     }
 
     /**
@@ -335,4 +282,27 @@ class ProductsController extends BaseController
 
         throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
+
+
+
+
+    public function actionRemoveImage($id)
+    {
+
+        $modelImage = Images::findOne(['id' => $id]);
+        Images::deleteAll(['id' => $id]);
+        if (!file_exists($modelImage->image_path)) {
+            return json_encode(['success' => false, 'error' => 'Failed to remove image']);
+        }
+
+        if (unlink($modelImage->image_path)) { // Delete the image file
+            return json_encode(['success' => true]);
+        } else {
+            // Respond with an error message if deletion fails
+           
+            return json_encode(['success' => false, 'error' => 'Failed to remove image']);
+        }
+    }
+
+  
 }

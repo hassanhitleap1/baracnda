@@ -24,39 +24,61 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
 use kartik\form\ActiveForm;
+use yii\helpers\Url;
 
 $categories = ArrayHelper::map(Categories::find()->all(), 'id', 'name');
 
 $warehouses = ArrayHelper::map(Warehouses::find()->all(), 'id', 'name');
+
+
 $dataImages = [];
-$options = [];
-
-if (!$model->isNewRecord) {
-    foreach ($model->images as $key => $value) {
-        $images_path[] = Yii::getAlias('@web') . '/' . $value['image_path'];
-    }
-    if (count($model->images) === 0) {
-        $dataImages = [
-            'showCaption' => true,
-            'showRemove' => true,
-            'showUpload' => false
-        ];
-    } else {
-        $dataImages = [
-            'showCaption' => true,
-            'showRemove' => true,
-            'showUpload' => false,
-            'initialPreview' => $images_path,
-            'initialPreviewAsData' => true,
-            // 'initialCaption' => Yii::getAlias('@web') . '/' . $model->thumbnail,
-            'initialPreviewConfig' => [
-                ['caption' => $model->name],
-            ],
-            'overwriteInitial' => true
-
-        ];
-    }
+$images_path_product = [];
+$initialPreviewConfigs = [];
+foreach ($model->images as $key => $value) {
+    $images_path_product[] = Html::img(Yii::getAlias('@web/' . $value->image_path), ['class' => 'file-preview-image', 'alt' => 'Uploaded Image']);
+    $initialPreviewConfigs[] = ['caption' => 'Image 1', 'url' => Url::to(['remove-image', 'id' => $value->id])];
 }
+
+
+$dataImages = [
+    'showCaption' => false,
+    'showRemove' => false,
+    'showUpload' => false,
+    'browseClass' => 'btn btn-primary btn-block',
+    'browseLabel' => 'Select Image',
+    'allowedFileTypes' => ['image'],
+    // 'initialPreviewAsData' => true,
+    'initialPreview' => $images_path_product,
+    'initialPreviewConfig' => $initialPreviewConfigs,
+    // 'overwriteInitial' => true,
+
+];
+// if (!$model->isNewRecord) {
+//     foreach ($model->images as $key => $image) {
+//         $images_path[] = $image->imageUrl;
+//     }
+//     if (count($model->images) === 0) {
+//         $dataImages = [
+//             'showCaption' => true,
+//             'showRemove' => true,
+//             'showUpload' => false
+//         ];
+//     } else {
+//         $dataImages = [
+//             'showCaption' => true,
+//             'showRemove' => true,
+//             'showUpload' => false,
+//             'initialPreview' => $images_path,
+//             'initialPreviewAsData' => true,
+//             // 'initialCaption' => Yii::getAlias('@web') . '/' . $model->thumbnail,
+//             'initialPreviewConfig' => [
+//                 ['caption' => $model->name],
+//             ],
+//             'overwriteInitial' => true
+
+//         ];
+//     }
+// }
 
 /** @var yii\web\View $this */
 /** @var app\models\products\Products $model */
@@ -134,184 +156,7 @@ if (!$model->isNewRecord) {
 
         </div>
     </div>
-    <div class="card-body" style="display: none;">
-        <div class="card-header">
-            <?= Yii::t('app', 'Product_Variants') ?>
-        </div>
-        <div class="card-body">
-            <div class="row" id="variants-generated">
-                <?php
-                $variantNames = Yii::$app->request->post('Product', [])['variant_name'] ?? [];
-                $variantPrices = Yii::$app->request->post('Product', [])['variant_price'] ?? [];
-                $variantCosts = Yii::$app->request->post('Product', [])['variant_cost'] ?? [];
-                $variantQuantities = Yii::$app->request->post('Product', [])['variant_quantity'] ?? [];
-                $variantDefaults = Yii::$app->request->post('Product', [])['variant_is_default'] ?? [];
-                $variantAttributes = Yii::$app->request->post('Product', [])['variant_attribute_option'] ?? [];
-                $attributeOptions = [];
-                $options = [];
-                ?>
-
-
-                <?php foreach ($variantNames as $index => $name): ?>
-                    <div class="row mb-3">
-                        <div class="col-3">
-                            <div class="form-group">
-                                <label class="control-label">Variant Name</label>
-                                <input type="text" class="form-control" name="Product[variant_name][<?= $index ?>]" value="<?= $name ?>">
-                                <?= Html::error($model, "variant_name_{$index}", ['class' => 'help-block text-danger']) ?>
-                            </div>
-                        </div>
-                        <div class="col-2">
-                            <div class="form-group">
-                                <label class="control-label">Variant Price</label>
-                                <input type="text" class="form-control" name="Product[variant_price][<?= $index ?>]" value="<?= $variantPrices[$index] ?? '' ?>">
-                                <?= Html::error($model, "variant_price_{$index}", ['class' => 'help-block text-danger']) ?>
-                            </div>
-                        </div>
-                        <div class="col-2">
-                            <div class="form-group">
-                                <label class="control-label">Variant Cost</label>
-                                <input type="text" class="form-control" name="Product[variant_cost][<?= $index ?>]" value="<?= $variantCosts[$index] ?? '' ?>">
-                                <?= Html::error($model, "variant_price_{$index}", ['class' => 'help-block text-danger']) ?>
-                            </div>
-                        </div>
-                        <div class="col-3">
-                            <div class="form-group">
-                                <label class="control-label">Variant Quantity</label>
-                                <input type="text" class="form-control" name="Product[variant_quantity][<?= $index ?>]" value="<?= $variantQuantities[$index] ?? '' ?>">
-                                <?= Html::error($model, "variant_quantity_{$index}", ['class' => 'help-block text-danger']) ?>
-                            </div>
-                        </div>
-
-                        <div class="col-2">
-                            <div class="form-group">
-                                <label class="control-label">Set as Default</label>
-                                <div class="form-check">
-                                    <input type="radio" class="form-check-input variant-default-radio" name="Product[variant_is_default][<?= $index ?>]" <?= isset($variantDefaults[$index]) && $variantDefaults[$index] == "on" ? 'checked' : '' ?>>
-                                    <?= Html::error($model, "variant_is_default", ['class' => 'help-block text-danger']) ?>
-                                </div>
-                            </div>
-                        </div>
-                        <?php
-                        // foreach ($variantAttributes as $key => $variantAttribute){
-                        //     dump($variantAttribute[1]);
-                        // }
-                        // dd('variantAttributes');
-                        ?>
-                        <?php foreach ($variantAttributes[$index] as $variantAttribute): ?>
-                            <?php
-
-                            $options = AttributeOptions::find()->where(['attribute_id' =>  $variantAttributes[1]])->all();
-
-                            ?>
-
-
-                            <div class="col-2">
-                                <div class="form-group">
-                                    <label class="control-label"><?= '' ?></label>
-                                    <select class="form-control" name="Product[variant_attribute_option][<?= $index ?>][<?= $variantAttribute[1] ?>]">
-                                        <?php foreach ($options as $option): ?>
-                                            <option value="<?= $option->id ?>" <?= $option->id == $variantAttribute[2]  ? 'selected' : '' ?>><?= $option->value ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                            </div>
-
-
-                        <?php endforeach; ?>
-                        <?php foreach ($attributeOptions as $attributeOption): ?>
-                            <?php
-                            if (!isset($options[$attributeOption->attribute_id])) {
-                                $options[$attributeOption->attribute_id] = AttributeOptions::find()->where(['attribute_id' => $attributeOption->attribute_id])->all();
-                            }
-                            ?>
-                            <div class="col-2">
-                                <div class="form-group">
-                                    <label class="control-label"><?= $attributeOption->attr->name ?></label>
-                                    <select class="form-control" name="Product[variant_attribute_option][<?= $index ?>]">
-                                        <?php foreach ($options[$attributeOption->attribute_id] as $option): ?>
-                                            <option value="<?= $option->id ?>" <?= $option->id == $attributeOption->id ? 'selected' : '' ?>><?= $option->value ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-
-                    </div>
-                <?php endforeach; ?>
-
-                <?php if (!$model->isNewRecord && $model->type == 'variant'): ?>
-                    <?php foreach ($model->variants as $variant): ?>
-
-                        <div class="row mb-3">
-                            <div class="col-2">
-                                <div class="form-group">
-                                    <label class="control-label">id</label>
-                                    <input type="text" class="form-control" name="Product[variant_id][<?= $variant->id ?>]" value="<?= $variant->id ?>">
-                                </div>
-                            </div>
-                            <div class="col-2">
-                                <div class="form-group">
-                                    <label class="control-label">Variant Name</label>
-                                    <input type="text" class="form-control" name="Product[variant_name][<?= $variant->id ?>]" value="<?= Html::encode($variant->name) ?>">
-                                </div>
-                            </div>
-                            <div class="col-2">
-                                <div class="form-group">
-                                    <label class="control-label">Variant Price</label>
-                                    <input type="text" class="form-control" name="Product[variant_price][<?= $variant->id ?>]" value="<?= Html::encode($variant->price) ?>">
-                                </div>
-                            </div>
-                            <div class="col-2">
-                                <div class="form-group">
-                                    <label class="control-label">Variant Cost</label>
-                                    <input type="text" class="form-control" name="Product[variant_cost][<?= $variant->id ?>]" value="<?= Html::encode($variant->cost) ?>">
-                                </div>
-                            </div>
-                            <div class="col-2">
-                                <div class="form-group">
-                                    <label class="control-label">Variant Quantity</label>
-                                    <input type="text" class="form-control" name="Product[variant_quantity][<?= $variant->id ?>]" value="<?= Html::encode($variant->quantity) ?>">
-                                </div>
-                            </div>
-                            <div class="col-2">
-                                <div class="form-group">
-                                    <label class="control-label">Set as Default</label>
-                                    <div class="form-check">
-                                        <input type="radio" class="form-check-input variant-default-radio" name="Product[variant_is_default]" value="<?= $variant->id ?>" <?= $variant->is_default ? 'checked' : '' ?>>
-                                        <label class="form-check-label">Default</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <?php foreach ($variant->variantAttributes as $attribute): ?>
-                                <?php
-
-                                if (!isset($options[$attribute->attribute_id])) {
-                                    $options[$attribute->attribute_id] = AttributeOptions::find()->where(['attribute_id' => $attribute->attribute_id])->all();
-                                }
-                                ?>
-                                <div class="col-2">
-                                    <div class="form-group">
-                                        <label class="control-label">options</label>
-                                        <select class="form-control" name="Product[variants][<?= $variant->id ?>][attributes][<?= $attribute->id ?>]">
-                                            <?php foreach ($options[$attribute->attribute_id] as $option): ?>
-                                                <option value="<?= $option->id ?>" <?= $option->id == $attribute->option_id ? 'selected' : '' ?>><?= $option->value ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-
-
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
-            </d>
-        </div>
-    </div>
-
+    
 
     <div class="card-body">
             <div class="card-header">
@@ -322,6 +167,7 @@ if (!$model->isNewRecord) {
                     <div class="col-12">
                         <?= $form->field($model, 'files[]')->widget(FileInput::classname(), [
                             'options' => ['accept' => 'image/*', 'multiple' => true],
+                            'pluginOptions' => $dataImages
                         ]); ?>
                     </div>
                     <div class="col-12">

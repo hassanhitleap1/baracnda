@@ -91,4 +91,12 @@ class Images extends \yii\db\ActiveRecord
         return new ImagesQuery(get_called_class());
     }
 
+
+
+    public function getImageUrl()
+    {
+        // Assuming your imageFile attribute stores the path to the image
+        return \Yii::getAlias('@web/' . $this->image_path);
+    }
 }
+
