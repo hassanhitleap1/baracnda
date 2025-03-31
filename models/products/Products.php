@@ -36,7 +36,6 @@ use yii\helpers\ArrayHelper;
  */
 class Products extends \yii\db\ActiveRecord
 {
-
     public $files;
 
     public $variant_name;
@@ -72,7 +71,7 @@ class Products extends \yii\db\ActiveRecord
             [['creator_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['creator_id' => 'id'], 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
             [['warehouse_id'], 'exist', 'skipOnError' => true, 'targetClass' => Warehouses::class, 'targetAttribute' => ['warehouse_id' => 'id'], 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
             ['type', 'in', 'range' => array_keys(self::productType())],
-            [['files'], 'image', 'skipOnEmpty' => true, 'extensions' => 'png,jpg,jpeg,gif,webp,webm', 'maxFiles' => 20, 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
+            [['files'], 'image', 'skipOnEmpty' => true, 'extensions' => 'png,jpg,jpeg,gif,webp', 'maxFiles' => 20, 'on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
             ['type', 'validateVariants','on' => [self::SCENARIO_UPDATE, self::SCENARIO_CREATE]],
         ];
     }

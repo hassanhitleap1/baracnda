@@ -2,6 +2,8 @@
 
 namespace app\models\images;
 
+use app\models\products\Products;
+use app\models\variants\Variants;
 use Yii;
 
 /**
@@ -35,13 +37,13 @@ class Images extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['product_id', 'variant_id'], 'default', 'value' => null],
-            [['product_id', 'variant_id'], 'integer'],
-            [['image_path'], 'required'],
-            [['created_at', 'updated_at'], 'safe'],
-            [['image_path'], 'string', 'max' => 255],
-            [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::class, 'targetAttribute' => ['product_id' => 'id']],
-            [['variant_id'], 'exist', 'skipOnError' => true, 'targetClass' => Variant::class, 'targetAttribute' => ['variant_id' => 'id']],
+            // [['product_id', 'variant_id'], 'default', 'value' => null],
+            // [['product_id', 'variant_id'], 'integer'],
+            // [['image_path'], 'required'],
+            // [['created_at', 'updated_at'], 'safe'],
+            // [['image_path'], 'string', 'max' => 255],
+            // [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Products::class, 'targetAttribute' => ['product_id' => 'id']],
+            // [['variant_id'], 'exist', 'skipOnError' => true, 'targetClass' => Variants::class, 'targetAttribute' => ['variant_id' => 'id']],
         ];
     }
 

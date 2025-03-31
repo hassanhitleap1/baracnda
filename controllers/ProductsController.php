@@ -84,10 +84,10 @@ class ProductsController extends BaseController
             $transaction = Yii::$app->db->beginTransaction();
             try {
                 if ($model->load($this->request->post()) && $model->validate()) {
-                    $files = UploadedFile::getInstance($model, 'files');
+                
 
+                    $files = UploadedFile::getInstances($model, 'files');
                     if (!empty($files)) {
-
                         $folder_path = "images/products/$newId";
                         FileHelper::createDirectory(
                             "$folder_path",
@@ -95,23 +95,50 @@ class ProductsController extends BaseController
                             $recursive = true
                         );
 
+                        
+
+
                         foreach ($files as $key => $file) {
-                            $modelImagesProduct = new  Images();
-                            $file_path = "$folder_path/images/$key" . "." . $file->extension;
-                            $modelImagesProduct->product_id = $newId;
-                            $modelImagesProduct->path = $file_path;
+                            $modelFile = new Images();
+                            $file_path = "$folder_path/$key" . "." . $file->extension;
+                            $modelFile->product_id = $newId;
+                            $modelFile->image_path = $file_path;
                             $file->saveAs($file_path);
-
                             if ($key == 0) {
-                                $model->image = $file_path;
+                                $model->image_path = $file_path;
                             }
-
-                            $modelImagesProduct->save(false);
+                            $modelFile->save(false);
                         }
+                        
+                        // foreach ($files as $key => $file) {
+                          
+                        //     $modelImagesProduct = new  Images();
+                        //     $file_path = "$folder_path/$key" . "." . $file->extension;
+                        //     $modelImagesProduct->product_id = $newId;
+                        //     $modelImagesProduct->image_path = $file_path;
+                        //     // $modelImagesProduct->variant_id = $model->id;
+                        //     $modelImagesProduct->created_at = date('Y-m-d H:i:s');
+                        //     $modelImagesProduct->updated_at = date('Y-m-d H:i:s');
+                        //     $modelImagesProduct->save(false);
+                        //     $file->saveAs($file_path);
+
+                        
+                        //     dd($modelImagesProduct->save(false));
+                        //     if ($key == 0) {
+                        //         $model->image_path = $file_path;
+                        //     }
+
+                           
+                          
+                        // }
+                    
+
+
                     }
                     if ($model->save(false) ) {
                         // Handle variants and attributes if any
-                        if($this->saveVariantsAndAttributes($model)){
+                       
+                        if(!$this->saveVariantsAndAttributes($model)){
                             $transaction->commit();
                             return $this->redirect(['view', 'id' => $model->id]);
                         }
@@ -167,7 +194,7 @@ class ProductsController extends BaseController
 
             return true;
         }
-        
+
         $postData = Yii::$app->request->post('Product');
         $variantDefaults = ArrayHelper::getValue($postData, 'variant_is_default', []);
         $variantNames = ArrayHelper::getValue($postData, 'variant_name', []);
@@ -248,11 +275,11 @@ class ProductsController extends BaseController
                             $modelImagesProduct = new  Images();
                             $file_path = "$folder_path/images/$key" . "." . $file->extension;
                             $modelImagesProduct->product_id = $newId;
-                            $modelImagesProduct->path = $file_path;
+                            $modelImagesProduct->image_path = $file_path;
                             $file->saveAs($file_path);
 
                             if ($key == 0) {
-                                $model->image = $file_path;
+                                $model->image_path = $file_path;
                             }
 
                             $modelImagesProduct->save(false);
