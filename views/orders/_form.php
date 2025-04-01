@@ -41,15 +41,6 @@ use yii\widgets\ActiveForm;
         <div class="card-body">
             <div class="row">
                 <div class="col-6">
-                    <?=   $form->field($model, 'country_id')->widget(Select2::classname(), [
-                        'data' => ArrayHelper::map(Countries::find()->all(), 'id', 'name'),
-                        'options' => ['placeholder' => 'Select a attribute'],
-                        'pluginOptions' => [
-                            'allowClear' => true
-                        ],
-                    ]); ?>
-                </div>
-                <div class="col-6">
                     <?=   $form->field($model, 'region_id')->widget(Select2::classname(), [
                         'data' => ArrayHelper::map(Regions::find()->all(), 'id', 'name'),
                         'options' => ['placeholder' => 'Select a attribute'],
