@@ -2,24 +2,22 @@
 
 use yii\db\Migration;
 
-class m250309_012312_create_images_tables extends Migration
+class m250401_013125_create_payments_tables extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->createTable('images', [
+        // Payments Table
+        $this->createTable('payments', [
             'id' => $this->primaryKey(),
-            'product_id' => $this->integer()->null(),
-            'variant_id' => $this->integer()->null(),
-            'image_path' => $this->string()->notNull(),
+            'name' => $this->string()->notNull(),
+            'module' => $this->string()->notNull(), // e.g., 'Cash', 'CreditCard', 'PayPal'
+            'status' => $this->integer()->notNull()->defaultValue(1), // 1: active, 0: inactive
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ]);
-
-        $this->addForeignKey('fk_images_product', 'images', 'product_id', 'products', 'id', 'CASCADE');
-        $this->addForeignKey('fk_images_variant', 'images', 'variant_id', 'variants', 'id', 'CASCADE');
     }
 
     /**
@@ -27,7 +25,9 @@ class m250309_012312_create_images_tables extends Migration
      */
     public function safeDown()
     {
-        $this->dropTable('products');
+        echo "m250401_013125_create_payments_tables cannot be reverted.\n";
+
+        return false;
     }
 
     /*
@@ -39,7 +39,7 @@ class m250309_012312_create_images_tables extends Migration
 
     public function down()
     {
-        echo "m250309_012312_create_images_tables cannot be reverted.\n";
+        echo "m250401_013125_create_payments_tables cannot be reverted.\n";
 
         return false;
     }
