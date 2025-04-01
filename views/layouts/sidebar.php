@@ -47,33 +47,23 @@ use yii\bootstrap5\Html;
                         </p>
                     </a>
                 </li>
+
+
+                <li class="nav-item">
+                    <a href="<?= Url::to(['orders/index']) ?>"
+                        class="nav-link  <?= Yii::$app->controller->id == 'orders' ? 'active' : '' ?>">
+                        <i class="nav-icon far fa-calendar-alt"></i>
+                        <p>
+                            Orders
+                        </p>
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a href="<?= Url::to(['products/index']) ?>"
                         class="nav-link  <?= Yii::$app->controller->id == 'products' ? 'active' : '' ?>">
                         <i class="nav-icon far fa-calendar-alt"></i>
                         <p>
                             Products
-                        </p>
-                    </a>
-                </li>
-
-        
-                <li class="nav-item">
-                    <a href="<?= Url::to(['variants/index']) ?>"
-                        class="nav-link  <?= Yii::$app->controller->id == 'variants' ? 'active' : '' ?>">
-                        <i class="nav-icon far fa-calendar-alt"></i>
-                        <p>
-                        variants
-                        </p>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="<?= Url::to(['variant-attributes/index']) ?>"
-                        class="nav-link  <?= Yii::$app->controller->id == 'variant-attributes' ? 'active' : '' ?>">
-                        <i class="nav-icon far fa-calendar-alt"></i>
-                        <p>
-                        variant attributes
                         </p>
                     </a>
                 </li>
@@ -130,25 +120,12 @@ use yii\bootstrap5\Html;
                     </a>
                 </li>
 
-
-                <li class="nav-item">
-                    <a href="<?= Url::to(['categories/index']) ?>"
-                        class="nav-link <?= Yii::$app->controller->id == 'categories' ? 'active' : '' ?>">
-                        <i class="nav-icon far fa-calendar-alt"></i>
-                        <p>
-                            Categories
-                        </p>
-                    </a>
-                </li>
-
-
                 <li class="nav-item">
                     <a href="<?= Url::to(['pages/index']) ?>"
                         class="nav-link <?= Yii::$app->controller->id == 'pages' ? 'active' : '' ?>">
                         <i class="nav-icon far fa-calendar-alt"></i>
                         <p>
                             Pages
-
                         </p>
                     </a>
                 </li>
