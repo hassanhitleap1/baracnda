@@ -22,6 +22,7 @@ class m250309_004101_create_orders_tables extends Migration
             'profit' => $this->decimal(10,2)->notNull()->defaultValue(0),
             'discount' => $this->decimal(10,2)->notNull()->defaultValue(0),
             'shipping_id'=>$this->integer()->notNull()->defaultValue(1),
+            'payment_id'=>$this->integer()->notNull()->defaultValue(1),
             'note' => $this->text(),
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
@@ -32,7 +33,7 @@ class m250309_004101_create_orders_tables extends Migration
         $this->addForeignKey('fk_orders_address', 'orders', 'address_id', 'addresses', 'id', 'CASCADE');
         $this->addForeignKey('fk_status', 'orders', 'status_id', 'status', 'id', 'CASCADE');
         $this->addForeignKey('fk_shipping', 'orders', 'shipping_id', 'shippings', 'id', 'CASCADE');
-
+        $this->addForeignKey('fk_payment', 'orders', 'payment_id', 'payments', 'id', 'CASCADE');
     }
 
     /**

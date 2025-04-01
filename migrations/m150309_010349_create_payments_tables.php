@@ -2,7 +2,7 @@
 
 use yii\db\Migration;
 
-class m250401_013125_create_payments_tables extends Migration
+class m150309_010349_create_payments_tables extends Migration
 {
     /**
      * {@inheritdoc}
