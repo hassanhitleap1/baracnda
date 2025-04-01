@@ -77,59 +77,42 @@ class ProductsController extends BaseController
     {
         $model = new Products();
         $model->scenario = Products::SCENARIO_CREATE;
-        $newId = Products::find()->max('id') + 1;
+       
 
-        if ($this->request->isPost) {
-         
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->validate()) {
+
+            $newId = Products::find()->max('id') + 1;
             $transaction = Yii::$app->db->beginTransaction();
-            try {
-                if ($model->load($this->request->post()) && $model->validate()) {
-                
+            $files = UploadedFile::getInstances($model, 'files');
+            if($model->save() && $this->saveVariantsAndAttributes($model)){
 
-                    $files = UploadedFile::getInstances($model, 'files');
-                    if (!empty($files)) {
-                        $files = UploadedFile::getInstances($model, 'files');
-                        $folder_path = "images/products/$newId";
-            
-                        FileHelper::createDirectory(
-                            "$folder_path",
-                            $mode = 0775,
-                            $recursive = true
-                        );
-            
-                        foreach ($files as $key => $file) {
-                            $modelFile = new Images();
-                            $file_path = "$folder_path/$key" . "." . $file->extension;
-                            $modelFile->product_id = $newId;
-                            $modelFile->image_path = $file_path;
-                            $file->saveAs($file_path);
-                            $modelFile->save(false);
+                if ($files) {   
+                    $folder_path = "images/products/$newId";
+                    FileHelper::createDirectory(
+                        "$folder_path",
+                        $mode = 0775,
+                        $recursive = true
+                    );
+                    foreach ($files as $key => $file) {
+                        $modelFile = new Images();
+                        $file_path = "$folder_path/$key" . "." . $file->extension;
+                        $modelFile->product_id = $newId;
+                        $modelFile->image_path = $file_path;
+                        $file->saveAs($file_path);
+                        if($key == 0){
+                            $model->image_path = $file_path;
+                            $model->save(false);
                         }
-                    }
 
-
-                    if ($model->save(false) ) {
-                        // Handle variants and attributes if any
-                       
-                        if(!$this->saveVariantsAndAttributes($model)){
-                            $transaction->commit();
-                            return $this->redirect(['view', 'id' => $model->id]);
-                        }
-            
-                    }else{
-                        Yii::$app->session->setFlash('error', $this->getErrorMessages($model));
+                        $modelFile->save(false);
                     }
-                }else{
-                  
-                    Yii::$app->session->setFlash('error', $this->getErrorMessages($model));
                 }
-            } catch (\Exception $e) {
+                $transaction->commit();
+                return $this->redirect(['view', 'id' => $model->id]);  
+            }else{
                 $transaction->rollBack();
                 Yii::$app->session->setFlash('error', $this->getErrorMessages($model));
             }
-        } else {
-            $model->loadDefaultValues();
-        
         }
 
         return $this->render('create', [
@@ -236,6 +219,9 @@ class ProductsController extends BaseController
                 $file_path = "$folder_path/$key" . "." . $file->extension;
                 $modelFile->product_id = $newId;
                 $modelFile->image_path = $file_path;
+                if ($key == 0) {
+                    $model->image_path = $file_path;
+                }
                 $file->saveAs($file_path);
                 $modelFile->save(false);
             }
