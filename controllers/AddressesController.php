@@ -131,4 +131,32 @@ class AddressesController extends BaseController
 
         throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
+
+    /**
+     * Fetches the country name based on the address ID.
+     * @param int $id ID
+     * @return \yii\web\Response
+     */
+    public function actionGetCountry($id)
+    {
+        $address = Addresses::findOne($id);
+        if ($address) {
+            return $this->asJson(['name' => $address->country->name]);
+        }
+        return $this->asJson(['name' => '']);
+    }
+
+    /**
+     * Fetches the region name based on the address ID.
+     * @param int $id ID
+     * @return \yii\web\Response
+     */
+    public function actionGetRegion($id)
+    {
+        $address = Addresses::findOne($id);
+        if ($address) {
+            return $this->asJson(['name' => $address->region->name]);
+        }
+        return $this->asJson(['name' => '']);
+    }
 }

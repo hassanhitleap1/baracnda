@@ -2,6 +2,11 @@
 
 namespace app\models\orders;
 
+use app\models\addresses\Addresses;
+use app\models\orderItems\OrderItems;
+use app\models\shippings\Shippings;
+use app\models\status\Status;
+use app\models\users\Users;
 use Yii;
 
 /**
@@ -22,19 +27,38 @@ use Yii;
  * @property string|null $created_at
  * @property string|null $updated_at
  *
- * @property Address $addresses
- * @property OrderItem[] $orderItems
- * @property Shipping $shippings
+ * @property Addresses $addresses
+ * @property OrderItems[] $orderItems
+ * @property Shippings $shippings
  * @property Status $status
- * @property User $users
- * @property User $users0
+ * @property Users $creator
+ * @property Users $user
  */
 class Orders extends \yii\db\ActiveRecord
 {
+  
 
+    public $country_id = null;
+
+    public $region_id = null;
+
+    public $subtotal = 0.00;
+    public $shipping = 0.00;
+    public $total = 0.00;
+    public $discount = 0.00;
+    public $shopping_price = 0.00;
+    public $profit = 0.00;
+    
+    public $full_name = null;
+
+    public $phone=  null;
 
     const SCENARIO_CREATE = 'create';
     const SCENARIO_UPDATE = 'update';
+
+    /**
+     * @var int|null Virtual property for country ID
+     */
 
     /**
      * {@inheritdoc}
@@ -49,7 +73,7 @@ class Orders extends \yii\db\ActiveRecord
      */
     public function rules()
     {
-        return [
+        return array_merge(parent::rules(), [
             [['user_id', 'note'], 'default', 'value' => null],
             [['shipping_id'], 'default', 'value' => 1],
             [['discount'], 'default', 'value' => 0.00],
@@ -58,12 +82,14 @@ class Orders extends \yii\db\ActiveRecord
             [['total', 'shopping_price', 'sub_total', 'profit', 'discount'], 'number'],
             [['note'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
-            [['address_id'], 'exist', 'skipOnError' => true, 'targetClass' => Address::class, 'targetAttribute' => ['address_id' => 'id']],
-            [['creator_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['creator_id' => 'id']],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
-            [['shipping_id'], 'exist', 'skipOnError' => true, 'targetClass' => Shipping::class, 'targetAttribute' => ['shipping_id' => 'id']],
+            [['address_id'], 'exist', 'skipOnError' => true, 'targetClass' => Addresses::class, 'targetAttribute' => ['address_id' => 'id']],
+            [['creator_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['creator_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['user_id' => 'id']],
+            [['shipping_id'], 'exist', 'skipOnError' => true, 'targetClass' => Shippings::class, 'targetAttribute' => ['shipping_id' => 'id']],
             [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => Status::class, 'targetAttribute' => ['status_id' => 'id']],
-        ];
+            [['user_id', 'address_id'], 'required'], // Ensure address_id is required
+            [['country_id'], 'safe'], // Allow country_id to be set
+        ]);
     }
 
     /**
@@ -96,7 +122,7 @@ class Orders extends \yii\db\ActiveRecord
      */
     public function getAddresses()
     {
-        return $this->hasOne(Address::class, ['id' => 'address_id']);
+        return $this->hasOne(Addresses::class, ['id' => 'address_id']);
     }
 
     /**
@@ -106,17 +132,17 @@ class Orders extends \yii\db\ActiveRecord
      */
     public function getOrderItems()
     {
-        return $this->hasMany(OrderItem::class, ['order_id' => 'id']);
+        return $this->hasMany(OrderItems::class, ['order_id' => 'id']);
     }
 
     /**
      * Gets query for [[Shippings]].
      *
-     * @return \yii\db\ActiveQuery|ShippingQuery
+     * @return \yii\db\ActiveQuery|ShippingsQuery
      */
     public function getShippings()
     {
-        return $this->hasOne(Shipping::class, ['id' => 'shipping_id']);
+        return $this->hasOne(Shippings::class, ['id' => 'shipping_id']);
     }
 
     /**
@@ -132,23 +158,25 @@ class Orders extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Users]].
      *
-     * @return \yii\db\ActiveQuery|UserQuery
+     * @return \yii\db\ActiveQuery|UsersQuery
      */
-    public function getUsers()
+    public function getCreator()
     {
-        return $this->hasOne(User::class, ['id' => 'creator_id']);
+        return $this->hasOne(Users::class, ['id' => 'creator_id']);
     }
 
     /**
      * Gets query for [[Users0]].
      *
-     * @return \yii\db\ActiveQuery|UserQuery
+     * @return \yii\db\ActiveQuery|UsersQuery
      */
-    public function getUsers0()
+    public function getUser()
     {
-        return $this->hasOne(User::class, ['id' => 'user_id']);
+        return $this->hasOne(Users::class, ['id' => 'user_id']);
     }
 
+  
+  
     /**
      * {@inheritdoc}
      * @return OrdersQuery the active query used by this AR class.
@@ -156,6 +184,30 @@ class Orders extends \yii\db\ActiveRecord
     public static function find()
     {
         return new OrdersQuery(get_called_class());
+    }
+
+    /**
+     * Calculates the subtotal, shipping, and total for the order.
+     */
+    public function calculateTotals()
+    {
+        $this->subtotal = 0;
+        foreach ($this->orderItems as $item) {
+            $this->subtotal += $item->quantity * $item->price;
+        }
+
+        $this->shipping = $this->calculateShipping(); // Custom logic for shipping
+        $this->total = $this->subtotal + $this->shipping;
+    }
+
+    /**
+     * Custom logic to calculate shipping cost.
+     * @return float
+     */
+    protected function calculateShipping()
+    {
+        // Example: Flat rate shipping
+        return 10.00;
     }
 
 }

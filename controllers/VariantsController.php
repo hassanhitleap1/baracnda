@@ -7,6 +7,7 @@ use app\models\variants\VariantsSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 
 /**
  * VariantsController implements the CRUD actions for Variants model.
@@ -130,5 +131,32 @@ class VariantsController extends BaseController
         }
 
         throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+    }
+
+    /**
+     * Searches for Variants models by name.
+     * @param string $term Search term
+     * @return array
+     */
+    public function actionSearch($term)
+    {
+        \Yii::$app->response->format = Response::FORMAT_JSON;
+
+        // Search for variants by name
+        $variants = Variants::find()
+            ->where(['like', 'name', $term])
+            ->limit(10) // Limit the number of results
+            ->all();
+
+        // Format the response
+        return array_map(function ($variant) {
+        
+            return [
+                'id' => $variant->id,
+                'name' => $variant->name,
+                'image' => $variant->product->imageUrl ,
+                'price' => $variant->price,
+            ];
+        }, $variants);
     }
 }

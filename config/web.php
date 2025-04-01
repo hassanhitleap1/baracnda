@@ -51,6 +51,7 @@ $config = [
                 // 'site/products/<slug>' => 'site/products',
                 'site/category/<slug>/<slug2>' => 'site/products',
                 'site/product/<id>' => 'site/product',
+                'variants/search' => 'variants/search', // Add this rule
             ],
         ],
         

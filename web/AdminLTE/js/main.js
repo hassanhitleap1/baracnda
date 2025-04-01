@@ -135,6 +135,79 @@ $(document).ready(function () {
         $('#exampleModal').modal('hide');
         $('.btn-secondary[data-bs-dismiss="modal"]').trigger('click');
     });
+
+    // Prevent form submission on "Enter" in the search input
+    $('#variantSearchInput').on('keydown', function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent form submission
+        }
+    });
+
+    // Search for variants
+    $('#variantSearchInput').on('input', function () {
+        const searchTerm = $(this).val();
+        if (searchTerm.length < 2) {
+            $('#variantSearchResults').html('');
+            return;
+        }
+
+        $.ajax({
+            url: SITE_URL + '/variants/search', // Adjust the URL to your endpoint
+            method: 'GET',
+            data: { term: searchTerm },
+            success: function (data) {
+                let resultsHtml = '';
+                data.forEach(variant => {
+                    resultsHtml += `
+                        <div class="dropdown-item d-flex align-items-center">
+                            <img src="${variant.image}" alt="${variant.name}" class="img-thumbnail" style="width: 50px; height: 50px; margin-right: 10px;">
+                            <span>${variant.name}</span>
+                            <button class="btn btn-primary btn-sm ml-auto add-variant-btn" data-id="${variant.id}" data-name="${variant.name}" data-image="${variant.image}" data-price="${variant.price}">
+                                Add
+                            </button>
+                        </div>
+                    `;
+                });
+                $('#variantSearchResults').html(resultsHtml);
+            }
+        });
+    });
+
+    // Add variant to the order items list
+    $(document).on('click', '.add-variant-btn', function (event) {
+        event.preventDefault(); // Prevent form submission
+        const variantId = $(this).data('id');
+        const variantName = $(this).data('name');
+        const variantImage = $(this).data('image');
+        const variantPrice = $(this).data('price');
+
+        const variantHtml = `
+            <div class="row mb-3 variant-item" data-id="${variantId}">
+                <div class="col-2">
+                    <img src="${variantImage}" alt="${variantName}" class="img-thumbnail">
+                </div>
+                <div class="col-4">
+                    <input type="text" class="form-control" name="OrderItems[variant_name][]" value="${variantName}" readonly>
+                </div>
+                <div class="col-2">
+                    <input type="number" class="form-control" name="OrderItems[variant_quantity][]" value="1" min="1">
+                </div>
+                <div class="col-2">
+                    <input type="text" class="form-control" name="OrderItems[variant_price][]" value="${variantPrice}" readonly>
+                </div>
+                <div class="col-2">
+                    <button class="btn btn-danger btn-sm delete-variant-btn">Delete</button>
+                </div>
+            </div>
+        `;
+
+        $('#orderItems').append(variantHtml);
+    });
+
+    // Delete variant from the order items list
+    $(document).on('click', '.delete-variant-btn', function () {
+        $(this).closest('.variant-item').remove();
+    });
 });
 
 function generateCombinations(selectedAttributes) {

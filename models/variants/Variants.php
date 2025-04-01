@@ -96,7 +96,7 @@ class Variants extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery|ProductQuery
      */
-    public function getProducts()
+    public function getProduct()
     {
         return $this->hasOne(Products::class, ['id' => 'product_id']);
     }

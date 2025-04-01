@@ -16,6 +16,24 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
+
+
+    <div class="card">
+        <div class="card-header">
+            <?= Yii::t('app', 'Variants') ?>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label for="variantSearchInput"><?= Yii::t('app', 'Search Variants') ?></label>
+                <input type="text" id="variantSearchInput" class="form-control" placeholder="<?= Yii::t('app', 'Enter variant name...') ?>">
+                <div id="variantSearchResults" class="dropdown-menu show" style="width: 100%;"></div>
+            </div>
+            <div id="orderItems" class="mt-3">
+                <!-- Selected variants will be appended here -->
+            </div>
+        </div>
+    </div>
+
     <div class="card">
         <div class="card-header">
             <?= Yii::t('app', 'address') ?>
@@ -49,14 +67,7 @@ use yii\widgets\ActiveForm;
                <?= $form->field($model, 'phone')->textInput(['maxlength' => true]) ?>
             </div>
         </div>
-        <div class="row">
-            <div class="col-6">
-               <?= $form->field($model, 'address')->textInput(['maxlength' => true]) ?>
-            </div>
-            <div class="col-6">
-             <?= $form->field($model, 'address_id')->textInput() ?>
-            </div>
-        </div>
+      
          
     </div>
 </div>
@@ -64,7 +75,7 @@ use yii\widgets\ActiveForm;
 
    <div class="card">
         <div class="card-header">
-            <?= Yii::t('app', 'address') ?>
+            <?= Yii::t('app', 'shipping') ?>
         </div>
         <div class="card-body">
             <div class="row">   
