@@ -70,7 +70,7 @@ class OrdersController extends BaseController
         $model = new Orders();
 
         if ($this->request->isPost) {
-            if ($model->load($this->request->post())) {
+            if ($model->load($this->request->post()) && $model->validate()) {
                 $model->calculateTotals(); // Calculate subtotal, shipping, and total
                 if ($model->save()) {
                     return $this->redirect(['view', 'id' => $model->id]);

@@ -160,7 +160,7 @@ $(document).ready(function () {
                 data.forEach(variant => {
                     resultsHtml += `
                         <div class="dropdown-item d-flex align-items-center">
-                            <img src="${variant.image}" alt="${variant.name}" class="img-thumbnail" style="width: 50px; height: 50px; margin-right: 10px;">
+                            <img src="${variant.image}" alt="${variant.name}" class="img-thumbnail" style="width: 30px; height: 30px; margin-right: 10px;">
                             <span>${variant.name}</span>
                             <button class="btn btn-primary btn-sm ml-auto add-variant-btn" data-id="${variant.id}" data-name="${variant.name}" data-image="${variant.image}" data-price="${variant.price}">
                                 Add
@@ -181,10 +181,15 @@ $(document).ready(function () {
         const variantImage = $(this).data('image');
         const variantPrice = $(this).data('price');
 
+        // Check if the variant is already added
+        if ($(`#orderItems .variant-item[data-id="${variantId}"]`).length > 0) {
+            return; // Do nothing if the variant is already added
+        }
+
         const variantHtml = `
             <div class="row mb-3 variant-item" data-id="${variantId}">
                 <div class="col-2">
-                    <img src="${variantImage}" alt="${variantName}" class="img-thumbnail">
+                    <img src="${variantImage}" alt="${variantName}" class="img-thumbnail w-40">
                 </div>
                 <div class="col-4">
                     <input type="text" class="form-control" name="OrderItems[variant_name][]" value="${variantName}" readonly>
@@ -202,11 +207,21 @@ $(document).ready(function () {
         `;
 
         $('#orderItems').append(variantHtml);
+
+        // Disable the "Add" button and mark it as checked
+        $(this).prop('disabled', true).text('Added');
     });
 
     // Delete variant from the order items list
     $(document).on('click', '.delete-variant-btn', function () {
-        $(this).closest('.variant-item').remove();
+        const variantItem = $(this).closest('.variant-item');
+        const variantId = variantItem.data('id');
+
+        // Remove the variant item
+        variantItem.remove();
+
+        // Re-enable the "Add" button for the removed variant
+        $(`#variantSearchResults .add-variant-btn[data-id="${variantId}"]`).prop('disabled', false).text('Add');
     });
 });
 
