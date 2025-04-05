@@ -2,7 +2,11 @@
 
 namespace app\models\users;
 
+use app\models\addresses\Addresses;
+use app\models\orders\Orders;
+use app\models\products\Products;
 use Yii;
+use yii\rbac\Role;
 
 /**
  * This is the model class for table "{{%users}}".
@@ -29,7 +33,13 @@ use Yii;
 class Users extends \yii\db\ActiveRecord
 {
 
+    const SCENARIO_CREATE = 'create';
+    const SCENARIO_UPDATE = 'update';
+    const ROLE_ADMIN = 1;
 
+    const ROLE_MANAGER = 2;
+    const ROLE_CLIENT = 3;
+  
     /**
      * {@inheritdoc}
      */
@@ -54,7 +64,7 @@ class Users extends \yii\db\ActiveRecord
             [['phone'], 'unique'],
             [['username'], 'unique'],
             [['email'], 'unique'],
-            [['address_id'], 'exist', 'skipOnError' => true, 'targetClass' => Address::class, 'targetAttribute' => ['address_id' => 'id']],
+            [['address_id'], 'exist', 'skipOnError' => true, 'targetClass' => Addresses::class, 'targetAttribute' => ['address_id' => 'id']],
             [['role_id'], 'exist', 'skipOnError' => true, 'targetClass' => Role::class, 'targetAttribute' => ['role_id' => 'id']],
         ];
     }
@@ -87,7 +97,7 @@ class Users extends \yii\db\ActiveRecord
      */
     public function getAddress()
     {
-        return $this->hasOne(Address::class, ['id' => 'address_id']);
+        return $this->hasOne(Addresses::class, ['id' => 'address_id']);
     }
 
     /**
@@ -97,7 +107,7 @@ class Users extends \yii\db\ActiveRecord
      */
     public function getOrders()
     {
-        return $this->hasMany(Order::class, ['creator_id' => 'id']);
+        return $this->hasMany(Orders::class, ['creator_id' => 'id']);
     }
 
     /**
@@ -107,7 +117,7 @@ class Users extends \yii\db\ActiveRecord
      */
     public function getOrders0()
     {
-        return $this->hasMany(Order::class, ['user_id' => 'id']);
+        return $this->hasMany(Orders::class, ['user_id' => 'id']);
     }
 
     /**
@@ -117,7 +127,7 @@ class Users extends \yii\db\ActiveRecord
      */
     public function getProducts()
     {
-        return $this->hasMany(Product::class, ['creator_id' => 'id']);
+        return $this->hasMany(Products::class, ['creator_id' => 'id']);
     }
 
     /**

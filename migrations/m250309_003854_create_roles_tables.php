@@ -29,6 +29,9 @@ class m250309_003854_create_roles_tables extends Migration
             ],
             [
                 'name' => 'manager',
+            ],
+            [
+                'name' => 'client',
             ]
         ];
 

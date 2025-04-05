@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\orders\Orders;
 use app\models\orders\OrdersSearch;
+use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -70,13 +71,49 @@ class OrdersController extends BaseController
         $model = new Orders();
 
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->validate()) {
-                $model->calculateTotals(); // Calculate subtotal, shipping, and total
-                if ($model->save()) {
-                    return $this->redirect(['view', 'id' => $model->id]);
+            $transaction = Yii::$app->db->beginTransaction();
+            if ($model->load($this->request->post()) ) {
+
+                if (!$model->save()) {
+                    Yii::$app->session->setFlash('error', $this->getErrorMessages($model));
+                    return $this->render('create', [
+                        'model' => $model,
+                    ]);
                 }
+
+                if($items = Yii::$app->request->post('OrderItems')) {
+                    foreach ($items as $item) {
+                       if( $model->addItem($item)){
+                            return $this->render('create', [
+                                'model' => $model,
+                            ]);
+                       } 
+                    }
+                }
+
+            
+
+                if($model->setAddress()  &&   $model->setCreator() && $model->setAddress() && $model->setUser()) {
+                    $model->setShippingPrice(); // Set shipping price based on region and shipping method
+                    $model->calculateTotals(); // Calculate subtotal, shipping, and total
+                  
+                }else {
+                    Yii::$app->session->setFlash('error', $this->getErrorMessages($model));
+                    return $this->render('create', [
+                        'model' => $model,
+                    ]);
+                }
+
+               
+            }else {
+                $transaction->commit();
+                Yii::$app->session->setFlash('error', $this->getErrorMessages($model));
+                return $this->render('create', [
+                    'model' => $model,
+                ]);
             }
         } else {
+            Yii::$app->session->setFlash('error', $this->getErrorMessages($model));
             $model->loadDefaultValues();
         }
 

@@ -4,6 +4,7 @@ namespace app\models\orders;
 
 use app\models\addresses\Addresses;
 use app\models\orderItems\OrderItems;
+use app\models\shippingPrices\ShippingPrices;
 use app\models\shippings\Shippings;
 use app\models\status\Status;
 use app\models\users\Users;
@@ -125,6 +126,101 @@ class Orders extends \yii\db\ActiveRecord
         return $this->hasOne(Addresses::class, ['id' => 'address_id']);
     }
 
+    public function setCreator()
+    {
+        $this->creator_id = Yii::$app->user->id;
+    }
+
+    /**
+     * Set the address for the order.
+     * If the order is new, it will create a new address.
+     * If the order is not new, it will find the address by id.
+     * If the address is not found, it will flash an error message.
+     * @return bool Whether the address was successfully set
+     */
+    public function setAddress()
+    {
+        $address = null;
+        if($this->isNewRecord){
+            $address = new Addresses();
+            $address->country_id = $this->country_id;
+            $address->region_id = $this->region_id;
+            $address->full_name = $this->full_name;
+            $address->phone = $this->phone;
+            if (!$address->save()) {
+                Yii::$app->session->setFlash('error', $address->getFirstErrors());
+                return false;
+            }
+        }else{
+            $address = Addresses::findOne($this->address_id);
+            if (!$address) {
+                Yii::$app->session->setFlash('error', 'Address not found');
+                return false;
+            }
+        }
+
+        $this->address_id = $address->id;
+    }
+
+
+
+    public function setShippingPrice()
+    {
+        $shipping= ShippingPrices::find()->where(['shipping_id' => $this->shipping_id,'region_id' => $this->region_id])->one();
+        if (!$shipping) {
+            Yii::$app->session->setFlash('error', 'Shipping not found');
+            return false;
+        }
+        
+        $this->shopping_price = $this->price;
+
+        return true;
+      
+    }
+
+
+    public function addItem($item)
+    {
+        $orderItem = new OrderItems();
+        $orderItem->order_id = $this->id;
+        $orderItem->product_id = $item->product_id;
+        $orderItem->quantity = $item->quantity;
+        $orderItem->variant_id = $item->variant_id;
+        $orderItem->order_id = $this->id;
+    
+        if (!$orderItem->save()) {
+            Yii::$app->session->setFlash('error', $orderItem->getFirstErrors());
+            return false;
+        }
+
+        return true;
+    }
+    
+    public function setUser()
+    {
+
+         $user = null;
+        if($this->isNewRecord){
+            $user = new Users();
+            $user->full_name = $this->full_name;
+            $user->phone = $this->phone;
+            $user->password_hash = Yii::$app->security->generatePasswordHash($this->phone);
+            $user->auth_key = Yii::$app->security->generateRandomString();
+            $user->role_id = Users::ROLE_CLIENT;
+            if (!$user->save()) {
+                Yii::$app->session->setFlash('error', $user->getFirstErrors());
+                return false;
+            } 
+        }else{
+            $user = Users::findOne($this->user_id);
+            if (!$user) {
+                Yii::$app->session->setFlash('error', 'Address not found');
+                return false;
+            }
+        }
+
+        $this->user_id   = $user->id;
+    }
     /**
      * Gets query for [[OrderItems]].
      *
