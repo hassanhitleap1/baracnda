@@ -1,10 +1,8 @@
 <?php
-
-use app\models\orders\Orders;
+use kartik\grid\GridView;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
-use yii\grid\GridView;
 use yii\widgets\Pjax;
 /** @var yii\web\View $this */
 /** @var app\models\orders\OrdersSearch $searchModel */
@@ -22,34 +20,58 @@ $this->params['breadcrumbs'][] = $this->title;
     </p>
 
     <?php Pjax::begin(); ?>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+            ['class' => 'kartik\grid\SerialColumn'],
 
             'id',
-            'user_id',
-            'creator_id',
-            'address_id',
-            'status_id',
-            //'total',
-            //'shopping_price',
-            //'sub_total',
-            //'profit',
-            //'discount',
-            //'shipping_id',
-            //'note:ntext',
-            //'created_at',
-            //'updated_at',
+            'user.full_name',
+            'creator.full_name',
+            [
+                'attribute' => 'address_id',
+                'label' => Yii::t('app', 'Full Address'),
+                'value' => function ($model) {
+                    return $model->addresses ? $model->addresses->full_name . ', ' . $model->addresses->address . ', ' . $model->addresses->region->name : null;
+                },
+            ],
+            'status.name',
+            'shopping_price',
+            'sub_total',
+            'profit',
+            'total',
+            'shipping.name',
+            'note:ntext',
+            [
+                'attribute' => 'orderItems',
+                'label' => Yii::t('app', 'Order Items'),
+                'format' => 'raw',
+                'value' => function ($model) {
+                    if ($model->orderItems) {
+                        $items = array_map(function ($item) {
+                            $image = Html::img($item->product->imageUrl, ['alt' => $item->product->name, 'style' => 'width:50px; height:auto;']);
+                            $details = Html::encode($item->product->name . ' (Qty: ' . $item->quantity . ')');
+                            return $image . '<br>' . $details;
+                        }, $model->orderItems);
+                        return implode('<br><br>', $items);
+                    }
+                    return null;
+                },
+            ],
             [
                 'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, Orders $model, $key, $index, $column) {
+                'urlCreator' => function ($action, $model, $key, $index) {
                     return Url::toRoute([$action, 'id' => $model->id]);
-                 }
+                },
             ],
+        ],
+        'responsive' => true,
+        'hover' => true,
+        'panel' => [
+            'type' => 'primary',
+            'heading' => Yii::t('app', 'Orders List'),
         ],
     ]); ?>
 

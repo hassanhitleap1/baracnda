@@ -78,7 +78,7 @@ class OrderItems extends \yii\db\ActiveRecord
      */
     public function getOrders()
     {
-        return $this->hasOne(Order::class, ['id' => 'order_id']);
+        return $this->hasOne(Orders::class, ['id' => 'order_id']);
     }
 
     /**
@@ -86,9 +86,9 @@ class OrderItems extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery|ProductQuery
      */
-    public function getProducts()
+    public function getProduct()
     {
-        return $this->hasOne(Product::class, ['id' => 'product_id']);
+        return $this->hasOne(Products::class, ['id' => 'product_id']);
     }
 
     /**
@@ -96,9 +96,9 @@ class OrderItems extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery|VariantQuery
      */
-    public function getVariants()
+    public function getVariant()
     {
-        return $this->hasOne(Variant::class, ['id' => 'variant_id']);
+        return $this->hasOne(Variants::class, ['id' => 'variant_id']);
     }
 
     /**

@@ -2,6 +2,10 @@
 
 namespace app\models\addresses;
 
+use app\models\countries\Countries;
+use app\models\orders\Orders;
+use app\models\regions\Regions;
+use app\models\users\Users;
 use Yii;
 
 /**
@@ -69,7 +73,7 @@ class Addresses extends \yii\db\ActiveRecord
      */
     public function getOrders()
     {
-        return $this->hasMany(Order::class, ['address_id' => 'id']);
+        return $this->hasMany(Orders::class, ['address_id' => 'id']);
     }
 
     /**
@@ -79,7 +83,16 @@ class Addresses extends \yii\db\ActiveRecord
      */
     public function getUsers()
     {
-        return $this->hasMany(User::class, ['address_id' => 'id']);
+        return $this->hasMany(Users::class, ['address_id' => 'id']);
+    }
+
+    public function getCountry()
+    {
+        return $this->hasOne(Countries::class, ['id' => 'country_id']);
+    }
+    public function getRegion()
+    {
+        return $this->hasOne(Regions::class, ['id' => 'region_id']);
     }
 
     /**
