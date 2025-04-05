@@ -74,23 +74,22 @@ class Orders extends \yii\db\ActiveRecord
      */
     public function rules()
     {
-        return array_merge(parent::rules(), [
-            [['user_id', 'note'], 'default', 'value' => null],
-            [['shipping_id'], 'default', 'value' => 1],
-            [['discount'], 'default', 'value' => 0.00],
-            [['user_id', 'creator_id', 'address_id', 'status_id', 'shipping_id'], 'integer'],
-            [['creator_id', 'address_id'], 'required'],
-            [['total', 'shopping_price', 'sub_total', 'profit', 'discount'], 'number'],
-            [['note'], 'string'],
-            [['created_at', 'updated_at'], 'safe'],
-            [['address_id'], 'exist', 'skipOnError' => true, 'targetClass' => Addresses::class, 'targetAttribute' => ['address_id' => 'id']],
-            [['creator_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['creator_id' => 'id']],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['user_id' => 'id']],
-            [['shipping_id'], 'exist', 'skipOnError' => true, 'targetClass' => Shippings::class, 'targetAttribute' => ['shipping_id' => 'id']],
-            [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => Status::class, 'targetAttribute' => ['status_id' => 'id']],
-            [['user_id', 'address_id'], 'required'], // Ensure address_id is required
-            [['country_id'], 'safe'], // Allow country_id to be set
-        ]);
+        return  [[['user_id', 'note'], 'default', 'value' => null],
+                [['shipping_id'], 'default', 'value' => 1],
+                [['discount'], 'default', 'value' => 0.00],
+                [['user_id', 'creator_id', 'address_id', 'status_id', 'shipping_id'], 'integer'],
+                [['creator_id', 'address_id'], 'required'],
+                [['total', 'shopping_price', 'sub_total', 'profit', 'discount'], 'number'],
+                [['note'], 'string'],
+                [['created_at', 'updated_at'], 'safe'],
+                [['address_id'], 'exist', 'skipOnError' => true, 'targetClass' => Addresses::class, 'targetAttribute' => ['address_id' => 'id']],
+                [['creator_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['creator_id' => 'id']],
+                [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['user_id' => 'id']],
+                [['shipping_id'], 'exist', 'skipOnError' => true, 'targetClass' => Shippings::class, 'targetAttribute' => ['shipping_id' => 'id']],
+                [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => Status::class, 'targetAttribute' => ['status_id' => 'id']],
+                [['user_id', 'address_id'], 'required'], // Ensure address_id is required
+                [['country_id'], 'safe'],
+        ] ;
     }
 
     /**
@@ -129,6 +128,8 @@ class Orders extends \yii\db\ActiveRecord
     public function setCreator()
     {
         $this->creator_id = Yii::$app->user->id;
+
+        return true;
     }
 
     /**
@@ -160,6 +161,7 @@ class Orders extends \yii\db\ActiveRecord
         }
 
         $this->address_id = $address->id;
+        return true;
     }
 
 
@@ -220,6 +222,7 @@ class Orders extends \yii\db\ActiveRecord
         }
 
         $this->user_id   = $user->id;
+        return true;
     }
     /**
      * Gets query for [[OrderItems]].
