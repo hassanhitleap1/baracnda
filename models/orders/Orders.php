@@ -131,6 +131,7 @@ class Orders extends \yii\db\ActiveRecord
         return $this->hasOne(Addresses::class, ['id' => 'address_id']);
     }
 
+
     public function setCreator()
     {
         $this->creator_id = Yii::$app->user->id;
@@ -332,7 +333,6 @@ class Orders extends \yii\db\ActiveRecord
             $this->subtotal += $item->quantity * $item->price;
         }
 
-        $this->shipping = $this->calculateShipping(); // Custom logic for shipping
         $this->total = $this->subtotal + $this->shipping;
     }
 
@@ -343,7 +343,7 @@ class Orders extends \yii\db\ActiveRecord
     protected function calculateShipping()
     {
         // Example: Flat rate shipping
-        return 10.00;
+        return 00.00;
     }
 
 }

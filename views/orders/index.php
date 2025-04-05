@@ -1,15 +1,21 @@
 <?php
+
+use app\models\status\Status;
 use kartik\grid\GridView;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\widgets\Pjax;
+use yii\bootstrap5\Modal; // Use Bootstrap 5 Modal
 /** @var yii\web\View $this */
 /** @var app\models\orders\OrdersSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
 $this->title = Yii::t('app', 'Orders');
 $this->params['breadcrumbs'][] = $this->title;
+
+// Define the $statusList variable
+$statusList = \yii\helpers\ArrayHelper::map(Status::find()->all(), 'id', 'name');
 ?>
 <div class="orders-index">
 
@@ -17,7 +23,32 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a(Yii::t('app', 'Create Orders'), ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::button(Yii::t('app', 'Print Selected'), [
+            'class' => 'btn btn-primary',
+            'id' => 'print-selected',
+        ]) ?>
+        <?= Html::button(Yii::t('app', 'Change Status'), [
+            'class' => 'btn btn-warning',
+            'id' => 'change-status',
+        ]) ?>
     </p>
+
+    <?php
+    Modal::begin([
+        'id' => 'status-modal',
+        'title' => Yii::t('app', 'Change Status'),
+        'footer' => Html::button(Yii::t('app', 'Apply Status'), [
+            'class' => 'btn btn-success',
+            'id' => 'apply-status',
+        ]),
+    ]);
+    ?>
+    <?= Html::dropDownList('new-status', null, $statusList, [
+        'id' => 'new-status',
+        'class' => 'form-control',
+        'prompt' => Yii::t('app', 'Select New Status'),
+    ]) ?>
+    <?php Modal::end(); ?>
 
     <?php Pjax::begin(); ?>
 
@@ -26,7 +57,12 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'kartik\grid\SerialColumn'],
-
+            [
+                'class' => 'yii\grid\CheckboxColumn',
+                'checkboxOptions' => function ($model) {
+                    return ['value' => $model->id];
+                },
+            ],
             'id',
             'user.full_name',
             'creator.full_name',
@@ -78,3 +114,44 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php Pjax::end(); ?>
 
 </div>
+
+<?php
+$printUrl = Url::to(['orders/print-selected']);
+$changeStatusUrl = Url::to(['orders/change-status']);
+$script = <<<JS
+    $('#print-selected').on('click', function () {
+        var keys = $('#w0').yiiGridView('getSelectedRows');
+        if (keys.length === 0) {
+            alert('Please select at least one order.');
+            return;
+        }
+        window.location.href = '$printUrl' + '?ids=' + JSON.stringify(keys);
+    });
+
+    $('#change-status').on('click', function () {
+        $('#status-modal').modal('show');
+    });
+
+    $('#apply-status').on('click', function () {
+        var keys = $('#w0').yiiGridView('getSelectedRows');
+        var newStatus = $('#new-status').val();
+        if (keys.length === 0) {
+            alert('Please select at least one order.');
+            return;
+        }
+        if (!newStatus) {
+            alert('Please select a new status.');
+            return;
+        }
+        $.post('$changeStatusUrl', {ids: keys, status: newStatus}, function (response) {
+            if (response.success) {
+                alert('Status updated successfully.');
+                location.reload();
+            } else {
+                alert('Failed to update status.');
+            }
+        });
+    });
+JS;
+$this->registerJs($script);
+?>

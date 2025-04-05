@@ -190,4 +190,48 @@ class OrdersController extends BaseController
 
         throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
+
+    /**
+     * Print selected orders.
+     * @return void
+     */
+    public function actionPrintSelected()
+    {
+        $ids = Yii::$app->request->get('ids');
+        $ids = json_decode($ids, true);
+
+        if (empty($ids)) {
+            Yii::$app->session->setFlash('error', 'No orders selected.');
+            return $this->redirect(['index']);
+        }
+
+        $orders = Orders::find()->where(['id' => $ids])->all();
+
+        // Render a view or generate a PDF for the selected orders
+        return $this->render('print', ['orders' => $orders]);
+    }
+
+    /**
+     * Change the status of selected orders.
+     * @return \yii\web\Response
+     */
+    public function actionChangeStatus()
+    {
+        $ids = Yii::$app->request->post('ids');
+        $status = Yii::$app->request->post('status');
+
+        if (empty($ids) || !$status) {
+            return $this->asJson(['success' => false, 'message' => 'Invalid input.']);
+        }
+
+        $orders = Orders::find()->where(['id' => $ids])->all();
+        foreach ($orders as $order) {
+            $order->status_id = $status;
+            if (!$order->save()) {
+                return $this->asJson(['success' => false, 'message' => 'Failed to update some orders.']);
+            }
+        }
+
+        return $this->asJson(['success' => true]);
+    }
 }
