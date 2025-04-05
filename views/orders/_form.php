@@ -30,6 +30,36 @@ use yii\widgets\ActiveForm;
             </div>
             <div id="orderItems" class="mt-3">
                 <!-- Selected variants will be appended here -->
+                 <?php
+                    $order= Yii::$app->request->post('Orders');
+                
+                    if( Yii::$app->request->isPost){
+                    
+                        foreach ($order['OrderItems'] as  $key => $orderItem) {
+                            
+                        echo '<div class="row mb-3 variant-item" data-id="'.$orderItem['variant_id'] .'">';
+                        echo '<div class="col-2">';
+                        echo '<input type="hidden" name="Orders[OrderItems]['. $key .'][variant_id]" value="'.$orderItem['variant_id'].'">';
+                        echo '<input type="hidden" name="Orders[OrderItems]['. $key .'][variant_image]" value="'.$orderItem['variant_image'] .'">';
+                        echo '<img src="'.$orderItem['variant_image'] .'" alt="'.$orderItem['variant_image'] .'" class="img-thumbnail w-40">';
+                        echo '</div>';
+                        echo '<div class="col-4">';
+                        echo '<input type="text" class="form-control" name="Orders[OrderItems]['. $key .'][variant_name]" value="'.$orderItem['variant_name'] .'" readonly>';
+                        echo '</div>';
+                        echo '<div class="col-2">';
+                        echo '<input type="number" class="form-control" name="Orders[OrderItems]['. $key .'][variant_quantity]" value="'.$orderItem['variant_quantity'] .'" min="1">';
+                        echo '</div>';
+                        echo '<div class="col-2">';
+                        echo '<input type="text" class="form-control" name="Orders[OrderItems]['. $key .'][variant_price]" value="'.$orderItem['variant_price'] .'" readonly>';
+                        echo '</div>';
+                        echo '<div class="col-2">';
+                        echo '<button class="btn btn-danger btn-sm delete-variant-btn">Delete</button>';
+                        echo '</div>';
+                        echo '</div>';
+
+                        }
+                    }
+                 ?>
             </div>
         </div>
     </div>

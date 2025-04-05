@@ -75,6 +75,7 @@ class Orders extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['phone','full_name','region_id'],'required', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
             [['user_id', 'note'], 'default', 'value' => null, 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
             [['shipping_id'], 'default', 'value' => 1, 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
             [['discount'], 'default', 'value' => 0.00, 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],

@@ -189,16 +189,18 @@ $(document).ready(function () {
         const variantHtml = `
             <div class="row mb-3 variant-item" data-id="${variantId}">
                 <div class="col-2">
+                    <input type="hidden" name="Orders[OrderItems][${variantId}][variant_id]" value="${variantId}">
+                    <input type="hidden" name="Orders[OrderItems][${variantId}][variant_image]" value="${variantImage}">
                     <img src="${variantImage}" alt="${variantName}" class="img-thumbnail w-40">
                 </div>
                 <div class="col-4">
-                    <input type="text" class="form-control" name="OrderItems[variant_name][]" value="${variantName}" readonly>
+                    <input type="text" class="form-control" name="Orders[OrderItems][${variantId}][variant_name]" value="${variantName}" readonly>
                 </div>
                 <div class="col-2">
-                    <input type="number" class="form-control" name="OrderItems[variant_quantity][]" value="1" min="1">
+                    <input type="number" class="form-control" name="Orders[OrderItems][${variantId}][variant_quantity]" value="1" min="1">
                 </div>
                 <div class="col-2">
-                    <input type="text" class="form-control" name="OrderItems[variant_price][]" value="${variantPrice}" readonly>
+                    <input type="text" class="form-control" name="Orders[OrderItems][${variantId}][variant_price]" value="${variantPrice}" readonly>
                 </div>
                 <div class="col-2">
                     <button class="btn btn-danger btn-sm delete-variant-btn">Delete</button>
