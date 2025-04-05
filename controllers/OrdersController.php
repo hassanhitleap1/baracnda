@@ -78,12 +78,11 @@ class OrdersController extends BaseController
                         throw new \Exception('Failed to set related data.');
                     }
 
-                   
-
                     if (!$model->save()) {
                         throw new \Exception('Failed to save order.');
                     }
 
+                    // Load and save OrderItems
                     if ($items = Yii::$app->request->post('Orders')['OrderItems'] ?? []) {
                         foreach ($items as $item) {
                             if (!$model->addItem((object)$item)) {
@@ -94,7 +93,11 @@ class OrdersController extends BaseController
 
                     $model->setShippingPrice();
                     $model->calculateTotals();
-                    
+
+                    if (!$model->save()) {
+                        throw new \Exception('Failed to update order totals.');
+                    }
+
                     $transaction->commit();
                     return $this->redirect(['view', 'id' => $model->id]);
                 } else {
