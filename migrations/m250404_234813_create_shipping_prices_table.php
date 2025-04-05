@@ -1,5 +1,7 @@
 <?php
 
+use app\models\regions\Regions;
+use app\models\shippings\Shippings;
 use yii\db\Migration;
 
 /**
@@ -41,6 +43,28 @@ class m250404_234813_create_shipping_prices_table extends Migration
             'CASCADE',
             'CASCADE'
         );
+
+        $regions = Regions::find()->all();
+        $shippingPrices = [];
+        $shippings=Shippings::find()->all();
+        foreach ($shippings as $shipping) {
+            foreach ($regions as $region) {
+                $shippingPrices[] = [
+                    'shipping_id' => $shipping->id, // Assuming 1 is the default shipping ID
+                    'region_id' => $region->id,
+                    'price' => 3, // Default price
+                ];
+            }
+        }
+
+        Yii::$app->db->createCommand()
+            ->batchInsert(
+                '{{%shipping_prices}}',
+                ['shipping_id', 'region_id', 'price'],
+                $shippingPrices
+            )
+            ->execute();
+        
     }
 
     /**

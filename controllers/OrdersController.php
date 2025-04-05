@@ -68,58 +68,41 @@ class OrdersController extends BaseController
      */
     public function actionCreate()
     {
-        $model = new Orders();
+        $model = new Orders(['scenario' => Orders::SCENARIO_CREATE]);
 
         if ($this->request->isPost) {
             $transaction = Yii::$app->db->beginTransaction();
-            if ($model->load($this->request->post()) ) {
-
-                if (!$model->save()) {
-                    Yii::$app->session->setFlash('error', $this->getErrorMessages($model));
-                    return $this->render('create', [
-                        'model' => $model,
-                    ]);
-                }
-
-                if($items = Yii::$app->request->post('OrderItems')) {
-                    foreach ($items as $item) {
-                       if( $model->addItem($item)){
-                            return $this->render('create', [
-                                'model' => $model,
-                            ]);
-                       } 
+            try {
+                if ($model->load($this->request->post()) && $model->validate()) {
+                    if (!$model->setAddress() || !$model->setUser() || !$model->setCreator()) {
+                        throw new \Exception('Failed to set related data.');
                     }
+
+                    $model->setShippingPrice();
+                    $model->calculateTotals();
+
+                    if (!$model->save()) {
+                        throw new \Exception('Failed to save order.');
+                    }
+
+                    if ($items = Yii::$app->request->post('OrderItems')) {
+                        foreach ($items as $item) {
+                            if (!$model->addItem($item)) {
+                                throw new \Exception('Failed to save order items.');
+                            }
+                        }
+                    }
+
+                    $transaction->commit();
+                    return $this->redirect(['view', 'id' => $model->id]);
                 }
-
-            
-
-                if($model->setAddress()  &&   $model->setCreator() && $model->setAddress() && $model->setUser()) {
-                    $model->setShippingPrice(); // Set shipping price based on region and shipping method
-                    $model->calculateTotals(); // Calculate subtotal, shipping, and total
-                  
-                }else {
-                    Yii::$app->session->setFlash('error', $this->getErrorMessages($model));
-                    return $this->render('create', [
-                        'model' => $model,
-                    ]);
-                }
-
-               
-            }else {
-                $transaction->commit();
-                Yii::$app->session->setFlash('error', $this->getErrorMessages($model));
-                return $this->render('create', [
-                    'model' => $model,
-                ]);
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                Yii::$app->session->setFlash('error', $e->getMessage());
             }
-        } else {
-            Yii::$app->session->setFlash('error', $this->getErrorMessages($model));
-            $model->loadDefaultValues();
         }
 
-        return $this->render('create', [
-            'model' => $model,
-        ]);
+        return $this->render('create', ['model' => $model]);
     }
 
     /**
@@ -132,17 +115,33 @@ class OrdersController extends BaseController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $model->scenario = Orders::SCENARIO_UPDATE;
 
-        if ($this->request->isPost && $model->load($this->request->post())) {
-            $model->calculateTotals(); // Recalculate totals on update
-            if ($model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+        if ($this->request->isPost) {
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                if ($model->load($this->request->post()) && $model->validate()) {
+                    if (!$model->setAddress() || !$model->setUser()) {
+                        throw new \Exception('Failed to update related data.');
+                    }
+
+                    $model->setShippingPrice();
+                    $model->calculateTotals();
+
+                    if (!$model->save()) {
+                        throw new \Exception('Failed to update order.');
+                    }
+
+                    $transaction->commit();
+                    return $this->redirect(['view', 'id' => $model->id]);
+                }
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                Yii::$app->session->setFlash('error', $e->getMessage());
             }
         }
 
-        return $this->render('update', [
-            'model' => $model,
-        ]);
+        return $this->render('update', ['model' => $model]);
     }
 
     /**

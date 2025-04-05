@@ -74,22 +74,23 @@ class Orders extends \yii\db\ActiveRecord
      */
     public function rules()
     {
-        return  [[['user_id', 'note'], 'default', 'value' => null],
-                [['shipping_id'], 'default', 'value' => 1],
-                [['discount'], 'default', 'value' => 0.00],
-                [['user_id', 'creator_id', 'address_id', 'status_id', 'shipping_id'], 'integer'],
-                [['creator_id', 'address_id'], 'required'],
-                [['total', 'shopping_price', 'sub_total', 'profit', 'discount'], 'number'],
-                [['note'], 'string'],
-                [['created_at', 'updated_at'], 'safe'],
-                [['address_id'], 'exist', 'skipOnError' => true, 'targetClass' => Addresses::class, 'targetAttribute' => ['address_id' => 'id']],
-                [['creator_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['creator_id' => 'id']],
-                [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['user_id' => 'id']],
-                [['shipping_id'], 'exist', 'skipOnError' => true, 'targetClass' => Shippings::class, 'targetAttribute' => ['shipping_id' => 'id']],
-                [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => Status::class, 'targetAttribute' => ['status_id' => 'id']],
-                [['user_id', 'address_id'], 'required'], // Ensure address_id is required
-                [['country_id'], 'safe'],
-        ] ;
+        return [
+            [['user_id', 'note'], 'default', 'value' => null, 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            [['shipping_id'], 'default', 'value' => 1, 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            [['discount'], 'default', 'value' => 0.00, 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            [['user_id', 'creator_id', 'address_id', 'status_id', 'shipping_id'], 'integer', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            [['creator_id', 'address_id'], 'required', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            [['total', 'shopping_price', 'sub_total', 'profit', 'discount'], 'number', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            [['note'], 'string', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            [['created_at', 'updated_at'], 'safe', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            [['address_id'], 'exist', 'skipOnError' => true, 'targetClass' => Addresses::class, 'targetAttribute' => ['address_id' => 'id'], 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            [['creator_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['creator_id' => 'id'], 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['user_id' => 'id'], 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            [['shipping_id'], 'exist', 'skipOnError' => true, 'targetClass' => Shippings::class, 'targetAttribute' => ['shipping_id' => 'id'], 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => Status::class, 'targetAttribute' => ['status_id' => 'id'], 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            [['country_id'], 'safe', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            [['creator_id', 'address_id', 'user_id'], 'required', 'on' => [self::SCENARIO_UPDATE]],
+        ];
     }
 
     /**
@@ -144,7 +145,7 @@ class Orders extends \yii\db\ActiveRecord
         $address = null;
         if($this->isNewRecord){
             $address = new Addresses();
-            $address->country_id = $this->country_id;
+            $address->country_id = 1;
             $address->region_id = $this->region_id;
             $address->full_name = $this->full_name;
             $address->phone = $this->phone;
@@ -165,6 +166,19 @@ class Orders extends \yii\db\ActiveRecord
     }
 
 
+    public function setProfit()
+    {
+        $this->profit = 0;
+        foreach ($this->orderItems as $item) {
+            $product = $item->products;
+            if ($product) {
+                $cost = $product->cost * $item->quantity;
+                $revenue = $item->price * $item->quantity;
+                $this->profit += $revenue - $cost;
+            }
+        }
+        return true;
+    }
 
     public function setShippingPrice()
     {

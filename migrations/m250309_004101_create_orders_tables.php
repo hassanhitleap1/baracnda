@@ -13,8 +13,8 @@ class m250309_004101_create_orders_tables extends Migration
         $this->createTable('orders', [
             'id' => $this->primaryKey(),
             'user_id' => $this->integer()->null(),
-            'creator_id' => $this->integer()->notNull(),
-            'address_id' => $this->integer()->notNull(),
+            'creator_id' => $this->integer()->null(),
+            'address_id' => $this->integer()->null(),
             'status_id' => $this->integer()->notNull()->defaultValue(1), // pending, completed, canceled, shipped, refunded
             'total' => $this->decimal(10,2)->notNull()->defaultValue(0),
             'shopping_price' => $this->decimal(10,2)->notNull()->defaultValue(0),

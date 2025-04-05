@@ -22,6 +22,11 @@ class m250309_004049_create_shippings_tables extends Migration
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ], $tableOptions);
+
+
+        Yii::$app->db->createCommand()->insert('shippings', [
+            'name' => 'Standard Shipping',
+        ])->execute();
     }
 
     /**
