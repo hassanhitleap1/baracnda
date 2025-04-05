@@ -312,6 +312,22 @@ class Orders extends \yii\db\ActiveRecord
     public function calculateTotals()
     {
         $this->subtotal = 0;
+
+        // Load OrderItems if not already loaded
+        if ($this->isNewRecord && empty($this->orderItems)) {
+            $orderItemsData = Yii::$app->request->post('Orders')['OrderItems'] ?? [];
+            foreach ($orderItemsData as $itemData) {
+                $orderItem = new OrderItems();
+                $orderItem->order_id = $this->id;
+                $orderItem->product_id = $itemData['product_id'];
+                $orderItem->variant_id = $itemData['variant_id'];
+                $orderItem->quantity = $itemData['variant_quantity'];
+                $orderItem->price = $itemData['variant_price'];
+                $this->orderItems[] = $orderItem;
+            }
+        }
+
+        // Calculate subtotal
         foreach ($this->orderItems as $item) {
             $this->subtotal += $item->quantity * $item->price;
         }
