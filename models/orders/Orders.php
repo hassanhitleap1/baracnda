@@ -223,8 +223,8 @@ class Orders extends \yii\db\ActiveRecord
     public function setUser()
     {
 
-         $user = null;
-        if($this->isNewRecord){
+         $user =  Users::findOne(['phone' => $this->phone]);
+        if($this->isNewRecord && !$user){
             $user = new Users();
             $user->full_name = $this->full_name;
             $user->phone = $this->phone;
