@@ -207,9 +207,9 @@ class Orders extends \yii\db\ActiveRecord
         $orderItem = new OrderItems();
         $orderItem->order_id = $this->id;
         $orderItem->product_id = $item->product_id;
-        $orderItem->quantity = $item->quantity;
+        $orderItem->quantity = $item->variant_quantity;
         $orderItem->variant_id = $item->variant_id;
-        $orderItem->price = $item->price;
+        $orderItem->price = $item->variant_price;
     
         if (!$orderItem->save()) {
             Yii::$app->session->setFlash('error', $orderItem->getFirstErrors());

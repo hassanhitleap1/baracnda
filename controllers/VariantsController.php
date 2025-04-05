@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\variants\Variants;
 use app\models\variants\VariantsSearch;
+use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -156,6 +157,7 @@ class VariantsController extends BaseController
                 'name' => $variant->name,
                 'image' => $variant->product->imageUrl ,
                 'price' => $variant->price,
+                'product_id' => $variant->product_id,
             ];
         }, $variants);
     }

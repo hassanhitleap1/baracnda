@@ -162,7 +162,7 @@ $(document).ready(function () {
                         <div class="dropdown-item d-flex align-items-center">
                             <img src="${variant.image}" alt="${variant.name}" class="img-thumbnail" style="width: 30px; height: 30px; margin-right: 10px;">
                             <span>${variant.name}</span>
-                            <button class="btn btn-primary btn-sm ml-auto add-variant-btn" data-id="${variant.id}" data-name="${variant.name}" data-image="${variant.image}" data-price="${variant.price}">
+                            <button class="btn btn-primary btn-sm ml-auto add-variant-btn" data-id="${variant.id}" data-product-id="${variant.product_id}" data-name="${variant.name}" data-image="${variant.image}" data-price="${variant.price}">
                                 Add
                             </button>
                         </div>
@@ -180,6 +180,7 @@ $(document).ready(function () {
         const variantName = $(this).data('name');
         const variantImage = $(this).data('image');
         const variantPrice = $(this).data('price');
+        const product_id = $(this).data('product-id');
 
         // Check if the variant is already added
         if ($(`#orderItems .variant-item[data-id="${variantId}"]`).length > 0) {
@@ -190,6 +191,7 @@ $(document).ready(function () {
             <div class="row mb-3 variant-item" data-id="${variantId}">
                 <div class="col-2">
                     <input type="hidden" name="Orders[OrderItems][${variantId}][variant_id]" value="${variantId}">
+                     <input type="hidden" name="Orders[OrderItems][${variantId}][product_id]" value="${product_id}">
                     <input type="hidden" name="Orders[OrderItems][${variantId}][variant_image]" value="${variantImage}">
                     <img src="${variantImage}" alt="${variantName}" class="img-thumbnail w-40">
                 </div>

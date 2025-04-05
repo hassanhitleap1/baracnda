@@ -77,28 +77,29 @@ class OrdersController extends BaseController
                     if (!$model->setAddress() || !$model->setUser() || !$model->setCreator()) {
                         throw new \Exception('Failed to set related data.');
                     }
+
                    
-                    $model->setShippingPrice();
-                    $model->calculateTotals();
 
                     if (!$model->save()) {
                         throw new \Exception('Failed to save order.');
                     }
 
-                    if ($items = Yii::$app->request->post('OrderItems')) {
+                    if ($items = Yii::$app->request->post('Orders')['OrderItems'] ?? []) {
                         foreach ($items as $item) {
-                            if (!$model->addItem($item)) {
+                            if (!$model->addItem((object)$item)) {
                                 throw new \Exception('Failed to save order items.');
                             }
                         }
                     }
 
+                    $model->setShippingPrice();
+                    $model->calculateTotals();
+                    
                     $transaction->commit();
                     return $this->redirect(['view', 'id' => $model->id]);
-                }else {
-                    Yii::$app->session->setFlash('error', $model->getMessage());
+                } else {
+                    Yii::$app->session->setFlash('error', 'Validation failed.');
                 }
-
             } catch (\Exception $e) {
                 $transaction->rollBack();
                 Yii::$app->session->setFlash('error', $e->getMessage());
@@ -135,10 +136,18 @@ class OrdersController extends BaseController
                         throw new \Exception('Failed to update order.');
                     }
 
+                    if ($items = Yii::$app->request->post('Orders')['OrderItems'] ?? []) {
+                        foreach ($items as $item) {
+                            if (!$model->addItem((object)$item)) {
+                                throw new \Exception('Failed to save order items.');
+                            }
+                        }
+                    }
+
                     $transaction->commit();
                     return $this->redirect(['view', 'id' => $model->id]);
-                }else {
-                    Yii::$app->session->setFlash('error', $model->getMessage());
+                } else {
+                    Yii::$app->session->setFlash('error', 'Validation failed.');
                 }
             } catch (\Exception $e) {
                 $transaction->rollBack();
