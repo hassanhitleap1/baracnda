@@ -1,6 +1,7 @@
 <?php
 
 use app\models\countries\Countries;
+use app\models\payments\Payments;
 use app\models\regions\Regions;
 use app\models\shippings\Shippings;
 use app\models\status\Status;
@@ -37,28 +38,54 @@ use yii\widgets\ActiveForm;
                     
                         foreach ($order['OrderItems'] as  $key => $orderItem) {
                             
-                        echo '<div class="row mb-3 variant-item" data-id="'.$orderItem['variant_id'] .'">';
-                        echo '<div class="col-2">';
-                        echo '<input type="hidden" name="Orders[OrderItems]['. $key .'][variant_id]" value="'.$orderItem['variant_id'].'">';
-                        echo '<input type="hidden" name="Orders[OrderItems]['. $key .'][variant_image]" value="'.$orderItem['variant_image'] .'">';
-                        echo '<img src="'.$orderItem['variant_image'] .'" alt="'.$orderItem['variant_image'] .'" class="img-thumbnail w-40">';
-                        echo '</div>';
-                        echo '<div class="col-4">';
-                        echo '<input type="text" class="form-control" name="Orders[OrderItems]['. $key .'][variant_name]" value="'.$orderItem['variant_name'] .'" readonly>';
-                        echo '</div>';
-                        echo '<div class="col-2">';
-                        echo '<input type="number" class="form-control" name="Orders[OrderItems]['. $key .'][variant_quantity]" value="'.$orderItem['variant_quantity'] .'" min="1">';
-                        echo '</div>';
-                        echo '<div class="col-2">';
-                        echo '<input type="text" class="form-control" name="Orders[OrderItems]['. $key .'][variant_price]" value="'.$orderItem['variant_price'] .'" readonly>';
-                        echo '</div>';
-                        echo '<div class="col-2">';
-                        echo '<button class="btn btn-danger btn-sm delete-variant-btn">Delete</button>';
-                        echo '</div>';
-                        echo '</div>';
+                                echo '<div class="row mb-3 variant-item" data-id="'.$orderItem['variant_id'] .'">';
+                                echo '<div class="col-2">';
+                                echo '<input type="hidden" name="Orders[OrderItems]['. $key .'][variant_id]" value="'.$orderItem['variant_id'].'">';
+                                echo '<input type="hidden" name="Orders[OrderItems]['. $key .'][variant_image]" value="'.$orderItem['variant_image'] .'">';
+                                echo '<img src="'.$orderItem['variant_image'] .'" alt="'.$orderItem['variant_image'] .'" class="img-thumbnail w-40">';
+                                echo '</div>';
+                                echo '<div class="col-4">';
+                                echo '<input type="text" class="form-control" name="Orders[OrderItems]['. $key .'][variant_name]" value="'.$orderItem['variant_name'] .'" readonly>';
+                                echo '</div>';
+                                echo '<div class="col-2">';
+                                echo '<input type="number" class="form-control" name="Orders[OrderItems]['. $key .'][variant_quantity]" value="'.$orderItem['variant_quantity'] .'" min="1">';
+                                echo '</div>';
+                                echo '<div class="col-2">';
+                                echo '<input type="text" class="form-control" name="Orders[OrderItems]['. $key .'][variant_price]" value="'.$orderItem['variant_price'] .'" readonly>';
+                                echo '</div>';
+                                echo '<div class="col-2">';
+                                echo '<button class="btn btn-danger btn-sm delete-variant-btn">Delete</button>';
+                                echo '</div>';
+                                echo '</div>';
 
                         }
                     }
+
+                    if(!Yii::$app->request->isPost){
+
+                        foreach ($model->orderItems as $key => $orderItem) {
+                            echo '<div class="row mb-3 variant-item" data-id="'.$orderItem->id .'">';
+                            echo '<div class="col-2">';
+                            echo '<input type="hidden" name="Orders[OrderItems]['. $key .'][variant_id]" value="'.$orderItem->variant_id.'">';
+                            echo '<input type="hidden" name="Orders[OrderItems]['. $key .'][variant_image]" value="'.$orderItem->product->image_path.'">';
+                            echo '<img src="'.$orderItem->product->image_path .'" alt="'.$orderItem->product->image_path .'" class="img-thumbnail w-40">';
+                            echo '</div>';
+                            echo '<div class="col-4">';
+                            echo '<input type="text" class="form-control" name="Orders[OrderItems]['. $key .'][variant_name]" value="'.$orderItem->product->name .'" readonly>';
+                            echo '</div>';
+                            echo '<div class="col-2">';
+                            echo '<input type="number" class="form-control" name="Orders[OrderItems]['. $key .'][variant_quantity]" value="'.$orderItem->quantity .'" min="1">';
+                            echo '</div>';
+                            echo '<div class="col-2">';
+                            echo '<input type="text" class="form-control" name="Orders[OrderItems]['. $key .'][variant_price]" value="'.$orderItem->price .'" readonly>';
+                            echo '</div>';
+                            echo '<div class="col-2">';
+                            echo '<button class="btn btn-danger btn-sm delete-variant-btn">Delete</button>';
+                            echo '</div>';
+                            echo '</div>';
+                        }
+                    }
+                    
                  ?>
             </div>
         </div>
@@ -108,7 +135,22 @@ use yii\widgets\ActiveForm;
                     ]); ?>
                 </div>
                 <div class="col-6">
+                    <?= $form->field($model, 'address')->textInput(['maxlength' => true]) ?>
+                </div>
+            
+
+                <div class="col-6">
                     <?= $form->field($model, 'note')->textarea(['rows' => 6]) ?>
+                </div>
+
+                <div class="col-6">
+                    <?= $form->field($model, 'payment_id')->widget(Select2::classname(), [
+                        'data' => ArrayHelper::map(Payments::find()->all(), 'id', 'name'),
+                        'options' => ['placeholder' => 'Select a payments','value' => $model->payment_id ??1],
+                        'pluginOptions' => [
+                            'allowClear' => true
+                        ],
+                    ]); ?>
                 </div>
             </div>
         </div>

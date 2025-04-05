@@ -77,7 +77,7 @@ class OrdersController extends BaseController
                     if (!$model->setAddress() || !$model->setUser() || !$model->setCreator()) {
                         throw new \Exception('Failed to set related data.');
                     }
-
+                   
                     $model->setShippingPrice();
                     $model->calculateTotals();
 
@@ -95,7 +95,10 @@ class OrdersController extends BaseController
 
                     $transaction->commit();
                     return $this->redirect(['view', 'id' => $model->id]);
+                }else {
+                    Yii::$app->session->setFlash('error', $model->getMessage());
                 }
+
             } catch (\Exception $e) {
                 $transaction->rollBack();
                 Yii::$app->session->setFlash('error', $e->getMessage());
@@ -134,6 +137,8 @@ class OrdersController extends BaseController
 
                     $transaction->commit();
                     return $this->redirect(['view', 'id' => $model->id]);
+                }else {
+                    Yii::$app->session->setFlash('error', $model->getMessage());
                 }
             } catch (\Exception $e) {
                 $transaction->rollBack();

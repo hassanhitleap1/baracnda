@@ -54,6 +54,8 @@ class Orders extends \yii\db\ActiveRecord
 
     public $phone=  null;
 
+    public $address = null;
+
     const SCENARIO_CREATE = 'create';
     const SCENARIO_UPDATE = 'update';
 
@@ -79,18 +81,20 @@ class Orders extends \yii\db\ActiveRecord
             [['user_id', 'note'], 'default', 'value' => null, 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
             [['shipping_id'], 'default', 'value' => 1, 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
             [['discount'], 'default', 'value' => 0.00, 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            [['user_id', 'creator_id', 'address_id', 'status_id', 'shipping_id'], 'integer', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            [['creator_id', 'address_id'], 'required', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            [['total', 'shopping_price', 'sub_total', 'profit', 'discount'], 'number', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            [['note'], 'string', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            [['created_at', 'updated_at'], 'safe', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            [['address_id'], 'exist', 'skipOnError' => true, 'targetClass' => Addresses::class, 'targetAttribute' => ['address_id' => 'id'], 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            [['creator_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['creator_id' => 'id'], 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['user_id' => 'id'], 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            [['shipping_id'], 'exist', 'skipOnError' => true, 'targetClass' => Shippings::class, 'targetAttribute' => ['shipping_id' => 'id'], 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => Status::class, 'targetAttribute' => ['status_id' => 'id'], 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            [['country_id'], 'safe', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            [['creator_id', 'address_id', 'user_id'], 'required', 'on' => [self::SCENARIO_UPDATE]],
+            [[ 'status_id', 'shipping_id'], 'integer', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            [['address'], 'string', 'max' => 255, 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+
+
+            // [['total', 'shopping_price', 'sub_total', 'profit', 'discount'], 'number', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            // [['note'], 'string', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            // [['created_at', 'updated_at'], 'safe', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            // [['address_id'], 'exist', 'skipOnError' => true, 'targetClass' => Addresses::class, 'targetAttribute' => ['address_id' => 'id'], 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            // [['creator_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['creator_id' => 'id'], 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            // [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['user_id' => 'id'], 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            // [['shipping_id'], 'exist', 'skipOnError' => true, 'targetClass' => Shippings::class, 'targetAttribute' => ['shipping_id' => 'id'], 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            // [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => Status::class, 'targetAttribute' => ['status_id' => 'id'], 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            // [['country_id'], 'safe', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            // [['creator_id', 'address_id', 'user_id'], 'required', 'on' => [self::SCENARIO_UPDATE]],
         ];
     }
 
@@ -149,6 +153,7 @@ class Orders extends \yii\db\ActiveRecord
             $address->country_id = 1;
             $address->region_id = $this->region_id;
             $address->full_name = $this->full_name;
+            $address->address = $this->address;
             $address->phone = $this->phone;
             if (!$address->save()) {
                 Yii::$app->session->setFlash('error', $address->getFirstErrors());
@@ -185,11 +190,12 @@ class Orders extends \yii\db\ActiveRecord
     {
         $shipping= ShippingPrices::find()->where(['shipping_id' => $this->shipping_id,'region_id' => $this->region_id])->one();
         if (!$shipping) {
+            
             Yii::$app->session->setFlash('error', 'Shipping not found');
             return false;
         }
-        
-        $this->shopping_price = $this->price;
+
+        $this->shopping_price = $shipping->price;
 
         return true;
       
@@ -203,7 +209,7 @@ class Orders extends \yii\db\ActiveRecord
         $orderItem->product_id = $item->product_id;
         $orderItem->quantity = $item->quantity;
         $orderItem->variant_id = $item->variant_id;
-        $orderItem->order_id = $this->id;
+        $orderItem->price = $item->price;
     
         if (!$orderItem->save()) {
             Yii::$app->session->setFlash('error', $orderItem->getFirstErrors());
@@ -224,7 +230,7 @@ class Orders extends \yii\db\ActiveRecord
             $user->password_hash = Yii::$app->security->generatePasswordHash($this->phone);
             $user->auth_key = Yii::$app->security->generateRandomString();
             $user->role_id = Users::ROLE_CLIENT;
-            if (!$user->save()) {
+            if (!$user->save(false)) {
                 Yii::$app->session->setFlash('error', $user->getFirstErrors());
                 return false;
             } 

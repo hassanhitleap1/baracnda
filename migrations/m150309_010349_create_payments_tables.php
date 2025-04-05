@@ -18,6 +18,26 @@ class m150309_010349_create_payments_tables extends Migration
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ]);
+
+        Yii::$app->db->createCommand()->insert('payments', [
+            'name' => 'Cash on Delivery',
+            'module' => 'CashOnDelivery',
+            'status' => 1,
+        ])->execute();
+        
+        Yii::$app->db->createCommand()->insert('payments', [
+            'name' => 'Bank Transfer',
+            'module' => 'BankTransfer',
+            'status' => 1,
+        ])->execute();
+
+        Yii::$app->db->createCommand()->insert('payments', [
+            'name' => 'Credit Card',
+            'module' => 'CreditCard',
+            'status' => 1,
+        ])->execute();
+        
+
     }
 
     /**
