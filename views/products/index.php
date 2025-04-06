@@ -1,6 +1,6 @@
 <?php
 
-
+use app\models\products\Products;
 use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 use kartik\grid\GridView;
@@ -12,6 +12,7 @@ use kartik\daterange\DateRangePicker;
 
 $this->title = Yii::t('app', 'Products');
 $this->params['breadcrumbs'][] = $this->title;
+
 ?>
 <div class="products-index">
 
@@ -62,15 +63,10 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'image_path',
-                'label' => Yii::t('app', 'Images'),
+                'label' => Yii::t('app', 'Image'),
                 'format' => 'html',
                 'value' => function ($model) {
-                    $images = $model->images;
-                    $html = '';
-                    foreach ($images as $image) {
-                        $html .= Html::img($image->getImageUrl(), ['style' => 'width:50px; margin-right:10px;']);
-                    }
-                    return $html;
+                    return Html::img($model->getImageUrl(), ['style' => 'width:50px; margin-right:10px;']);
                 },
             ],
             [

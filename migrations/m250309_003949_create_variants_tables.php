@@ -45,7 +45,7 @@ class m250309_003949_create_variants_tables  extends Migration
                 'creator_id' => 1,
                 'category_id' => 1,
                 'description' => 'Test Product Description',
-                'image_path'=>"product-empty.png",
+                'image_path'=>"product-empty.webp",
             ])->execute();
 
             Yii::$app->db->createCommand()->insert('variants', [
@@ -57,22 +57,6 @@ class m250309_003949_create_variants_tables  extends Migration
                 'quantity' => 10,
             ])->execute();
 
-            // $product = new Products();
-            // $product->name = "Test Product $i";
-            // $product->type = Products::SIMPLE;
-            // $product->price = rand(1, 100);
-            // $product->cost = $product->price / 2;
-            // $product->quantity = 10;
-            // $product->image_path="product-empty.png";
-            // $product->save(false);
-            // $variant = new Variants();
-            // $variant->product_id = $product->id;
-            // $variant->is_default = 1;
-            // $variant->name = 'Test Variant';
-            // $variant->price = rand(1, 100);
-            // $variant->cost = $variant->price / 2;
-            // $variant->quantity = 10;
-            // $variant->save(false);
         }
      
     
