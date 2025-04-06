@@ -30,17 +30,47 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'user_id',
-            'creator_id',
-            'address_id',
-            'status_id',
+            [
+                'label' => Yii::t('app', 'User'),
+                'value' => $model->user ? $model->user->full_name : null,
+            ],
+            [
+                'label' => Yii::t('app', 'Creator'),
+                'value' => $model->creator ? $model->creator->full_name : null,
+            ],
+            [
+                'label' => Yii::t('app', 'Address'),
+                'value' => $model->addresses ? $model->addresses->full_name . ', ' . $model->addresses->address . ', ' . $model->addresses->region->name : null,
+            ],
+            [
+                'label' => Yii::t('app', 'Status'),
+                'value' => $model->status ? $model->status->name : null,
+            ],
             'total',
             'shopping_price',
             'sub_total',
             'profit',
             'discount',
-            'shipping_id',
+            [
+                'label' => Yii::t('app', 'Shipping'),
+                'value' => $model->shippings ? $model->shippings->name : null,
+            ],
             'note:ntext',
+            [
+                'label' => Yii::t('app', 'Order Items'),
+                'format' => 'raw',
+                'value' => function ($model) {
+                    if ($model->orderItems) {
+                        $items = array_map(function ($item) {
+                            $image = Html::img($item->product->imageUrl, ['alt' => $item->product->name, 'style' => 'width:50px; height:auto;']);
+                            $details = Html::encode($item->product->name . ' (Qty: ' . $item->quantity . ')');
+                            return $image . '<br>' . $details;
+                        }, $model->orderItems);
+                        return implode('<br><br>', $items);
+                    }
+                    return null;
+                },
+            ],
             'created_at',
             'updated_at',
         ],

@@ -7,6 +7,8 @@ use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\widgets\Pjax;
 use yii\bootstrap5\Modal; // Use Bootstrap 5 Modal
+use kartik\daterange\DateRangePicker;
+use yii\helpers\ArrayHelper;
 /** @var yii\web\View $this */
 /** @var app\models\orders\OrdersSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
@@ -64,8 +66,18 @@ $statusList = \yii\helpers\ArrayHelper::map(Status::find()->all(), 'id', 'name')
                 },
             ],
             'id',
-            'user.full_name',
-            'creator.full_name',
+            [
+                'attribute' => 'user_id',
+                'label' => Yii::t('app', 'User'),
+                'value' => 'user.full_name',
+                'filter' => ArrayHelper::map(\app\models\users\Users::find()->all(), 'id', 'full_name'),
+            ],
+            [
+                'attribute' => 'creator_id',
+                'label' => Yii::t('app', 'Creator'),
+                'value' => 'creator.full_name',
+                'filter' => ArrayHelper::map(\app\models\users\Users::find()->all(), 'id', 'full_name'),
+            ],
             [
                 'attribute' => 'address_id',
                 'label' => Yii::t('app', 'Full Address'),
@@ -73,7 +85,12 @@ $statusList = \yii\helpers\ArrayHelper::map(Status::find()->all(), 'id', 'name')
                     return $model->addresses ? $model->addresses->full_name . ', ' . $model->addresses->address . ', ' . $model->addresses->region->name : null;
                 },
             ],
-            'status.name',
+            [
+                'attribute' => 'status_id',
+                'label' => Yii::t('app', 'Status'),
+                'value' => 'status.name',
+                'filter' => ArrayHelper::map(\app\models\status\Status::find()->all(), 'id', 'name'),
+            ],
             'shopping_price',
             'sub_total',
             'profit',
@@ -96,6 +113,24 @@ $statusList = \yii\helpers\ArrayHelper::map(Status::find()->all(), 'id', 'name')
                     return null;
                 },
             ],
+            [
+                'attribute' => 'created_at',
+                'label' => Yii::t('app', 'Created At'),
+                'format' => 'datetime',
+                'filter' => DateRangePicker::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'created_at',
+                    'convertFormat' => true,
+                    'pluginOptions' => [
+                        'timePicker' => true,
+                        'timePickerIncrement' => 30,
+                        'locale' => [
+                            'format' => 'Y-m-d H:i:s',
+                        ],
+                    ],
+                ]),
+            ],
+            'updated_at',
             [
                 'class' => ActionColumn::className(),
                 'urlCreator' => function ($action, $model, $key, $index) {
