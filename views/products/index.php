@@ -1,11 +1,11 @@
 <?php
 
-use app\models\products\Products;
+
 use yii\helpers\Html;
-use yii\helpers\Url;
-use yii\grid\ActionColumn;
-use yii\grid\GridView;
+use yii\helpers\ArrayHelper;
+use kartik\grid\GridView;
 use yii\widgets\Pjax;
+use kartik\daterange\DateRangePicker;
 /** @var yii\web\View $this */
 /** @var app\models\products\ProductsSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
@@ -29,32 +29,83 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
-            // 'id',
-            'creator.full_name',
+            'id',
+            [
+                'attribute' => 'creator_id',
+                'label' => Yii::t('app', 'Creator'),
+                'value' => function ($model) {
+                    return $model->creator ? $model->creator->username : null;
+                },
+            ],
             'name',
-            // 'description:ntext',
+            [
+                'attribute' => 'description',
+                'format' => 'html',
+            ],
             'price',
             'cost',
-            'category.name',
-            'warehouse.name',
+            [
+                'attribute' => 'category_id',
+                'label' => Yii::t('app', 'Category'),
+                'value' => function ($model) {
+                    return $model->category ? $model->category->name : null;
+                },
+                'filter' => ArrayHelper::map(\app\models\categories\Categories::find()->all(), 'id', 'name'),
+            ],
+            [
+                'attribute' => 'warehouse_id',
+                'label' => Yii::t('app', 'Warehouse'),
+                'value' => function ($model) {
+                    return $model->warehouse ? $model->warehouse->name : null;
+                },
+                'filter' => ArrayHelper::map(\app\models\warehouses\Warehouses::find()->all(), 'id', 'name'),
+            ],
             [
                 'attribute' => 'image_path',
-                'format' => 'raw',
+                'label' => Yii::t('app', 'Images'),
+                'format' => 'html',
                 'value' => function ($model) {
-                        return Html::img($model->getImageUrl(), ['width' => '100']);
-                    },
+                    $images = $model->images;
+                    $html = '';
+                    foreach ($images as $image) {
+                        $html .= Html::img($image->getImageUrl(), ['style' => 'width:50px; margin-right:10px;']);
+                    }
+                    return $html;
+                },
             ],
-
-            //'image_path',
-            //'created_at',
-            //'updated_at',
             [
-                'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, Products $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                 }
+                'attribute' => 'variants',
+                'label' => Yii::t('app', 'Variants'),
+                'format' => 'html',
+                'value' => function ($model) {
+                    $variants = $model->variants;
+                    $html = '<ul>';
+                    foreach ($variants as $variant) {
+                        $html .= '<li>' . Html::encode($variant->name) . ' - ' . Yii::$app->formatter->asCurrency($variant->price, 'USD') . '</li>';
+                    }
+                    $html .= '</ul>';
+                    return $html;
+                },
             ],
+            [
+                'attribute' => 'created_at',
+                'label' => Yii::t('app', 'Created At'),
+                'format' => 'datetime',
+                'filter' => DateRangePicker::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'created_at',
+                    'convertFormat' => true,
+                    'pluginOptions' => [
+                        'timePicker' => true,
+                        'timePickerIncrement' => 30,
+                        'locale' => [
+                            'format' => 'Y-m-d H:i:s',
+                        ],
+                    ],
+                ]),
+            ],
+            'updated_at',
+            ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
 
