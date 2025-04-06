@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <ul>
         <?php foreach ($roles as $role): ?>
             <li>
-                <strong><?= Html::encode($role->name) ?>:</strong> <?= Html::encode($role->description) ?>
+                <strong><?= Html::encode($role->name === 'ROLE_SUPER_ADMIN' ? 'Super Admin' : $role->name) ?>:</strong> <?= Html::encode($role->description) ?>
                 <ul>
                     <?php foreach ($permissions as $permission): ?>
                         <li>

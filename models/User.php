@@ -31,6 +31,8 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_ACTIVE = 10;
     const ADMIN = 2;
     const SUPER_ADMIN = 1;
+    
+    const ROLE_SUPER_ADMIN = 1;
     /**
      * {@inheritdoc}
      */

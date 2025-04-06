@@ -104,9 +104,11 @@ class RbacController extends Controller
         ];
 
         foreach ($permissions as $name => $description) {
-            $permission = $auth->createPermission($name);
-            $permission->description = $description;
-            $auth->add($permission);
+            if (!$auth->getPermission($name)) {
+                $permission = $auth->createPermission($name);
+                $permission->description = $description;
+                $auth->add($permission);
+            }
         }
 
         // Create roles
@@ -116,36 +118,68 @@ class RbacController extends Controller
         $manager = $auth->createRole('ROLE_MANAGER');
         $auth->add($manager);
 
-        $admin = $auth->createRole('ROLE_ADMIN');
-        $auth->add($admin);
+        $seller = $auth->createRole('ROLE_SELLER');
+        $auth->add($seller);
+
+        $superAdmin = $auth->createRole('ROLE_SUPER_ADMIN');
+        $auth->add($superAdmin);
 
         // Create viewOwnOrders permission
-        $viewOwnOrders = $auth->createPermission('viewOwnOrders');
-        $viewOwnOrders->description = 'View Own Orders';
-        $auth->add($viewOwnOrders);
+        if (!$auth->getPermission('viewOwnOrders')) {
+            $viewOwnOrders = $auth->createPermission('viewOwnOrders');
+            $viewOwnOrders->description = 'View Own Orders';
+            $auth->add($viewOwnOrders);
+        }
 
         // Assign specific permissions to ROLE_DATA_ENTRY
-        $auth->addChild($dataEntry, $auth->getPermission('products/create'));
-        $auth->addChild($dataEntry, $auth->getPermission('products/update'));
-        $auth->addChild($dataEntry, $auth->getPermission('categories/create'));
-        $auth->addChild($dataEntry, $auth->getPermission('categories/update'));
+        $this->assignPermission($auth, $dataEntry, 'products/create');
+        $this->assignPermission($auth, $dataEntry, 'products/update');
+        $this->assignPermission($auth, $dataEntry, 'categories/create');
+        $this->assignPermission($auth, $dataEntry, 'categories/update');
+
+        // Assign specific permissions to ROLE_SELLER
+        $this->assignPermission($auth, $seller, 'products/index');
+        $this->assignPermission($auth, $seller, 'products/view');
+        $this->assignPermission($auth, $seller, 'orders/index');
+        $this->assignPermission($auth, $seller, 'orders/view');
 
         // Assign specific permissions to ROLE_MANAGER
-        $auth->addChild($manager, $viewOwnOrders);
-        $auth->addChild($manager, $auth->getPermission('orders/index'));
-        $auth->addChild($manager, $auth->getPermission('orders/view'));
-        $auth->addChild($manager, $auth->getPermission('products/index'));
-        $auth->addChild($manager, $auth->getPermission('products/view'));
+        $this->assignPermission($auth, $manager, 'viewOwnOrders');
+        $this->assignPermission($auth, $manager, 'orders/index');
+        $this->assignPermission($auth, $manager, 'orders/view');
+        $this->assignPermission($auth, $manager, 'products/index');
+        $this->assignPermission($auth, $manager, 'products/view');
         $auth->addChild($manager, $dataEntry); // Inherit ROLE_DATA_ENTRY permissions
 
-        // Assign all permissions to ROLE_ADMIN
+        // Assign all permissions to ROLE_MANAGER
         foreach ($auth->getPermissions() as $permission) {
-            $auth->addChild($admin, $permission);
+            $this->assignPermission($auth, $manager, $permission->name);
+        }
+
+        // Assign all permissions to ROLE_SUPER_ADMIN
+        foreach ($auth->getPermissions() as $permission) {
+            $this->assignPermission($auth, $superAdmin, $permission->name);
         }
 
         // Assign roles to users (adjust user IDs as needed)
-        $auth->assign($admin, 1); // Assign admin role to user ID 1
+        $auth->assign($superAdmin, 1); // Assign super admin role to user ID 1
         $auth->assign($manager, 2); // Assign manager role to user ID 2
         $auth->assign($dataEntry, 3); // Assign data entry role to user ID 3
+        $auth->assign($seller, 4); // Assign seller role to user ID 4
+    }
+
+    /**
+     * Assign a permission to a role if not already assigned.
+     *
+     * @param \yii\rbac\ManagerInterface $auth
+     * @param \yii\rbac\Role $role
+     * @param string $permissionName
+     */
+    private function assignPermission($auth, $role, $permissionName)
+    {
+        $permission = $auth->getPermission($permissionName);
+        if ($permission && !$auth->hasChild($role, $permission)) {
+            $auth->addChild($role, $permission);
+        }
     }
 }

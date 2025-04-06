@@ -78,7 +78,7 @@ class AdminController extends BaseController
                 [
                     'label' => 'Users',
                     'data' => [
-                        Users::find()->where(['role_id' => Users::ROLE_ADMIN])->count(),
+                        Users::find()->where(['role_id' => Users::ROLE_SUPER_ADMIN])->count(),
                         Users::find()->where(['role_id' => Users::ROLE_MANAGER])->count(),
                         Users::find()->where(['role_id' => Users::ROLE_CLIENT])->count(),
                     ],

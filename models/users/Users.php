@@ -35,9 +35,11 @@ class Users extends \yii\db\ActiveRecord
 
     const SCENARIO_CREATE = 'create';
     const SCENARIO_UPDATE = 'update';
-    const ROLE_ADMIN = 1;
+    const ROLE_SUPER_ADMIN = 1;
     const ROLE_MANAGER = 2;
     const ROLE_CLIENT = 3;
+    const ROLE_SELLER = 4;
+    const ROLE_GUEST = 5;
 
     /**
      * {@inheritdoc}
