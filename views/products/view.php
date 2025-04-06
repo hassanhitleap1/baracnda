@@ -30,14 +30,51 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'creator_id',
+         
+            [
+                'label' => Yii::t('app', 'Creator'),
+                'value' => $model->creator ? $model->creator->username : null,
+            ],
             'name',
-            'description:ntext',
+            'description:html',
             'price',
             'cost',
             'category_id',
-            'warehouse_id',
-            'image_path',
+            [
+                'label' => Yii::t('app', 'Category'),
+                'value' => $model->category ? $model->category->name : null,
+            ],
+
+            [
+                'label' => Yii::t('app', 'Warehouse'),
+                'value' => $model->warehouse ? $model->warehouse->name : null,
+            ],
+        
+            [
+                'label' => Yii::t('app', 'Images'),
+                'format' => 'html',
+                'value' => function ($model) {
+                    $images = $model->images;
+                    $html = '';
+                    foreach ($images as $image) {
+                        $html .= Html::img($image->getImageUrl(), ['style' => 'width:100px; margin-right:10px;']);
+                    }
+                    return $html;
+                },
+            ],
+            [
+                'label' => Yii::t('app', 'Variants'),
+                'format' => 'html',
+                'value' => function ($model) {
+                    $variants = $model->variants;
+                    $html = '<ul>';
+                    foreach ($variants as $variant) {
+                        $html .= '<li>' . Html::encode($variant->name) . ' - ' . Yii::$app->formatter->asCurrency($variant->price, 'USD') . '</li>';
+                    }
+                    $html .= '</ul>';
+                    return $html;
+                },
+            ],
             'created_at',
             'updated_at',
         ],
