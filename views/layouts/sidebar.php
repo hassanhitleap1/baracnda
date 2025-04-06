@@ -18,7 +18,6 @@ use yii\bootstrap5\Html;
 <?php if (Yii::$app->user->isGuest): ?>
     <?php Yii::$app->response->redirect(['site/index'])->send(); ?>
 <?php else: ?>
-    <!-- Sidebar content for authenticated users -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
         <a href="<?= Url::to(['site/index']) ?>" class="brand-link">
@@ -33,7 +32,7 @@ use yii\bootstrap5\Html;
                         class="img-circle elevation-2" alt="User Image">
                 </div>
                 <div class="info">
-                    <a href="#" class="d-block"><?= Yii::$app->user->isGuest ? 'Guest' : Yii::$app->user->identity->full_name ?></a>
+                    <a href="#" class="d-block"><?= Yii::$app->user->identity->full_name ?? 'Guest' ?></a>
                 </div>
             </div>
             <!-- Sidebar Menu -->
@@ -49,7 +48,7 @@ use yii\bootstrap5\Html;
                     </li>
 
                     <!-- Orders -->
-                    <?php if (!Yii::$app->user->isGuest && (Yii::$app->user->can('viewAllOrders') || Yii::$app->user->can('viewOwnOrders'))): ?>
+                    <?php if (Yii::$app->user->can('viewAllOrders') || Yii::$app->user->can('viewOwnOrders')): ?>
                         <li class="nav-item">
                             <a href="<?= Url::to(['orders/index']) ?>"
                                 class="nav-link <?= Yii::$app->controller->id == 'orders' ? 'active' : '' ?>">
@@ -60,7 +59,7 @@ use yii\bootstrap5\Html;
                     <?php endif; ?>
 
                     <!-- Products -->
-                    <?php if (!Yii::$app->user->isGuest && Yii::$app->user->can('manageProducts')): ?>
+                    <?php if (Yii::$app->user->can('manageProducts')): ?>
                         <li class="nav-item">
                             <a href="<?= Url::to(['products/index']) ?>"
                                 class="nav-link <?= Yii::$app->controller->id == 'products' ? 'active' : '' ?>">
@@ -71,7 +70,7 @@ use yii\bootstrap5\Html;
                     <?php endif; ?>
 
                     <!-- Categories -->
-                    <?php if (!Yii::$app->user->isGuest && Yii::$app->user->can('manageProducts')): ?>
+                    <?php if (Yii::$app->user->can('manageProducts')): ?>
                         <li class="nav-item">
                             <a href="<?= Url::to(['categories/index']) ?>"
                                 class="nav-link <?= Yii::$app->controller->id == 'categories' ? 'active' : '' ?>">
@@ -82,7 +81,7 @@ use yii\bootstrap5\Html;
                     <?php endif; ?>
 
                     <!-- Users (Admin Only) -->
-                    <?php if (!Yii::$app->user->isGuest && Yii::$app->user->identity->role_id == User::SUPER_ADMIN): ?>
+                    <?php if (Yii::$app->user->identity->role_id == User::SUPER_ADMIN): ?>
                         <li class="nav-item">
                             <a href="<?= Url::to(['users/index']) ?>"
                                 class="nav-link <?= Yii::$app->controller->id == 'users' ? 'active' : '' ?>">
@@ -93,7 +92,7 @@ use yii\bootstrap5\Html;
                     <?php endif; ?>
 
                     <!-- Settings -->
-                    <?php if (!Yii::$app->user->isGuest && Yii::$app->user->identity->role_id == User::SUPER_ADMIN): ?>
+                    <?php if (Yii::$app->user->identity->role_id == User::SUPER_ADMIN): ?>
                         <li class="nav-item">
                             <a href="<?= Url::to(['settings/index']) ?>"
                                 class="nav-link <?= Yii::$app->controller->id == 'settings' ? 'active' : '' ?>">
@@ -104,17 +103,15 @@ use yii\bootstrap5\Html;
                     <?php endif; ?>
 
                     <!-- Logout -->
-                    <?php if (!Yii::$app->user->isGuest): ?>
-                        <li class="nav-item">
-                            <a class="nav-link">
-                                <i class="nav-icon fas fa-sign-out-alt"></i>
-                                <?php echo Html::beginForm(['/site/logout'], 'post')
-                                    . Html::submitButton('Log Out', ['class' => 'p-0 logout'])
-                                    . Html::endForm();
-                                ?>
-                            </a>
-                        </li>
-                    <?php endif; ?>
+                    <li class="nav-item">
+                        <a class="nav-link">
+                            <i class="nav-icon fas fa-sign-out-alt"></i>
+                            <?php echo Html::beginForm(['/site/logout'], 'post')
+                                . Html::submitButton('Log Out', ['class' => 'p-0 logout'])
+                                . Html::endForm();
+                            ?>
+                        </a>
+                    </li>
                 </ul>
             </nav>
             <!-- /.sidebar-menu -->

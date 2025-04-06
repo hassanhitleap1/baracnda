@@ -17,34 +17,44 @@ class RbacController extends Controller
         // Clear existing data
         $auth->removeAll();
 
-        // Create permissions
-        $manageProducts = $auth->createPermission('manageProducts');
-        $manageProducts->description = 'Manage Products';
-        $auth->add($manageProducts);
+        // Create permissions for all controllers and actions
+        $permissions = [
+            'orders/index' => 'View Orders',
+            'orders/view' => 'View Order Details',
+            'orders/create' => 'Create Orders',
+            'orders/update' => 'Update Orders',
+            'orders/delete' => 'Delete Orders',
+            'products/index' => 'View Products',
+            'products/view' => 'View Product Details',
+            'products/create' => 'Create Products',
+            'products/update' => 'Update Products',
+            'products/delete' => 'Delete Products',
+            // Add more permissions for other controllers and actions
+        ];
 
-        $viewOwnOrders = $auth->createPermission('viewOwnOrders');
-        $viewOwnOrders->description = 'View Own Orders';
-        $auth->add($viewOwnOrders);
-
-        $manageOwnOrders = $auth->createPermission('manageOwnOrders');
-        $manageOwnOrders->description = 'Manage Own Orders';
-        $auth->add($manageOwnOrders);
-
-        $viewAllOrders = $auth->createPermission('viewAllOrders');
-        $viewAllOrders->description = 'View All Orders';
-        $auth->add($viewAllOrders);
+        foreach ($permissions as $name => $description) {
+            $permission = $auth->createPermission($name);
+            $permission->description = $description;
+            $auth->add($permission);
+        }
 
         // Create roles
         $manager = $auth->createRole('ROLE_MANAGER');
         $auth->add($manager);
-        $auth->addChild($manager, $manageProducts);
-        $auth->addChild($manager, $viewOwnOrders);
-        $auth->addChild($manager, $manageOwnOrders);
 
         $admin = $auth->createRole('ROLE_ADMIN');
         $auth->add($admin);
-        $auth->addChild($admin, $manager); // Admin inherits Manager permissions
-        $auth->addChild($admin, $viewAllOrders);
+
+        // Assign all permissions to ROLE_ADMIN
+        foreach ($auth->getPermissions() as $permission) {
+            $auth->addChild($admin, $permission);
+        }
+
+        // Assign specific permissions to ROLE_MANAGER
+        $auth->addChild($manager, $auth->getPermission('orders/index'));
+        $auth->addChild($manager, $auth->getPermission('orders/view'));
+        $auth->addChild($manager, $auth->getPermission('products/index'));
+        $auth->addChild($manager, $auth->getPermission('products/view'));
 
         // Assign roles to users (adjust user IDs as needed)
         $auth->assign($admin, 1); // Assign admin role to user ID 1

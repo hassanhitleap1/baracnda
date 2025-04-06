@@ -17,15 +17,16 @@ class BaseController extends Controller
             'access' => [
                 'class' => AccessControl::class,
                 'denyCallback' => function ($rule, $action) {
-                    return $this->redirect(['site/index']); // Redirect to home page
+                    return $this->redirect(['site/index']); // Redirect unauthorized users to the home page
                 },
                 'rules' => [
                     [
                         'allow' => true,
                         'roles' => ['@'], // Allow authenticated users
-                    ],
-                    [
-                        'allow' => false, // Deny all other users
+                        'matchCallback' => function ($rule, $action) {
+                            $permissionName = $action->controller->id . '/' . $action->id;
+                            return Yii::$app->user->can($permissionName) || Yii::$app->user->identity->role_id == \app\models\users\Users::ROLE_ADMIN;
+                        },
                     ],
                 ],
             ],
