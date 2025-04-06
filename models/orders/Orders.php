@@ -304,7 +304,17 @@ class Orders extends \yii\db\ActiveRecord
      */
     public static function find()
     {
-        return new OrdersQuery(get_called_class());
+        $query = new OrdersQuery(get_called_class());
+
+        if (Yii::$app->user->can('viewAllOrders')) {
+            return $query; // Admin can view all orders
+        }
+
+        if (Yii::$app->user->can('viewOwnOrders')) {
+            return $query->andWhere(['creator_id' => Yii::$app->user->id]); // Manager can view only their own orders
+        }
+
+        return $query->andWhere('0=1'); // Deny access by default
     }
 
     /**

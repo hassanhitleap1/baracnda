@@ -42,7 +42,7 @@ class OrdersSearch extends Orders
      */
     public function search($params, $formName = null)
     {
-        $query = Orders::find();
+        $query = Orders::find()->joinWith(['user', 'creator', 'status']);
 
         // add conditions that should always apply here
 
@@ -74,6 +74,13 @@ class OrdersSearch extends Orders
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
+
+        // Filter by date range
+        if (!empty($this->created_at)) {
+            $dateRange = explode(' - ', $this->created_at);
+            $query->andFilterWhere(['>=', 'created_at', $dateRange[0]])
+                  ->andFilterWhere(['<=', 'created_at', $dateRange[1]]);
+        }
 
         $query->andFilterWhere(['like', 'note', $this->note]);
 

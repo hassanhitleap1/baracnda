@@ -4,12 +4,34 @@ namespace app\controllers;
 
 use Yii;
 use yii\web\Controller;
+use yii\filters\AccessControl;
 
 /**
  * CategoriesController implements the CRUD actions for Categories model.
  */
 class BaseController extends Controller
 {
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'denyCallback' => function ($rule, $action) {
+                    return $this->redirect(['site/index']); // Redirect to home page
+                },
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'], // Allow authenticated users
+                    ],
+                    [
+                        'allow' => false, // Deny all other users
+                    ],
+                ],
+            ],
+        ];
+    }
+
     public function beforeAction($action)
     {
         $this->layout = "admin";

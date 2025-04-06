@@ -15,174 +15,110 @@ use yii\bootstrap5\Html;
         color: #c2c7d0;
     }
 </style>
-<aside class="main-sidebar sidebar-dark-primary elevation-4">
-    <!-- Brand Logo -->
-    <a href="<?= Url::to(['site/index']) ?>" class="brand-link">
-        <?= Html::img(Yii::getAlias('@web') . '/logo-white.png', ['alt' => 'Neutron sys logo white"', 'class' => 'px-3']) ?>
-    </a>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <!-- Sidebar user panel (optional) -->
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-            <div class="image">
-                <img src="<?= Yii::getAlias('@web') . '/AdminLTE/dist/img/user2-160x160.jpg' ?>"
-                    class="img-circle elevation-2" alt="User Image">
-
+<?php if (Yii::$app->user->isGuest): ?>
+    <?php Yii::$app->response->redirect(['site/index'])->send(); ?>
+<?php else: ?>
+    <!-- Sidebar content for authenticated users -->
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+        <!-- Brand Logo -->
+        <a href="<?= Url::to(['site/index']) ?>" class="brand-link">
+            <?= Html::img(Yii::getAlias('@web') . '/logo-white.png', ['alt' => 'Neutron sys logo white"', 'class' => 'px-3']) ?>
+        </a>
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Sidebar user panel (optional) -->
+            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                <div class="image">
+                    <img src="<?= Yii::getAlias('@web') . '/AdminLTE/dist/img/user2-160x160.jpg' ?>"
+                        class="img-circle elevation-2" alt="User Image">
+                </div>
+                <div class="info">
+                    <a href="#" class="d-block"><?= Yii::$app->user->isGuest ? 'Guest' : Yii::$app->user->identity->full_name ?></a>
+                </div>
             </div>
-            <div class="info">
-                <a href="#" class="d-block">Admin</a>
-            </div>
-        </div>
-        <!-- Sidebar Menu -->
-        <nav class="mt-2">
-            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
-                <li class="nav-item">
-                    <a href="<?= Url::to(['admin/index']) ?>"
-                        class="nav-link  <?= Yii::$app->controller->id == 'admin' ? 'active' : '' ?>">
-                        <i class="nav-icon far fa-calendar-alt"></i>
-                        <p>
-                            admin
-                        </p>
-                    </a>
-                </li>
-
-
-                <li class="nav-item">
-                    <a href="<?= Url::to(['orders/index']) ?>"
-                        class="nav-link  <?= Yii::$app->controller->id == 'orders' ? 'active' : '' ?>">
-                        <i class="nav-icon far fa-calendar-alt"></i>
-                        <p>
-                            Orders
-                        </p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="<?= Url::to(['products/index']) ?>"
-                        class="nav-link  <?= Yii::$app->controller->id == 'products' ? 'active' : '' ?>">
-                        <i class="nav-icon far fa-calendar-alt"></i>
-                        <p>
-                            Products
-                        </p>
-                    </a>
-                </li>
-
-
-
-                <li class="nav-item">
-                    <a href="<?= Url::to(['categories/index']) ?>"
-                        class="nav-link <?= Yii::$app->controller->id == 'categories' ? 'active' : '' ?>">
-                        <i class="nav-icon far fa-calendar-alt"></i>
-                        <p>
-                            Categories
-                        </p>
-                    </a>
-                </li>
-
-
-                <li class="nav-item">
-                    <a href="<?= Url::to(['attributes/index']) ?>"
-                        class="nav-link <?= Yii::$app->controller->id == 'attributes' ? 'active' : '' ?>">
-                        <i class="nav-icon far fa-calendar-alt"></i>
-                        <p>
-                         attributes
-                        </p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="<?= Url::to(['attribute-options/index']) ?>"
-                        class="nav-link <?= Yii::$app->controller->id == 'attribute-options' ? 'active' : '' ?>">
-                        <i class="nav-icon far fa-calendar-alt"></i>
-                        <p>
-                         attribute options
-                        </p>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="<?= Url::to(['addresses/index']) ?>"
-                        class="nav-link <?= Yii::$app->controller->id == 'addresses' ? 'active' : '' ?>">
-                        <i class="nav-icon far fa-calendar-alt"></i>
-                        <p>
-                         addresses
-                        </p>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="<?= Url::to(['status/index']) ?>"
-                        class="nav-link <?= Yii::$app->controller->id == 'status' ? 'active' : '' ?>">
-                        <i class="nav-icon far fa-calendar-alt"></i>
-                        <p>
-                        status
-                        </p>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="<?= Url::to(['pages/index']) ?>"
-                        class="nav-link <?= Yii::$app->controller->id == 'pages' ? 'active' : '' ?>">
-                        <i class="nav-icon far fa-calendar-alt"></i>
-                        <p>
-                            Pages
-                        </p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="<?= Url::to(['slider/index']) ?>"
-                        class="nav-link <?= Yii::$app->controller->id == 'slider' ? 'active' : '' ?>">
-                        <i class="nav-icon far fa-calendar-alt"></i>
-                        <p>
-                            Slider
-
-                        </p>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="<?= Url::to(['warehouses/index']) ?>"
-                        class="nav-link  <?= Yii::$app->controller->id == 'warehouses' ? 'active' : '' ?>">
-                        <i class="nav-icon far fa-calendar-alt"></i>
-                        <p>
-                        warehouses
-                        </p>
-                    </a>
-                </li>
-                <?php if (Yii::$app->user->identity->role_id == User::SUPER_ADMIN): ?>
+            <!-- Sidebar Menu -->
+            <nav class="mt-2">
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                    <!-- Dashboard -->
                     <li class="nav-item">
-                        <a href="<?= Url::to(['user/index']) ?>"
-                            class="nav-link  <?= Yii::$app->controller->id == 'user' ? 'active' : '' ?>">
-                            <i class="nav-icon far fa-calendar-alt"></i>
-                            <p>
-                                users
-                            </p>
+                        <a href="<?= Url::to(['site/index']) ?>"
+                            class="nav-link <?= Yii::$app->controller->id == 'site' ? 'active' : '' ?>">
+                            <i class="nav-icon fas fa-tachometer-alt"></i>
+                            <p>Dashboard</p>
                         </a>
                     </li>
 
-                <?php endif; ?>
-                <li class="nav-item">
-                    <a href="<?= Url::to(['settings/index']) ?>"
-                        class="nav-link  <?= Yii::$app->controller->id == 'settings' ? 'active' : '' ?>">
-                        <i class="nav-icon far fa-calendar-alt"></i>
-                        <p>
-                            Settings
+                    <!-- Orders -->
+                    <?php if (!Yii::$app->user->isGuest && (Yii::$app->user->can('viewAllOrders') || Yii::$app->user->can('viewOwnOrders'))): ?>
+                        <li class="nav-item">
+                            <a href="<?= Url::to(['orders/index']) ?>"
+                                class="nav-link <?= Yii::$app->controller->id == 'orders' ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-shopping-cart"></i>
+                                <p>Orders</p>
+                            </a>
+                        </li>
+                    <?php endif; ?>
 
-                        </p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link">
-                        <i class="nav-icon far fa-calendar-alt"></i>
-                        <?php echo Html::beginForm(['/site/logout'], 'post')
-                            . Html::submitButton('log out', ['class' => 'p-0 logout '])
-                            . \yii\helpers\Html::endForm();
-                        ?>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-        <!-- /.sidebar-menu -->
-    </div>
-    <!-- /.sidebar -->
-</aside>
+                    <!-- Products -->
+                    <?php if (!Yii::$app->user->isGuest && Yii::$app->user->can('manageProducts')): ?>
+                        <li class="nav-item">
+                            <a href="<?= Url::to(['products/index']) ?>"
+                                class="nav-link <?= Yii::$app->controller->id == 'products' ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-box"></i>
+                                <p>Products</p>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+
+                    <!-- Categories -->
+                    <?php if (!Yii::$app->user->isGuest && Yii::$app->user->can('manageProducts')): ?>
+                        <li class="nav-item">
+                            <a href="<?= Url::to(['categories/index']) ?>"
+                                class="nav-link <?= Yii::$app->controller->id == 'categories' ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-tags"></i>
+                                <p>Categories</p>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+
+                    <!-- Users (Admin Only) -->
+                    <?php if (!Yii::$app->user->isGuest && Yii::$app->user->identity->role_id == User::SUPER_ADMIN): ?>
+                        <li class="nav-item">
+                            <a href="<?= Url::to(['users/index']) ?>"
+                                class="nav-link <?= Yii::$app->controller->id == 'users' ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-users"></i>
+                                <p>Users</p>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+
+                    <!-- Settings -->
+                    <?php if (!Yii::$app->user->isGuest && Yii::$app->user->identity->role_id == User::SUPER_ADMIN): ?>
+                        <li class="nav-item">
+                            <a href="<?= Url::to(['settings/index']) ?>"
+                                class="nav-link <?= Yii::$app->controller->id == 'settings' ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-cogs"></i>
+                                <p>Settings</p>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+
+                    <!-- Logout -->
+                    <?php if (!Yii::$app->user->isGuest): ?>
+                        <li class="nav-item">
+                            <a class="nav-link">
+                                <i class="nav-icon fas fa-sign-out-alt"></i>
+                                <?php echo Html::beginForm(['/site/logout'], 'post')
+                                    . Html::submitButton('Log Out', ['class' => 'p-0 logout'])
+                                    . Html::endForm();
+                                ?>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+                </ul>
+            </nav>
+            <!-- /.sidebar-menu -->
+        </div>
+        <!-- /.sidebar -->
+    </aside>
+<?php endif; ?>

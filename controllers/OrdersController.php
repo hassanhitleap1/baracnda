@@ -8,6 +8,7 @@ use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 /**
  * OrdersController implements the CRUD actions for Orders model.
@@ -19,17 +20,29 @@ class OrdersController extends BaseController
      */
     public function behaviors()
     {
-        return array_merge(
-            parent::behaviors(),
-            [
-                'verbs' => [
-                    'class' => VerbFilter::className(),
-                    'actions' => [
-                        'delete' => ['POST'],
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'denyCallback' => function ($rule, $action) {
+                    return $this->redirect(['site/index']); // Redirect to home page
+                },
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'], // Allow authenticated users
+                    ],
+                    [
+                        'allow' => false, // Deny all other users
                     ],
                 ],
-            ]
-        );
+            ],
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['POST'],
+                ],
+            ],
+        ];
     }
 
     /**
@@ -233,5 +246,36 @@ class OrdersController extends BaseController
         }
 
         return $this->asJson(['success' => true]);
+    }
+
+    public function actionCalculateTotals()
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $shippingId = Yii::$app->request->post('shipping_id');
+        $orderItems = Yii::$app->request->post('order_items');
+
+        // Parse order items
+        parse_str($orderItems, $parsedItems);
+
+        $subtotal = 0;
+        foreach ($parsedItems['OrderItems'] as $item) {
+            $subtotal += $item['quantity'] * $item['price'];
+        }
+
+        $shippingPrice = 0;
+        if ($shippingId) {
+            $shipping = \app\models\shippingPrices\ShippingPrices::findOne(['shipping_id' => $shippingId]);
+            $shippingPrice = $shipping ? $shipping->price : 0;
+        }
+
+        $total = $subtotal + $shippingPrice;
+
+        return [
+            'success' => true,
+            'subtotal' => $subtotal,
+            'shipping_price' => $shippingPrice,
+            'total' => $total,
+        ];
     }
 }

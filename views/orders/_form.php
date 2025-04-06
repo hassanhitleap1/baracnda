@@ -9,10 +9,13 @@ use kartik\select2\Select2;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use yii\helpers\Url;
 
 /** @var yii\web\View $this */
 /** @var app\models\orders\Orders $model */
 /** @var yii\widgets\ActiveForm $form */
+
+$calculateTotalsUrl = Url::to(['orders/calculate-totals']);
 ?>
 
 <div class="orders-form">
@@ -157,6 +160,12 @@ use yii\widgets\ActiveForm;
             </div>
         </div>
     </div>
+    <div id="totals-container" style="margin-top: 20px;">
+        <h4>Order Summary</h4>
+        <p><strong>Subtotal:</strong> <span id="subtotal">0.00</span></p>
+        <p><strong>Shipping Price:</strong> <span id="shipping-price">0.00</span></p>
+        <p><strong>Total:</strong> <span id="total">0.00</span></p>
+    </div>
     <div class="form-group">
         <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
     </div>
@@ -164,3 +173,35 @@ use yii\widgets\ActiveForm;
     <?php ActiveForm::end(); ?>
 
 </div>
+
+<?php
+$script = <<<JS
+function calculateTotals() {
+    var shippingId = $('#shipping-select').val();
+    var orderItems = $('#order-items-container').find('input, select').serialize();
+
+    $.ajax({
+        url: '$calculateTotalsUrl',
+        type: 'POST',
+        data: {shipping_id: shippingId, order_items: orderItems},
+        success: function (response) {
+            if (response.success) {
+                $('#subtotal').text(response.subtotal.toFixed(2));
+                $('#shipping-price').text(response.shipping_price.toFixed(2));
+                $('#total').text(response.total.toFixed(2));
+            } else {
+                alert('Failed to calculate totals.');
+            }
+        },
+        error: function () {
+            alert('An error occurred while calculating totals.');
+        }
+    });
+}
+
+$('#shipping-select').on('change', calculateTotals);
+$('#order-items-container').on('change', 'input, select', calculateTotals);
+JS;
+
+$this->registerJs($script);
+?>
