@@ -1,5 +1,7 @@
 <?php
 
+use app\models\products\Products;
+use app\models\variants\Variants;
 use yii\db\Migration;
 
 class m250309_003949_create_variants_tables  extends Migration
@@ -29,6 +31,51 @@ class m250309_003949_create_variants_tables  extends Migration
         ], $tableOptions);
 
         $this->addForeignKey('fk_variants_product', 'variants', 'product_id', 'products', 'id', 'CASCADE');
+
+
+        for($i = 1; $i < 20; $i++) { 
+
+            Yii::$app->db->createCommand()->insert('products', [
+                'name' => "Test Product $i",
+                'type' => Products::SIMPLE,
+                'price' => rand(1, 100),
+                'cost' => rand(1, 100) / 2,
+                'quantity' => 10,
+                'warehouse_id' => 1,
+                'creator_id' => 1,
+                'category_id' => 1,
+                'description' => 'Test Product Description',
+                'image_path'=>"product-empty.png",
+            ])->execute();
+
+            Yii::$app->db->createCommand()->insert('variants', [
+                'product_id' => $i ,
+                'is_default' => 1,
+                'name' => 'Test Variant',
+                'price' => rand(1, 100),
+                'cost' => rand(1, 100) / 2,
+                'quantity' => 10,
+            ])->execute();
+
+            // $product = new Products();
+            // $product->name = "Test Product $i";
+            // $product->type = Products::SIMPLE;
+            // $product->price = rand(1, 100);
+            // $product->cost = $product->price / 2;
+            // $product->quantity = 10;
+            // $product->image_path="product-empty.png";
+            // $product->save(false);
+            // $variant = new Variants();
+            // $variant->product_id = $product->id;
+            // $variant->is_default = 1;
+            // $variant->name = 'Test Variant';
+            // $variant->price = rand(1, 100);
+            // $variant->cost = $variant->price / 2;
+            // $variant->quantity = 10;
+            // $variant->save(false);
+        }
+     
+    
     }
 
     /**

@@ -25,6 +25,7 @@ use Yii;
  * @property float $discount
  * @property int $shipping_id
  * @property string|null $note
+ * @property string|null $status_order
  * @property string|null $created_at
  * @property string|null $updated_at
  *
@@ -58,6 +59,12 @@ class Orders extends \yii\db\ActiveRecord
 
     const SCENARIO_CREATE = 'create';
     const SCENARIO_UPDATE = 'update';
+
+    const STATUS_RESERVED = 'reserved';
+    const STATUS_CANCELED = 'canceled';
+    const STATUS_PROCESSING = 'processing';
+    const STATUS_COMPLETED = 'completed';
+    const STATUS_REFUNDED = 'refunded';
 
     /**
      * @var int|null Virtual property for country ID
@@ -356,4 +363,37 @@ class Orders extends \yii\db\ActiveRecord
         return 00.00;
     }
 
+
+
+
+    public function beforeSave($insert)
+    {
+
+        parent::beforeSave($insert);
+
+        if ($this->isNewRecord) {
+            $this->status_order = SELF::STATUS_RESERVED;
+        }else{
+          switch ($this->status_id) {
+                case 1:
+                    $this->status_order = SELF::STATUS_RESERVED;
+                    break;
+                case 2:
+                    $this->status_order = SELF::STATUS_CANCELED;
+                    break;
+                case 3:
+                    $this->status_order = SELF::STATUS_PROCESSING;
+                    break;
+                case 4:
+                    $this->status_order = SELF::STATUS_COMPLETED;
+                    break;
+                case 5:
+                    $this->status_order = SELF::STATUS_REFUNDED;
+                    break;
+            }
+        }
+
+
+        return true;
+    }
 }

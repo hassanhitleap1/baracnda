@@ -23,6 +23,7 @@ class m250309_004101_create_orders_tables extends Migration
             'discount' => $this->decimal(10,2)->notNull()->defaultValue(0),
             'shipping_id'=>$this->integer()->notNull()->defaultValue(1),
             'payment_id'=>$this->integer()->notNull()->defaultValue(1),
+            'status_order'=>'Enum("reserved","canceled","processing","refunded","completed") NOT NULL DEFAULT "reserved"',
             'note' => $this->text(),
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
