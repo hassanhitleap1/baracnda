@@ -48,7 +48,7 @@ use yii\bootstrap5\Html;
                     </li>
 
                     <!-- Orders -->
-                    <?php if (Yii::$app->user->can('viewAllOrders') || Yii::$app->user->can('viewOwnOrders')): ?>
+                    <?php if (Yii::$app->user->can('orders/index')): ?>
                         <li class="nav-item">
                             <a href="<?= Url::to(['orders/index']) ?>"
                                 class="nav-link <?= Yii::$app->controller->id == 'orders' ? 'active' : '' ?>">
@@ -59,7 +59,7 @@ use yii\bootstrap5\Html;
                     <?php endif; ?>
 
                     <!-- Products -->
-                    <?php if (Yii::$app->user->can('manageProducts')): ?>
+                    <?php if (Yii::$app->user->can('products/index')): ?>
                         <li class="nav-item">
                             <a href="<?= Url::to(['products/index']) ?>"
                                 class="nav-link <?= Yii::$app->controller->id == 'products' ? 'active' : '' ?>">
@@ -70,7 +70,7 @@ use yii\bootstrap5\Html;
                     <?php endif; ?>
 
                     <!-- Categories -->
-                    <?php if (Yii::$app->user->can('manageProducts')): ?>
+                    <?php if (Yii::$app->user->can('categories/index')): ?>
                         <li class="nav-item">
                             <a href="<?= Url::to(['categories/index']) ?>"
                                 class="nav-link <?= Yii::$app->controller->id == 'categories' ? 'active' : '' ?>">
@@ -80,8 +80,8 @@ use yii\bootstrap5\Html;
                         </li>
                     <?php endif; ?>
 
-                    <!-- Users (Admin Only) -->
-                    <?php if (Yii::$app->user->identity->role_id == User::SUPER_ADMIN): ?>
+                    <!-- Users -->
+                    <?php if (Yii::$app->user->can('users/index')): ?>
                         <li class="nav-item">
                             <a href="<?= Url::to(['users/index']) ?>"
                                 class="nav-link <?= Yii::$app->controller->id == 'users' ? 'active' : '' ?>">
@@ -92,12 +92,102 @@ use yii\bootstrap5\Html;
                     <?php endif; ?>
 
                     <!-- Settings -->
-                    <?php if (Yii::$app->user->identity->role_id == User::SUPER_ADMIN): ?>
+                    <?php if (Yii::$app->user->can('settings/index')): ?>
                         <li class="nav-item">
                             <a href="<?= Url::to(['settings/index']) ?>"
                                 class="nav-link <?= Yii::$app->controller->id == 'settings' ? 'active' : '' ?>">
                                 <i class="nav-icon fas fa-cogs"></i>
                                 <p>Settings</p>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+
+                    <?php if (Yii::$app->user->can('addresses/index')): ?>
+                        <li class="nav-item">
+                            <a href="<?= Url::to(['addresses/index']) ?>"
+                                class="nav-link <?= Yii::$app->controller->id == 'addresses' ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-map-marker-alt"></i>
+                                <p>Addresses</p>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+
+                    <?php if (Yii::$app->user->can('attribute-options/index')): ?>
+                        <li class="nav-item">
+                            <a href="<?= Url::to(['attribute-options/index']) ?>"
+                                class="nav-link <?= Yii::$app->controller->id == 'attribute-options' ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-list-alt"></i>
+                                <p>Attribute Options</p>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+
+                    <?php if (Yii::$app->user->can('attributes/index')): ?>
+                        <li class="nav-item">
+                            <a href="<?= Url::to(['attributes/index']) ?>"
+                                class="nav-link <?= Yii::$app->controller->id == 'attributes' ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-tags"></i>
+                                <p>Attributes</p>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+
+                    <?php if (Yii::$app->user->can('pages/index')): ?>
+                        <li class="nav-item">
+                            <a href="<?= Url::to(['pages/index']) ?>"
+                                class="nav-link <?= Yii::$app->controller->id == 'pages' ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-file-alt"></i>
+                                <p>Pages</p>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+
+                    <?php if (Yii::$app->user->can('payments/index')): ?>
+                        <li class="nav-item">
+                            <a href="<?= Url::to(['payments/index']) ?>"
+                                class="nav-link <?= Yii::$app->controller->id == 'payments' ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-credit-card"></i>
+                                <p>Payments</p>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+
+                    <?php if (Yii::$app->user->can('regions/index')): ?>
+                        <li class="nav-item">
+                            <a href="<?= Url::to(['regions/index']) ?>"
+                                class="nav-link <?= Yii::$app->controller->id == 'regions' ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-globe"></i>
+                                <p>Regions</p>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+
+                    <?php if (Yii::$app->user->can('shipping-prices/index')): ?>
+                        <li class="nav-item">
+                            <a href="<?= Url::to(['shipping-prices/index']) ?>"
+                                class="nav-link <?= Yii::$app->controller->id == 'shipping-prices' ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-shipping-fast"></i>
+                                <p>Shipping Prices</p>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+
+                    <?php if (Yii::$app->user->can('slider/index')): ?>
+                        <li class="nav-item">
+                            <a href="<?= Url::to(['slider/index']) ?>"
+                                class="nav-link <?= Yii::$app->controller->id == 'slider' ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-images"></i>
+                                <p>Slider</p>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+
+                    <?php if (Yii::$app->user->can('warehouses/index')): ?>
+                        <li class="nav-item">
+                            <a href="<?= Url::to(['warehouses/index']) ?>"
+                                class="nav-link <?= Yii::$app->controller->id == 'warehouses' ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-warehouse"></i>
+                                <p>Warehouses</p>
                             </a>
                         </li>
                     <?php endif; ?>
@@ -114,8 +204,6 @@ use yii\bootstrap5\Html;
                     </li>
                 </ul>
             </nav>
-            <!-- /.sidebar-menu -->
         </div>
-        <!-- /.sidebar -->
     </aside>
 <?php endif; ?>

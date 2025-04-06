@@ -53,7 +53,7 @@ class OrdersController extends BaseController
     public function actionIndex()
     {
         $searchModel = new OrdersSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -69,8 +69,14 @@ class OrdersController extends BaseController
      */
     public function actionView($id)
     {
+        $model = Orders::findOne($id);
+
+        if (!$model || (!Yii::$app->user->can('viewAllOrders') && $model->creator_id !== Yii::$app->user->id)) {
+            throw new \yii\web\ForbiddenHttpException('You are not allowed to view this order.');
+        }
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
         ]);
     }
 
