@@ -255,6 +255,12 @@ class ProductsController extends BaseController
      */
     public function actionDelete($id)
     {
+        // before delete checked if there are any orders
+
+        if($this->findModel($id)->orderItem->count() > 0){
+            Yii::$app->session->setFlash('error', 'You can not delete this product because it has orders');
+            return $this->redirect(['index']);
+        }
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
