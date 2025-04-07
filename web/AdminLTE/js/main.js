@@ -169,6 +169,7 @@ $(document).ready(function () {
                     `;
                 });
                 $('#variantSearchResults').html(resultsHtml);
+                $('#variantSearchResults').val('');
             }
         });
     });
@@ -232,7 +233,7 @@ $(document).ready(function () {
         // Re-enable the "Add" button for the removed variant
         $(`#variantSearchResults .add-variant-btn[data-id="${variantId}"]`).prop('disabled', false).text('Add');
 
-
+        updateOrderSummary();
      
     });
 
@@ -262,8 +263,17 @@ $(document).ready(function () {
         });
     });
 
+    $('#region-id').on('change', function (e) {
+        e.preventDefault();
+        if($(this).val() != '') {
+            $('#select2-orders-shipping_id').prop('disabled', false);
+        }else {
+            $('#select2-orders-shipping_id').prop('disabled', true);   
+        }
+    });
+    
     // Handle shipping selection
-    $('#shipping-select').on('change', function () {
+    $('#select2-orders-shipping_id').on('change', function () {
         const shippingId = $(this).val();
         const regionId = $('#region-id').val();
         const url = `${SITE_URL}/orders/get-shipping-price`;
@@ -359,3 +369,5 @@ function calculateSubtotal() {
     });
     return subtotal;
 }
+
+

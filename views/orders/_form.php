@@ -1,3 +1,21 @@
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css">
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
+
+<!-- include summernote css/js-->
+<link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.css" rel="stylesheet">
+<script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.js" defer></script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+
+
+
 <?php
 
 use app\models\countries\Countries;
@@ -103,11 +121,13 @@ $calculateTotalsUrl = Url::to(['orders/calculate-totals']);
                 <div class="card-body">
                     <div class="row">
                         <div class="col-6">
+
                             <?= $form->field($model, 'region_id')->widget(Select2::classname(), [
                                 'data' => ArrayHelper::map(Regions::find()->all(), 'id', 'name'),
-                                'options' => ['placeholder' => 'Select a attribute'],
+                                'options' => ['placeholder' => 'Select a attribute' ,'id' => 'region-id'],
                                 'pluginOptions' => [
-                                    'allowClear' => true
+                                    'allowClear' => true,
+                                    'id' => 'region-id'
                                 ],
                             ]); ?>
                         </div>
@@ -131,13 +151,7 @@ $calculateTotalsUrl = Url::to(['orders/calculate-totals']);
                     </div>
                     <div class="row">
                         <div class="col-6">
-                            <?= $form->field($model, 'shipping_id')->widget(Select2::classname(), [
-                                'data' => ArrayHelper::map(Shippings::find()->all(), 'id', 'name'),
-                                'options' => ['placeholder' => 'Select a status'],
-                                'pluginOptions' => [
-                                    'allowClear' => true
-                                ],
-                            ]); ?>
+                            <?= $form->field($model, 'shipping_id')->dropDownList(ArrayHelper::map(Shippings::find()->all(), 'id', 'name'), ['prompt' => 'Select a shipping','id' => 'select2-orders-shipping_id','disabled' => true])//['prompt' => 'Select a shipping']) ?>
                         </div>
                         <div class="col-6">
                             <?= $form->field($model, 'address')->textInput(['maxlength' => true]) ?>
