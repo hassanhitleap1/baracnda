@@ -13,22 +13,22 @@ $(document).ready(function () {
     $('#generateVariants').on('click', function () {
         var selectedAttributes = {};
         var price = $("#products-price").val() ?? 0;
-        var cost = $("#products-cost").val() ?? 0; 
-        var quantity = $("#products-quantity").val() ?? 0; 
+        var cost = $("#products-cost").val() ?? 0;
+        var quantity = $("#products-quantity").val() ?? 0;
         var options = {}; // Changed to object
-        
+
         // Loop through all checked checkboxes
         $('input[type="checkbox"].attribute-option:checked').each(function () {
             var attributeId = $(this).attr('data-attribute-id');
             var attributeOptionId = $(this).attr('data-attribute-option-id');
             var optionValue = $(this).val();
             var attributeName = $(this).attr('data-attribute-name');
-           
+
             // Initialize array for this attribute if it doesn't exist
             if (!options[attributeId]) {
                 options[attributeId] = []; // Initialize as array
             }
-            
+
             // Add the option to the array
             options[attributeId].push({
                 attributeOptionId: attributeOptionId,
@@ -53,11 +53,11 @@ $(document).ready(function () {
         // Generate all combinations of selected attributes
         var variants = generateCombinations(selectedAttributes);
         console.log(variants)
-        
+
         // Clear previous variants
         $('#variants-generated').html('');
         let isDefaultChecked = '';
-        
+
         // Create input fields for each variant
         variants.forEach((variant, index) => {
             let variantName = variant.map(attr => attr.value).join(' ');
@@ -66,7 +66,7 @@ $(document).ready(function () {
             //     attributeId: attr.attributeId,
             //     optionId: attr.attributeOptionId
             // }));
-    
+
             let attributeDropdowns = '';
             variant.forEach(attr => {
                 attributeDropdowns += `
@@ -74,11 +74,11 @@ $(document).ready(function () {
                         <div class="form-group">
                             <label class="control-label">${attr.attributeName}</label>
                             <select class="form-control"  name="Product[variant_attribute_option][${variantId}][${attr.attributeId}]">
-                                ${options[attr.attributeId].map(opt => 
-                                    `<option value="${opt.attributeOptionId}" ${opt.attributeOptionId == attr.attributeOptionId ? 'selected' : ''}>
+                                ${options[attr.attributeId].map(opt =>
+                    `<option value="${opt.attributeOptionId}" ${opt.attributeOptionId == attr.attributeOptionId ? 'selected' : ''}>
                                         ${opt.value}
                                     </option>`
-                                ).join('')}
+                ).join('')}
                             </select>
                         </div>
                     </div>
@@ -199,10 +199,10 @@ $(document).ready(function () {
                     <input type="text" class="form-control" name="Orders[OrderItems][${variantId}][variant_name]" value="${variantName}" readonly>
                 </div>
                 <div class="col-2">
-                    <input type="number" class="form-control" name="Orders[OrderItems][${variantId}][variant_quantity]" value="1" min="1">
+                    <input type="number" class="form-control variant-quantity" name="Orders[OrderItems][${variantId}][variant_quantity]" value="1" min="1">
                 </div>
                 <div class="col-2">
-                    <input type="text" class="form-control" name="Orders[OrderItems][${variantId}][variant_price]" value="${variantPrice}" readonly>
+                    <input type="text" class="form-control variant-price" name="Orders[OrderItems][${variantId}][variant_price]" value="${variantPrice}" readonly>
                 </div>
                 <div class="col-2">
                     <button class="btn btn-danger btn-sm delete-variant-btn">Delete</button>
@@ -214,6 +214,11 @@ $(document).ready(function () {
 
         // Disable the "Add" button and mark it as checked
         $(this).prop('disabled', true).text('Added');
+
+
+
+        updateOrderSummary();
+
     });
 
     // Delete variant from the order items list
@@ -226,7 +231,74 @@ $(document).ready(function () {
 
         // Re-enable the "Add" button for the removed variant
         $(`#variantSearchResults .add-variant-btn[data-id="${variantId}"]`).prop('disabled', false).text('Add');
+
+
+     
     });
+
+    // Handle variant selection
+    $('.variant-select').on('change', function () {
+        const variantId = $(this).val();
+        const productId = $(this).data('product-id');
+        const url = `${SITE_URL}/orders/get-variant-details`;
+
+        $.ajax({
+            url: url,
+            method: 'GET',
+            data: { variant_id: variantId, product_id: productId },
+            success: function (response) {
+                if (response.success) {
+                    // Update the price, quantity, and other details in the UI
+                    $(`#variant-price-${productId}`).text(response.data.price);
+                    $(`#variant-quantity-${productId}`).val(response.data.quantity);
+                    updateOrderSummary();
+                } else {
+                    alert('Failed to fetch variant details.');
+                }
+            },
+            error: function () {
+                console.error('Error fetching variant details.');
+            },
+        });
+    });
+
+    // Handle shipping selection
+    $('#shipping-select').on('change', function () {
+        const shippingId = $(this).val();
+        const regionId = $('#region-id').val();
+        const url = `${SITE_URL}/orders/get-shipping-price`;
+
+        $.ajax({
+            url: url,
+            method: 'GET',
+            data: { shipping_id: shippingId, region_id: regionId },
+            success: function (response) {
+                if (response.success) {
+                    // Update the shipping price in the UI
+                    $('#shipping-price').text(response.data.price);
+                    updateOrderSummary();
+                } else {
+                    alert('Failed to fetch shipping price.');
+                }
+            },
+            error: function () {
+                console.error('Error fetching shipping price.');
+            },
+        });
+    });
+
+
+    // Trigger order summary update on quantity change
+    $('.variant-quantity').on('input', function () {
+        updateOrderSummary();
+    });
+
+    // Trigger order summary update on discount change
+    $('#discount').on('input', function () {
+        updateOrderSummary();
+    });
+
+
 });
 
 function generateCombinations(selectedAttributes) {
@@ -250,10 +322,40 @@ function generateCombinations(selectedAttributes) {
 
 
 $('#products-type').on('click', function () {
-    if($(this).val()==='variant'){
-       $('#btn-modal-open').css('display', 'block');
-    }else{
+    if ($(this).val() === 'variant') {
+        $('#btn-modal-open').css('display', 'block');
+    } else {
         $('#btn-modal-open').css('display', 'none');
     }
 
 })
+
+
+
+// Update order summary
+function updateOrderSummary() {
+    const subtotal = calculateSubtotal();
+    const shippingPrice = parseFloat($('#shipping-price').text()) || 0;
+    const discount = parseFloat($('#discount').val()) || 0;
+
+    const total = subtotal + shippingPrice - discount;
+    $('#subtotal').text(subtotal.toFixed(2));
+    $('#order-subtotal').text(subtotal.toFixed(2));
+    $('#total').text(total.toFixed(2));
+}
+
+
+// Calculate subtotal
+function calculateSubtotal() {
+    subtotal=0;
+    $('.variant-price').each(function () {
+       
+        const price = parseFloat($(this).val()) || 0;
+
+        const quantity = parseInt($(this).closest('.variant-item').find('.variant-quantity').val()) || 0;
+     
+        subtotal += price * quantity;
+
+    });
+    return subtotal;
+}

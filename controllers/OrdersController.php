@@ -265,8 +265,8 @@ class OrdersController extends BaseController
         parse_str($orderItems, $parsedItems);
 
         $subtotal = 0;
-        foreach ($parsedItems['OrderItems'] as $item) {
-            $subtotal += $item['quantity'] * $item['price'];
+        foreach ($parsedItems['Orders']['OrderItems'] as $item) {
+            $subtotal += $item['variant_quantity'] * $item['variant_price'];
         }
 
         $shippingPrice = 0;
@@ -283,5 +283,48 @@ class OrdersController extends BaseController
             'shipping_price' => $shippingPrice,
             'total' => $total,
         ];
+    }
+
+    public function actionGetVariantDetails()
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $variantId = Yii::$app->request->get('variant_id');
+        $productId = Yii::$app->request->get('product_id');
+
+        $variant = \app\models\variants\Variants::findOne(['id' => $variantId, 'product_id' => $productId]);
+
+        if ($variant) {
+            return [
+                'success' => true,
+                'data' => [
+                    'price' => $variant->price,
+                    'quantity' => $variant->quantity,
+                ],
+            ];
+        }
+
+        return ['success' => false];
+    }
+
+    public function actionGetShippingPrice()
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $shippingId = Yii::$app->request->get('shipping_id');
+        $regionId = Yii::$app->request->get('region_id');
+
+        $shippingPrice = \app\models\shippingPrices\ShippingPrices::findOne(['shipping_id' => $shippingId, 'region_id' => $regionId]);
+
+        if ($shippingPrice) {
+            return [
+                'success' => true,
+                'data' => [
+                    'price' => $shippingPrice->price,
+                ],
+            ];
+        }
+
+        return ['success' => false];
     }
 }

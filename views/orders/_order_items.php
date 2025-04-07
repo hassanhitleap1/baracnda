@@ -21,13 +21,13 @@ use yii\helpers\Html;
             <?php foreach ($model->orderItems as $index => $item): ?>
                 <tr>
                     <td>
-                        <?= Html::dropDownList("OrderItems[$index][product_id]", $item->product_id, $productList, ['class' => 'form-control']) ?>
+                        <?= Html::dropDownList("OrderItems[$index][product_id]", $item->product_id, $productList, ['class' => 'form-control ']) ?>
                     </td>
                     <td>
-                        <?= Html::input('number', "OrderItems[$index][quantity]", $item->quantity, ['class' => 'form-control', 'min' => 1]) ?>
+                        <?= Html::input('number', "OrderItems[$index][quantity]", $item->quantity, ['class' => 'form-control variant-quantity', 'min' => 1]) ?>
                     </td>
                     <td>
-                        <?= Html::input('number', "OrderItems[$index][price]", $item->price, ['class' => 'form-control', 'step' => '0.01']) ?>
+                        <?= Html::input('number', "OrderItems[$index][price]", $item->price, ['class' => 'form-control variant-price', 'step' => '0.01']) ?>
                     </td>
                 </tr>
             <?php endforeach; ?>

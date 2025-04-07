@@ -64,4 +64,6 @@ var apiUrl = `${SITE_URL}/site/autocomplete`;
           //$('#myForm').submit();
         }
       });
+
+
     });

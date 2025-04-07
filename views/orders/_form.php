@@ -53,10 +53,10 @@ $calculateTotalsUrl = Url::to(['orders/calculate-totals']);
                                 echo '<input type="text" class="form-control" name="Orders[OrderItems][' . $key . '][variant_name]" value="' . $orderItem['variant_name'] . '" readonly>';
                                 echo '</div>';
                                 echo '<div class="col-2">';
-                                echo '<input type="number" class="form-control" name="Orders[OrderItems][' . $key . '][variant_quantity]" value="' . $orderItem['variant_quantity'] . '" min="1">';
+                                echo '<input type="number" class="form-control variant-quantity" name="Orders[OrderItems][' . $key . '][variant_quantity]" value="' . $orderItem['variant_quantity'] . '" min="1">';
                                 echo '</div>';
                                 echo '<div class="col-2">';
-                                echo '<input type="text" class="form-control" name="Orders[OrderItems][' . $key . '][variant_price]" value="' . $orderItem['variant_price'] . '" readonly>';
+                                echo '<input type="text" class="form-control variant-price" name="Orders[OrderItems][' . $key . '][variant_price]" value="' . $orderItem['variant_price'] . '" readonly>';
                                 echo '</div>';
                                 echo '<div class="col-2">';
                                 echo '<button class="btn btn-danger btn-sm delete-variant-btn">Delete</button>';
@@ -79,10 +79,10 @@ $calculateTotalsUrl = Url::to(['orders/calculate-totals']);
                                 echo '<input type="text" class="form-control" name="Orders[OrderItems][' . $key . '][variant_name]" value="' . $orderItem->product->name . '" readonly>';
                                 echo '</div>';
                                 echo '<div class="col-2">';
-                                echo '<input type="number" class="form-control" name="Orders[OrderItems][' . $key . '][variant_quantity]" value="' . $orderItem->quantity . '" min="1">';
+                                echo '<input type="number" class="form-control variant-quantity" name="Orders[OrderItems][' . $key . '][variant_quantity]" value="' . $orderItem->quantity . '" min="1">';
                                 echo '</div>';
                                 echo '<div class="col-2">';
-                                echo '<input type="text" class="form-control" name="Orders[OrderItems][' . $key . '][variant_price]" value="' . $orderItem->price . '" readonly>';
+                                echo '<input type="text" class="form-control variant-price" name="Orders[OrderItems][' . $key . '][variant_price]" value="' . $orderItem->price . '" readonly>';
                                 echo '</div>';
                                 echo '<div class="col-2">';
                                 echo '<button class="btn btn-danger btn-sm delete-variant-btn">Delete</button>';
@@ -180,35 +180,3 @@ $calculateTotalsUrl = Url::to(['orders/calculate-totals']);
     <?php ActiveForm::end(); ?>
 
 </div>
-
-<?php
-$script = <<<JS
-function calculateTotals() {
-    var shippingId = $('#shipping-select').val();
-    var orderItems = $('#order-items-container').find('input, select').serialize();
-
-    $.ajax({
-        url: '$calculateTotalsUrl',
-        type: 'POST',
-        data: {shipping_id: shippingId, order_items: orderItems},
-        success: function (response) {
-            if (response.success) {
-                $('#subtotal').text(response.subtotal.toFixed(2));
-                $('#shipping-price').text(response.shipping_price.toFixed(2));
-                $('#total').text(response.total.toFixed(2));
-            } else {
-                alert('Failed to calculate totals.');
-            }
-        },
-        error: function () {
-            alert('An error occurred while calculating totals.');
-        }
-    });
-}
-
-$('#shipping-select').on('change', calculateTotals);
-$('#order-items-container').on('change', 'input, select', calculateTotals);
-JS;
-
-$this->registerJs($script);
-?>
