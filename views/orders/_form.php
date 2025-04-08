@@ -1,4 +1,3 @@
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
@@ -18,7 +17,6 @@
 
 <?php
 
-use app\models\countries\Countries;
 use app\models\payments\Payments;
 use app\models\regions\Regions;
 use app\models\shippings\Shippings;
@@ -29,11 +27,16 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 
+
+
+$region_id = $model->isNewRecord ? null : $model->addresses->region_id;
+$full_name = $model->isNewRecord ? null : $model->addresses->full_name;
+$address = $model->isNewRecord ? null : $model->addresses->address;
+$phone = $model->isNewRecord ? null : $model->addresses->phone;
+
 /** @var yii\web\View $this */
 /** @var app\models\orders\Orders $model */
 /** @var yii\widgets\ActiveForm $form */
-
-$calculateTotalsUrl = Url::to(['orders/calculate-totals']);
 ?>
 
 <div class="orders-form">
@@ -56,7 +59,7 @@ $calculateTotalsUrl = Url::to(['orders/calculate-totals']);
                         <?php
                         $order = Yii::$app->request->post('Orders');
 
-                        if (Yii::$app->request->isPost) {
+                        if (Yii::$app->request->isPost && isset($order['OrderItems'])) {
 
                             foreach ($order['OrderItems'] as  $key => $orderItem) {
 
@@ -124,7 +127,7 @@ $calculateTotalsUrl = Url::to(['orders/calculate-totals']);
 
                             <?= $form->field($model, 'region_id')->widget(Select2::classname(), [
                                 'data' => ArrayHelper::map(Regions::find()->all(), 'id', 'name'),
-                                'options' => ['placeholder' => 'Select a attribute' ,'id' => 'region-id'],
+                                'options' => ['placeholder' => 'Select a attribute' ,'id' => 'region-id','value' => $region_id],
                                 'pluginOptions' => [
                                     'allowClear' => true,
                                     'id' => 'region-id'
@@ -132,12 +135,12 @@ $calculateTotalsUrl = Url::to(['orders/calculate-totals']);
                             ]); ?>
                         </div>
                         <div class="col-6">
-                            <?= $form->field($model, 'phone')->textInput(['maxlength' => true]) ?>
+                            <?= $form->field($model, 'phone')->textInput(['maxlength' => true,'value' => $phone, 'id' => 'phone']) ?>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-6">
-                            <?= $form->field($model, 'full_name')->textInput(['maxlength' => true]) ?>
+                            <?= $form->field($model, 'full_name')->textInput(['maxlength' => true,'value' => $full_name]) ?>
                         </div>
                         <div class="col-6">
                             <?= $form->field($model, 'status_id')->widget(Select2::classname(), [
@@ -154,7 +157,7 @@ $calculateTotalsUrl = Url::to(['orders/calculate-totals']);
                             <?= $form->field($model, 'shipping_id')->dropDownList(ArrayHelper::map(Shippings::find()->all(), 'id', 'name'), ['prompt' => 'Select a shipping','id' => 'select2-orders-shipping_id','disabled' => true])//['prompt' => 'Select a shipping']) ?>
                         </div>
                         <div class="col-6">
-                            <?= $form->field($model, 'address')->textInput(['maxlength' => true]) ?>
+                            <?= $form->field($model, 'address')->textInput(['maxlength' => true,'value' => $address]) ?>
                         </div>
 
 
