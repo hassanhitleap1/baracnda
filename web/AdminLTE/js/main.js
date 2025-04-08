@@ -220,6 +220,8 @@ $(document).ready(function () {
 
         updateOrderSummary();
 
+        $('#variantSearchInput').val('');
+        $('#variantSearchResults').html('');
     });
 
     // Delete variant from the order items list
