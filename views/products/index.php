@@ -69,6 +69,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     return Html::img($model->getImageUrl(), ['style' => 'width:50px; margin-right:10px;']);
                 },
             ],
+            'quantity',
             [
                 'attribute' => 'variants',
                 'label' => Yii::t('app', 'Variants'),
@@ -77,7 +78,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     $variants = $model->variants;
                     $html = '<ul>';
                     foreach ($variants as $variant) {
-                        $html .= '<li>' . Html::encode($variant->name) . ' - ' . Yii::$app->formatter->asCurrency($variant->price, 'USD') . '</li>';
+                        $html .= '<li>' . Html::encode($variant->name) . ' - ' . Yii::$app->formatter->asCurrency($variant->price, 'JOD') .' Quantity:  '. $variant->quantity . '</li>';
                     }
                     $html .= '</ul>';
                     return $html;

@@ -5,6 +5,7 @@ namespace app\models\products;
 use app\models\categories\Categories;
 use app\models\images\Images;
 use app\models\orderItems\OrderItems;
+use app\models\orders\Orders;
 use app\models\users\Users;
 use app\models\variants\Variants;
 use app\models\warehouses\Warehouses;
@@ -277,4 +278,11 @@ class Products extends \yii\db\ActiveRecord
         // Assuming your imageFile attribute stores the path to the image
         return \Yii::getAlias('@web/' . $this->image_path);
     }
+
+
+    public function getOrderItem(){
+        return $this->hasMany(OrderItems::class, ['product_id' => 'id']);
+    }
 }
+
+
