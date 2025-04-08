@@ -17,7 +17,7 @@ class m250309_004101_create_orders_tables extends Migration
             'address_id' => $this->integer()->null(),
             'status_id' => $this->integer()->notNull()->defaultValue(1), // pending, completed, canceled, shipped, refunded
             'total' => $this->decimal(10,2)->notNull()->defaultValue(0),
-            'shopping_price' => $this->decimal(10,2)->notNull()->defaultValue(0),
+            'shipping_price' => $this->decimal(10,2)->notNull()->defaultValue(0),
             'sub_total' => $this->decimal(10,2)->notNull()->defaultValue(0),
             'profit' => $this->decimal(10,2)->notNull()->defaultValue(0),
             'discount' => $this->decimal(10,2)->notNull()->defaultValue(0),

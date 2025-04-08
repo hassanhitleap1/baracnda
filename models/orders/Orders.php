@@ -19,7 +19,7 @@ use Yii;
  * @property int $address_id
  * @property int $status_id
  * @property float $total
- * @property float $shopping_price
+ * @property float $shipping_price
  * @property float $sub_total
  * @property float $profit
  * @property float $discount
@@ -90,7 +90,7 @@ class Orders extends \yii\db\ActiveRecord
             [['discount'], 'default', 'value' => 0.00, 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
             [[ 'status_id', 'shipping_id'], 'integer', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
             [['address'], 'string', 'max' => 255, 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-
+            [['total', 'shipping_price', 'sub_total', 'profit', 'discount'], 'number', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
 
             // [['total', 'shopping_price', 'sub_total', 'profit', 'discount'], 'number', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
             // [['note'], 'string', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
@@ -203,7 +203,7 @@ class Orders extends \yii\db\ActiveRecord
             return false;
         }
 
-        $this->shopping_price = $shipping->price;
+        $this->shipping_price = $shipping->price??0;
 
         return true;
       
@@ -324,6 +324,21 @@ class Orders extends \yii\db\ActiveRecord
         return $query->andWhere('0=1'); // Deny access by default
     }
 
+
+    public function calculateTotal(){
+
+        return $this->total = $this->subtotal + $this->shipping;
+    }
+
+
+    public function calculateSubTotal($items){
+        $subtotal = 0;
+        foreach ($items as $item) {
+            $subtotal += $item['variant_quantity'] * $item['variant_price'];
+        }
+
+        return $this->sub_total =  $subtotal;
+    }
     /**
      * Calculates the subtotal, shipping, and total for the order.
      */

@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\orderItems\OrderItems;
 use app\models\orders\Orders;
 use app\models\orders\OrdersSearch;
 use Yii;
@@ -93,6 +94,17 @@ class OrdersController extends BaseController
             $transaction = Yii::$app->db->beginTransaction();
             try {
                 if ($model->load($this->request->post()) && $model->validate()) {
+
+                    $items = Yii::$app->request->post('Orders')['OrderItems'] ?? [];
+                    if(empty($items)){
+                        throw new \Exception('Order items cannot be empty.');
+                    }
+                    $model->calculateSubTotal($items); 
+                    $model->setShippingPrice();
+                    $model->calculateTotals();
+
+
+
                     if (!$model->setAddress() || !$model->setUser() || !$model->setCreator()) {
                         throw new \Exception('Failed to set related data.');
                     }
@@ -102,16 +114,12 @@ class OrdersController extends BaseController
                     }
 
                     // Load and save OrderItems
-                    if ($items = Yii::$app->request->post('Orders')['OrderItems'] ?? []) {
-                        foreach ($items as $item) {
-                            if (!$model->addItem((object)$item)) {
-                                throw new \Exception('Failed to save order items.');
-                            }
+                    foreach ($items as $item) {
+                        Orders::deleteAll(['order_id' => $model->id]);
+                        if (!$model->addItem((object)$item)) {
+                            throw new \Exception('Failed to save order items.');
                         }
                     }
-
-                    $model->setShippingPrice();
-                    $model->calculateTotals();
 
                     if (!$model->save()) {
                         throw new \Exception('Failed to update order totals.');
@@ -147,25 +155,28 @@ class OrdersController extends BaseController
             $transaction = Yii::$app->db->beginTransaction();
             try {
                 if ($model->load($this->request->post()) && $model->validate()) {
-                    if (!$model->setAddress() || !$model->setUser()) {
+                    $items = Yii::$app->request->post('Orders')['OrderItems'] ?? [];
+                    if(empty($items)){
+                        throw new \Exception('Order items cannot be empty.');
+                    }
+                    $model->calculateSubTotal($items); 
+                    $model->setShippingPrice();                  
+                    $model->calculateTotal();
+
+                    if (!$model->setAddress()) {
                         throw new \Exception('Failed to update related data.');
                     }
-
-                    $model->setShippingPrice();
-                    $model->calculateTotals();
 
                     if (!$model->save()) {
                         throw new \Exception('Failed to update order.');
                     }
 
-                    if ($items = Yii::$app->request->post('Orders')['OrderItems'] ?? []) {
-                        foreach ($items as $item) {
-                            if (!$model->addItem((object)$item)) {
-                                throw new \Exception('Failed to save order items.');
-                            }
+                    foreach ($items as $item) {
+                        OrderItems::deleteAll(['order_id' => $id]);
+                        if (!$model->addItem((object)$item)) {
+                            throw new \Exception('Failed to save order items.');
                         }
                     }
-
                     $transaction->commit();
                     return $this->redirect(['view', 'id' => $model->id]);
                 } else {
