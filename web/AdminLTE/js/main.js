@@ -158,18 +158,18 @@ $(document).ready(function () {
             success: function (data) {
                 let resultsHtml = '';
                 data.forEach(variant => {
+                    const isAdded = $(`#orderItems .variant-item[data-id="${variant.id}"]`).length > 0;
                     resultsHtml += `
                         <div class="dropdown-item d-flex align-items-center">
                             <img src="${variant.image}" alt="${variant.name}" class="img-thumbnail" style="width: 30px; height: 30px; margin-right: 10px;">
                             <span>${variant.name}</span>
-                            <button class="btn btn-primary btn-sm ml-auto add-variant-btn" data-id="${variant.id}" data-product-id="${variant.product_id}" data-name="${variant.name}" data-image="${variant.image}" data-price="${variant.price}">
-                                Add
+                            <button class="btn btn-primary btn-sm ml-auto add-variant-btn" data-id="${variant.id}" data-product-id="${variant.product_id}" data-name="${variant.name}" data-image="${variant.image}" data-price="${variant.price}" ${isAdded ? 'disabled' : ''}>
+                                ${isAdded ? 'Added' : 'Add'}
                             </button>
                         </div>
                     `;
                 });
                 $('#variantSearchResults').html(resultsHtml);
-                $('#variantSearchResults').val('');
             }
         });
     });
