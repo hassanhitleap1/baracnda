@@ -33,6 +33,9 @@ $region_id = $model->isNewRecord ? null : $model->addresses->region_id;
 $full_name = $model->isNewRecord ? null : $model->addresses->full_name;
 $address = $model->isNewRecord ? null : $model->addresses->address;
 $phone = $model->isNewRecord ? null : $model->addresses->phone;
+$subtotal= $model->isNewRecord ? null : $model->sub_total;
+$shipping_price= $model->isNewRecord ? null : $model->shipping_price;
+$total= $model->isNewRecord ? null : $model->total;
 
 /** @var yii\web\View $this */
 /** @var app\models\orders\Orders $model */
@@ -127,7 +130,7 @@ $phone = $model->isNewRecord ? null : $model->addresses->phone;
 
                             <?= $form->field($model, 'region_id')->widget(Select2::classname(), [
                                 'data' => ArrayHelper::map(Regions::find()->all(), 'id', 'name'),
-                                'options' => ['placeholder' => 'Select a attribute' ,'id' => 'region-id','value' => $region_id],
+                                'options' => ['placeholder' => 'Select a attribute', 'id' => 'region-id', 'value' => $region_id],
                                 'pluginOptions' => [
                                     'allowClear' => true,
                                     'id' => 'region-id'
@@ -135,12 +138,12 @@ $phone = $model->isNewRecord ? null : $model->addresses->phone;
                             ]); ?>
                         </div>
                         <div class="col-6">
-                            <?= $form->field($model, 'phone')->textInput(['maxlength' => true,'value' => $phone, 'id' => 'phone']) ?>
+                            <?= $form->field($model, 'phone')->textInput(['maxlength' => true, 'value' => $phone, 'id' => 'phone']) ?>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-6">
-                            <?= $form->field($model, 'full_name')->textInput(['maxlength' => true,'value' => $full_name]) ?>
+                            <?= $form->field($model, 'full_name')->textInput(['maxlength' => true, 'value' => $full_name]) ?>
                         </div>
                         <div class="col-6">
                             <?= $form->field($model, 'status_id')->widget(Select2::classname(), [
@@ -154,10 +157,11 @@ $phone = $model->isNewRecord ? null : $model->addresses->phone;
                     </div>
                     <div class="row">
                         <div class="col-6">
-                            <?= $form->field($model, 'shipping_id')->dropDownList(ArrayHelper::map(Shippings::find()->all(), 'id', 'name'), ['prompt' => 'Select a shipping','id' => 'select2-orders-shipping_id','disabled' => true])//['prompt' => 'Select a shipping']) ?>
+                            <?= $form->field($model, 'shipping_id')->dropDownList(ArrayHelper::map(Shippings::find()->all(), 'id', 'name'), ['prompt' => 'Select a shipping', 'id' => 'select2-orders-shipping_id', 'disabled' => true]) //['prompt' => 'Select a shipping']) 
+                            ?>
                         </div>
                         <div class="col-6">
-                            <?= $form->field($model, 'address')->textInput(['maxlength' => true,'value' => $address]) ?>
+                            <?= $form->field($model, 'address')->textInput(['maxlength' => true, 'value' => $address]) ?>
                         </div>
 
 
@@ -183,14 +187,14 @@ $phone = $model->isNewRecord ? null : $model->addresses->phone;
             </div>
         </div>
         <div class="col-2" id="totals-container">
-                <div class="card-header">
-                    <?= Yii::t('app', 'Order Summary') ?>
-                </div>
-                <div class="card-body" >
-                    <p><strong>Subtotal:</strong> <span id="subtotal">0.00</span></p>
-                    <p><strong>Shipping Price:</strong> <span id="shipping-price">0.00</span></p>
-                    <p><strong>Total:</strong> <span id="total">0.00</span></p>
-                </div>
+            <div class="card-header">
+                <?= Yii::t('app', 'Order Summary') ?>
+            </div>
+            <div class="card-body">
+                <p><strong>Subtotal:</strong> <span id="subtotal"><?= $subtotal ?></span></p>
+                <p><strong>Shipping Price:</strong> <span id="shipping-price"><?= $shipping_price ?></span></p>
+                <p><strong>Total:</strong> <span id="total"><?= $total ?></span></p>
+            </div>
         </div>
     </div>
 

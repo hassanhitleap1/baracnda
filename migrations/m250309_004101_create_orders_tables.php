@@ -15,12 +15,14 @@ class m250309_004101_create_orders_tables extends Migration
             'user_id' => $this->integer()->null(),
             'creator_id' => $this->integer()->null(),
             'address_id' => $this->integer()->null(),
-            'status_id' => $this->integer()->notNull()->defaultValue(1), // pending, completed, canceled, shipped, refunded
-            'total' => $this->decimal(10,2)->notNull()->defaultValue(0),
-            'shipping_price' => $this->decimal(10,2)->notNull()->defaultValue(0),
+            'status_id' => $this->integer()->notNull()->defaultValue(1),
+
             'sub_total' => $this->decimal(10,2)->notNull()->defaultValue(0),
+            'shipping_price' => $this->decimal(10,2)->notNull()->defaultValue(0),
+            'total' => $this->decimal(10,2)->notNull()->defaultValue(0),
             'profit' => $this->decimal(10,2)->notNull()->defaultValue(0),
             'discount' => $this->decimal(10,2)->notNull()->defaultValue(0),
+
             'shipping_id'=>$this->integer()->notNull()->defaultValue(1),
             'payment_id'=>$this->integer()->notNull()->defaultValue(1),
             'status_order'=>'Enum("reserved","canceled","processing","refunded","completed") NOT NULL DEFAULT "reserved"',

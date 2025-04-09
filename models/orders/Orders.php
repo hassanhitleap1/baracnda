@@ -44,13 +44,6 @@ class Orders extends \yii\db\ActiveRecord
 
     public $region_id = null;
 
-    public $subtotal = 0.00;
-    public $shipping = 0.00;
-    public $total = 0.00;
-    public $discount = 0.00;
-    public $shopping_price = 0.00;
-    public $profit = 0.00;
-    
     public $full_name = null;
 
     public $phone=  null;
@@ -87,21 +80,10 @@ class Orders extends \yii\db\ActiveRecord
             [['phone','full_name','region_id'],'required', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
             [['user_id', 'note'], 'default', 'value' => null, 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
             [['shipping_id'], 'default', 'value' => 1, 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            [['discount'], 'default', 'value' => 0.00, 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
             [[ 'status_id', 'shipping_id'], 'integer', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
             [['address'], 'string', 'max' => 255, 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
             [['total', 'shipping_price', 'sub_total', 'profit', 'discount'], 'number', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-
-            // [['total', 'shopping_price', 'sub_total', 'profit', 'discount'], 'number', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            // [['note'], 'string', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            // [['created_at', 'updated_at'], 'safe', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            // [['address_id'], 'exist', 'skipOnError' => true, 'targetClass' => Addresses::class, 'targetAttribute' => ['address_id' => 'id'], 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            // [['creator_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['creator_id' => 'id'], 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            // [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['user_id' => 'id'], 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            // [['shipping_id'], 'exist', 'skipOnError' => true, 'targetClass' => Shippings::class, 'targetAttribute' => ['shipping_id' => 'id'], 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            // [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => Status::class, 'targetAttribute' => ['status_id' => 'id'], 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            // [['country_id'], 'safe', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            // [['creator_id', 'address_id', 'user_id'], 'required', 'on' => [self::SCENARIO_UPDATE]],
+            [['discount'], 'default', 'value' => 0.00, 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
         ];
     }
 
@@ -117,7 +99,7 @@ class Orders extends \yii\db\ActiveRecord
             'address_id' => Yii::t('app', 'Address ID'),
             'status_id' => Yii::t('app', 'Status ID'),
             'total' => Yii::t('app', 'Total'),
-            'shopping_price' => Yii::t('app', 'Shopping Price'),
+            'shipping_price' => Yii::t('app', 'Shopping Price'),
             'sub_total' => Yii::t('app', 'Sub Total'),
             'profit' => Yii::t('app', 'Profit'),
             'discount' => Yii::t('app', 'Discount'),
@@ -203,7 +185,7 @@ class Orders extends \yii\db\ActiveRecord
             return false;
         }
 
-        $this->shipping_price = $shipping->price??0;
+        $this->shipping_price = (float) $shipping->price ?? 0;
 
         return true;
       
@@ -327,7 +309,8 @@ class Orders extends \yii\db\ActiveRecord
 
     public function calculateTotal(){
 
-        return $this->total = $this->subtotal + $this->shipping;
+        $this->total = (float) $this->sub_total + (float) $this->shipping_price - (float) $this->discount;
+        return $this->total ;
     }
 
 
@@ -339,53 +322,25 @@ class Orders extends \yii\db\ActiveRecord
 
         return $this->sub_total =  $subtotal;
     }
-    /**
-     * Calculates the subtotal, shipping, and total for the order.
-     */
-    public function calculateTotals()
-    {
-        $this->subtotal = 0;
-
-        // Load OrderItems if not already loaded
-        if ($this->isNewRecord && empty($this->orderItems)) {
-            $orderItemsData = Yii::$app->request->post('Orders')['OrderItems'] ?? [];
-            foreach ($orderItemsData as $itemData) {
-                $orderItem = new OrderItems();
-                $orderItem->order_id = $this->id;
-                $orderItem->product_id = $itemData['product_id'];
-                $orderItem->variant_id = $itemData['variant_id'];
-                $orderItem->quantity = $itemData['variant_quantity'];
-                $orderItem->price = $itemData['variant_price'];
-                $this->orderItems[] = $orderItem;
+  
+    public function calculateProfit(){
+        $cost = 0;
+        foreach ($this->orderItems as $item) {
+            $product = $item->product;
+            if ($product) {
+                $cost += $product->cost * $item->quantity;
             }
         }
-
-        // Calculate subtotal
-        foreach ($this->orderItems as $item) {
-            $this->subtotal += $item->quantity * $item->price;
-        }
-
-        $this->total = $this->subtotal + $this->shipping;
+        $cost = (float) $cost  +  $this->shipping_price - $this->discount;
+        $this->profit = (float) $this->total - $cost;
+        return $this->profit;
     }
-
-    /**
-     * Custom logic to calculate shipping cost.
-     * @return float
-     */
-    protected function calculateShipping()
-    {
-        // Example: Flat rate shipping
-        return 00.00;
-    }
-
-
-
 
     public function beforeSave($insert)
     {
 
         parent::beforeSave($insert);
-
+        $this->calculateProfit();
         if ($this->isNewRecord) {
             $this->status_order = SELF::STATUS_RESERVED;
         }else{

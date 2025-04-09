@@ -47,7 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => $model->status ? $model->status->name : null,
             ],
             'total',
-            'shopping_price',
+            'shipping_price',
             'sub_total',
             'profit',
             'discount',

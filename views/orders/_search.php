@@ -30,7 +30,7 @@ use yii\widgets\ActiveForm;
 
     <?php // echo $form->field($model, 'total') ?>
 
-    <?php // echo $form->field($model, 'shopping_price') ?>
+    <?php // echo $form->field($model, 'shipping_price') ?>
 
     <?php // echo $form->field($model, 'sub_total') ?>
 

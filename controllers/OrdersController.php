@@ -160,9 +160,9 @@ class OrdersController extends BaseController
                         throw new \Exception('Order items cannot be empty.');
                     }
                     $model->calculateSubTotal($items); 
-                    $model->setShippingPrice();                  
+                    $model->setShippingPrice();           
                     $model->calculateTotal();
-
+                    
                     if (!$model->setAddress()) {
                         throw new \Exception('Failed to update related data.');
                     }

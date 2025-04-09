@@ -18,7 +18,7 @@ class OrdersSearch extends Orders
     {
         return [
             [['id', 'user_id', 'creator_id', 'address_id', 'status_id', 'shipping_id'], 'integer'],
-            [['total', 'shopping_price', 'sub_total', 'profit', 'discount'], 'number'],
+            [['total', 'shipping_price', 'sub_total', 'profit', 'discount'], 'number'],
             [['note', 'created_at', 'updated_at'], 'safe'],
         ];
     }
@@ -66,7 +66,7 @@ class OrdersSearch extends Orders
             'address_id' => $this->address_id,
             'status_id' => $this->status_id,
             'total' => $this->total,
-            'shopping_price' => $this->shopping_price,
+            'shipping_price' => $this->shipping_price,
             'sub_total' => $this->sub_total,
             'profit' => $this->profit,
             'discount' => $this->discount,

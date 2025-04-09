@@ -91,7 +91,7 @@ $statusList = \yii\helpers\ArrayHelper::map(Status::find()->all(), 'id', 'name')
                 'value' => 'status.name',
                 'filter' => ArrayHelper::map(\app\models\status\Status::find()->all(), 'id', 'name'),
             ],
-            'shopping_price',
+            'shipping_price',
             'sub_total',
             'profit',
             'total',
