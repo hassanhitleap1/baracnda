@@ -1,5 +1,6 @@
 <?php
 
+use app\models\orders\Orders;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
@@ -12,6 +13,21 @@ $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="orders-view">
+    
+
+<div class="row">
+        <div class="card">
+            <div class="card-header">
+                <?= Yii::t('app', 'order status') ?>
+            </div>
+            <div class="card-body">
+                <?php if ($model->status_order == Orders::STATUS_RESERVED) : ?>
+                    <?= Html::a(Yii::t('app', 'Confirm'), ['confirm', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+                <?php elseif ($model->status_order == Orders::STATUS_PROCESSING) : ?>    
+                <?php endif ?>
+            </div>
+        </div>
+    </div>
     
     <p>
         <?php

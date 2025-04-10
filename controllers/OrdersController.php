@@ -101,7 +101,7 @@ class OrdersController extends BaseController
                     }
                     $model->calculateSubTotal($items); 
                     $model->setShippingPrice();
-                    $model->calculateTotals();
+                    $model->calculateTotal();
 
 
 
@@ -115,7 +115,6 @@ class OrdersController extends BaseController
 
                     // Load and save OrderItems
                     foreach ($items as $item) {
-                        Orders::deleteAll(['order_id' => $model->id]);
                         if (!$model->addItem((object)$item)) {
                             throw new \Exception('Failed to save order items.');
                         }

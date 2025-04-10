@@ -30,10 +30,13 @@ use yii\helpers\Url;
 
 
 
-$region_id = $model->isNewRecord ? null : $model->addresses->region_id;
-$full_name = $model->isNewRecord ? null : $model->addresses->full_name;
-$address = $model->isNewRecord ? null : $model->addresses->address;
-$phone = $model->isNewRecord ? null : $model->addresses->phone;
+
+$region_id = $model->isNewRecord || !$model->addresses ? null : $model->addresses->region_id;
+$full_name = $model->isNewRecord || !$model->addresses ? null : $model->addresses->full_name;
+$address = $model->isNewRecord || !$model->addresses ? null : $model->addresses->address;
+$phone = $model->isNewRecord || !$model->addresses ? null : $model->addresses->phone;
+
+// These seem to be direct properties of the Orders model, so the original check is likely sufficient
 $subtotal = $model->isNewRecord ? null : $model->sub_total;
 $shipping_price = $model->isNewRecord ? null : $model->shipping_price;
 $total = $model->isNewRecord ? null : $model->total;
