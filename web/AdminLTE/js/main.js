@@ -343,7 +343,19 @@ $('#products-type').on('click', function () {
 })
 
 
-
+$(document).on('click', '.delete-item-btn', function (e) {
+        e.preventDefault();
+        var itemId = $(this).attr('data-id');
+        if (confirm('Are you sure you want to delete this item?')) {
+            $.post(`${SITE_URL}/orders/delete-item?id=${itemId}`, function (response) {
+                if (response.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to delete item.');
+                }
+            });
+        }
+});
 // Update order summary
 function updateOrderSummary() {
     const subtotal = calculateSubtotal();

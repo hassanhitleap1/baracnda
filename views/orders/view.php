@@ -105,10 +105,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <?= Html::img($item->product->imageUrl, ['alt' => $item->product->name, 'style' => 'width:50px; height:auto;']) ?>
                                     <?= Html::encode($item->product->name . ' (Qty: ' . $item->quantity . ')') ?>
                                     <?php if (in_array($model->status_order, [Orders::STATUS_PROCESSING, Orders::STATUS_RESERVED])): ?>
-                                        <?= Html::a('Delete', ['delete-item', 'id' => $item->id], [
-                                            'class' => 'btn btn-danger btn-sm delete-item-btn',
-                                            'data-id' => $item->id,
-                                        ]) ?>
+                                        <?= Html::button('Delete', [ 'class' => 'btn btn-danger btn-sm delete-item-btn' ,'data-id' => $item->id]) ?>
+                                 
                                     <?php endif; ?>
                                 </li>
                             <?php endforeach; ?>
@@ -187,27 +185,7 @@ $script = <<<JS
     });
 
     // Delete item via AJAX and recalculate totals
-    $('.delete-item-btn').on('click', function (e) {
-        e.preventDefault();
-        var itemId = $(this).data('id');
-        if (confirm('Are you sure you want to delete this item?')) {
-            $.post('$deleteItemUrl', {id: itemId}, function (response) {
-                if (response.success) {
-                    alert('Item deleted successfully.');
-                    // Recalculate totals after deletion
-                    $.post('$recalculateTotalsUrl', {order_id: {$model->id}}, function (totalsResponse) {
-                        if (totalsResponse.success) {
-                            $('#subtotal').text(totalsResponse.subtotal);
-                            $('#total').text(totalsResponse.total);
-                        }
-                    });
-                    location.reload();
-                } else {
-                    alert('Failed to delete item.');
-                }
-            });
-        }
-    });
+
 JS;
 $this->registerJs($script);
 ?>

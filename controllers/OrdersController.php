@@ -380,6 +380,11 @@ class OrdersController extends BaseController
         }
 
         if ($item->delete()) {
+           $order->calculateSubTotalFromOrderItems();
+           $order->setShippingPrice();
+           $order->calculateProfit();
+           $order->calculateTotal();
+
             return ['success' => true];
         }
 

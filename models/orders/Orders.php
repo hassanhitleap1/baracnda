@@ -336,6 +336,15 @@ class Orders extends \yii\db\ActiveRecord
 
         return $this->sub_total =  $subtotal;
     }
+
+    public function calculateSubTotalFromOrderItems(){
+        $subtotal = 0;
+        foreach ($this->orderItems as $item) {
+            $subtotal += $item->quantity * $item->price;
+        }
+        return $this->sub_total =  $subtotal;
+
+    }
   
     public function calculateProfit(){
         $cost = 0;
