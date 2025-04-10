@@ -258,7 +258,7 @@ class Orders extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery|ShippingsQuery
      */
-    public function getShippings()
+    public function getShipping()
     {
         return $this->hasOne(Shippings::class, ['id' => 'shipping_id']);
     }

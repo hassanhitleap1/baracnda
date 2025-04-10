@@ -108,6 +108,7 @@ class OrdersController extends BaseController
                     if (!$model->setAddress() || !$model->setUser() || !$model->setCreator()) {
                         throw new \Exception('Failed to set related data.');
                     }
+                    $model->status_order=Orders::STATUS_RESERVED;
 
                     if (!$model->save()) {
                         throw new \Exception('Failed to save order.');

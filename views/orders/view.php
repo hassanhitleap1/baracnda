@@ -14,7 +14,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="orders-view">
     
-
+<?= $model->status_order?>
 <div class="row">
         <div class="card">
             <div class="card-header">
@@ -76,7 +76,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'discount',
             [
                 'label' => Yii::t('app', 'Shipping'),
-                'value' => $model->shippings ? $model->shippings->name : null,
+                'value' => $model->shipping ? $model->shipping->name : null,
             ],
             'note:ntext',
             [

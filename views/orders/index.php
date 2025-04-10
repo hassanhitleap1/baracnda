@@ -18,6 +18,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
 // Define the $statusList variable
 $statusList = \yii\helpers\ArrayHelper::map(Status::find()->all(), 'id', 'name');
+
+// Set default currency code for the formatter
+Yii::$app->formatter->currencyCode = 'JOD'; // Replace 'USD' with your desired currency code
 ?>
 <div class="orders-index">
 
@@ -57,6 +60,7 @@ $statusList = \yii\helpers\ArrayHelper::map(Status::find()->all(), 'id', 'name')
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
+        'showFooter' => true, // Enable footer
         'columns' => [
             ['class' => 'kartik\grid\SerialColumn'],
             [
@@ -66,12 +70,12 @@ $statusList = \yii\helpers\ArrayHelper::map(Status::find()->all(), 'id', 'name')
                 },
             ],
             'id',
-            [
-                'attribute' => 'user_id',
-                'label' => Yii::t('app', 'User'),
-                'value' => 'user.full_name',
-                'filter' => ArrayHelper::map(\app\models\users\Users::find()->all(), 'id', 'full_name'),
-            ],
+            // [
+            //     'attribute' => 'user_id',
+            //     'label' => Yii::t('app', 'User'),
+            //     'value' => 'user.full_name',
+            //     'filter' => ArrayHelper::map(\app\models\users\Users::find()->all(), 'id', 'full_name'),
+            // ],
             [
                 'attribute' => 'creator_id',
                 'label' => Yii::t('app', 'Creator'),
@@ -91,12 +95,24 @@ $statusList = \yii\helpers\ArrayHelper::map(Status::find()->all(), 'id', 'name')
                 'value' => 'status.name',
                 'filter' => ArrayHelper::map(\app\models\status\Status::find()->all(), 'id', 'name'),
             ],
-            'shpping_price',
-            'sub_total',
-            'profit',
-            'total',
-            'shipping.name',
-            'note:ntext',
+            [
+                'attribute' => 'shipping_price',
+                'footer' => Yii::$app->formatter->asCurrency($dataProvider->query->sum('shipping_price')),
+            ],
+            [
+                'attribute' => 'sub_total',
+                'footer' => Yii::$app->formatter->asCurrency($dataProvider->query->sum('sub_total')),
+            ],
+            [
+                'attribute' => 'profit',
+                'footer' => Yii::$app->formatter->asCurrency($dataProvider->query->sum('profit')),
+            ],
+            [
+                'attribute' => 'total',
+                'footer' => Yii::$app->formatter->asCurrency($dataProvider->query->sum('total')),
+            ],
+            // 'shipping.name',
+            // 'note:ntext',
             [
                 'attribute' => 'orderItems',
                 'label' => Yii::t('app', 'Order Items'),
@@ -113,6 +129,8 @@ $statusList = \yii\helpers\ArrayHelper::map(Status::find()->all(), 'id', 'name')
                     return null;
                 },
             ],
+            'discount',
+            'status_order',
             [
                 'attribute' => 'created_at',
                 'label' => Yii::t('app', 'Created At'),
@@ -136,6 +154,15 @@ $statusList = \yii\helpers\ArrayHelper::map(Status::find()->all(), 'id', 'name')
                 'urlCreator' => function ($action, $model, $key, $index) {
                     return Url::toRoute([$action, 'id' => $model->id]);
                 },
+                'visibleButtons' => [
+                    'view' => true,
+                    'delete' => function ($model) {
+                        return $model->status_order === 'reserved';
+                    },
+                    'update' => function ($model) {
+                        return $model->status_order === 'reserved'; // Allow editing only if status_order is 'reserved'
+                    },
+                ],
             ],
         ],
         'responsive' => true,
