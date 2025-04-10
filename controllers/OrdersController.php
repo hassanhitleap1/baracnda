@@ -247,22 +247,48 @@ class OrdersController extends BaseController
      */
     public function actionChangeStatus()
     {
-        $ids = Yii::$app->request->post('ids');
-        $status = Yii::$app->request->post('status');
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
-        if (empty($ids) || !$status) {
-            return $this->asJson(['success' => false, 'message' => 'Invalid input.']);
+        $id = Yii::$app->request->post('id');
+        $statusId = Yii::$app->request->post('status_id');
+
+        $order = Orders::findOne($id);
+        if (!$order) {
+            return ['success' => false, 'message' => 'Order not found.'];
         }
 
-        $orders = Orders::find()->where(['id' => $ids])->all();
-        foreach ($orders as $order) {
-            $order->status_id = $status;
-            if (!$order->save()) {
-                return $this->asJson(['success' => false, 'message' => 'Failed to update some orders.']);
-            }
+        $order->status_id = $statusId;
+        if ($order->save()) {
+            return ['success' => true];
         }
 
-        return $this->asJson(['success' => true]);
+        return ['success' => false, 'message' => 'Failed to update status.'];
+    }
+
+    public function actionChangeDeliveryStatus()
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $id = Yii::$app->request->post('id');
+        $deliveryStatus = Yii::$app->request->post('delivery_status');
+
+        $order = Orders::findOne($id);
+        if (!$order) {
+            return ['success' => false, 'message' => 'Order not found.'];
+        }
+
+        $order->delivery_status = $deliveryStatus;
+        if ($deliveryStatus === 'delivered') {
+            $order->status_order = Orders::STATUS_COMPLETED;
+        } elseif ($deliveryStatus === 'shipped') {
+            $order->status_order = Orders::STATUS_CANCELED;
+        }
+
+        if ($order->save()) {
+            return ['success' => true];
+        }
+
+        return ['success' => false, 'message' => 'Failed to update delivery status.'];
     }
 
     public function actionCalculateTotals()
@@ -337,5 +363,54 @@ class OrdersController extends BaseController
         }
 
         return ['success' => false];
+    }
+
+    public function actionDeleteItem($id)
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $item = OrderItems::findOne($id);
+        if (!$item) {
+            return ['success' => false, 'message' => 'Item not found.'];
+        }
+
+        $order = $item->orders;
+        if (!in_array($order->status_order, [Orders::STATUS_PROCESSING, Orders::STATUS_RESERVED])) {
+            return ['success' => false, 'message' => 'Cannot delete items for this order status.'];
+        }
+
+        if ($item->delete()) {
+            return ['success' => true];
+        }
+
+        return ['success' => false, 'message' => 'Failed to delete item.'];
+    }
+
+    public function actionRecalculateTotals()
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $orderId = Yii::$app->request->post('order_id');
+        $order = Orders::findOne($orderId);
+
+        if (!$order) {
+            return ['success' => false, 'message' => 'Order not found.'];
+        }
+
+        $order->sub_total = 0;
+        foreach ($order->orderItems as $item) {
+            $order->sub_total += $item->quantity * $item->price;
+        }
+
+        $order->calculateTotal();
+        if ($order->save()) {
+            return [
+                'success' => true,
+                'subtotal' => $order->sub_total,
+                'total' => $order->total,
+            ];
+        }
+
+        return ['success' => false, 'message' => 'Failed to recalculate totals.'];
     }
 }

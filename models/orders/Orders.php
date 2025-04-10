@@ -34,9 +34,9 @@ use Yii;
  * @property string $status_order
  * @property string|null $note
  * @property string|null $status_order
+ * @property string $delivery_status
  * @property string|null $created_at
  * @property string|null $updated_at
- *
  * @property Addresses $addresses
  * @property OrderItems[] $orderItems
  * @property Shippings $shippings
@@ -66,6 +66,12 @@ class Orders extends \yii\db\ActiveRecord
     const STATUS_PROCESSING = 'processing';
     const STATUS_COMPLETED = 'completed';
     const STATUS_REFUNDED = 'refunded';
+
+    const DELIVERY_PENDING = 'pending';
+    const DELIVERY_DELIVERED = 'delivered';
+
+    const DELIVERY_REFUNDED = 'refunded';
+
 
     /**
      * @var int|null Virtual property for country ID
@@ -352,21 +358,12 @@ class Orders extends \yii\db\ActiveRecord
         if ($this->isNewRecord) {
             $this->status_order = SELF::STATUS_RESERVED;
         }else{
-          switch ($this->status_id) {
-                case 1:
-                    $this->status_order = SELF::STATUS_RESERVED;
-                    break;
-                case 2:
-                    $this->status_order = SELF::STATUS_CANCELED;
-                    break;
-                case 3:
-                    $this->status_order = SELF::STATUS_PROCESSING;
-                    break;
-                case 4:
+          switch ($this->delivery_status) {
+                case self::DELIVERY_DELIVERED :
                     $this->status_order = SELF::STATUS_COMPLETED;
                     break;
-                case 5:
-                    $this->status_order = SELF::STATUS_REFUNDED;
+                case self::DELIVERY_REFUNDED :
+                    $this->status_order = SELF::STATUS_CANCELED;
                     break;
             }
         }
