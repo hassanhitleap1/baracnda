@@ -17,6 +17,7 @@
 
 <?php
 
+use app\models\orders\Orders;
 use app\models\payments\Payments;
 use app\models\regions\Regions;
 use app\models\shippings\Shippings;
@@ -33,17 +34,17 @@ $region_id = $model->isNewRecord ? null : $model->addresses->region_id;
 $full_name = $model->isNewRecord ? null : $model->addresses->full_name;
 $address = $model->isNewRecord ? null : $model->addresses->address;
 $phone = $model->isNewRecord ? null : $model->addresses->phone;
-$subtotal= $model->isNewRecord ? null : $model->sub_total;
-$shipping_price= $model->isNewRecord ? null : $model->shipping_price;
-$total= $model->isNewRecord ? null : $model->total;
+$subtotal = $model->isNewRecord ? null : $model->sub_total;
+$shipping_price = $model->isNewRecord ? null : $model->shipping_price;
+$total = $model->isNewRecord ? null : $model->total;
 
 /** @var yii\web\View $this */
 /** @var app\models\orders\Orders $model */
 /** @var yii\widgets\ActiveForm $form */
 ?>
 
-<div class="orders-form">
 
+<div class="orders-form">
     <?php $form = ActiveForm::begin(); ?>
     <div class="row">
         <div class="col-10">
@@ -71,7 +72,7 @@ $total= $model->isNewRecord ? null : $model->total;
                                 echo '<input type="hidden" name="Orders[OrderItems][' . $key . '][variant_id]" value="' . $orderItem['variant_id'] . '">';
                                 echo '<input type="hidden" name="Orders[OrderItems][' . $key . '][product_id]" value="' . $orderItem['product_id'] . '">';
                                 echo '<input type="hidden" name="Orders[OrderItems][' . $key . '][variant_image]" value="' . $orderItem['variant_image'] . '">';
-                                echo '<img src="' ."/". $orderItem['variant_image'] . '" alt="' . $orderItem['variant_image'] . '" class="img-thumbnail w-40">';
+                                echo '<img src="' . "/" . $orderItem['variant_image'] . '" alt="' . $orderItem['variant_image'] . '" class="img-thumbnail w-40">';
                                 echo '</div>';
                                 echo '<div class="col-4">';
                                 echo '<input type="text" class="form-control" name="Orders[OrderItems][' . $key . '][variant_name]" value="' . $orderItem['variant_name'] . '" readonly>';
@@ -97,7 +98,7 @@ $total= $model->isNewRecord ? null : $model->total;
                                 echo '<input type="hidden" name="Orders[OrderItems][' . $key . '][variant_id]" value="' . $orderItem->variant_id . '">';
                                 echo '<input type="hidden" name="Orders[OrderItems][' . $key . '][product_id]" value="' . $orderItem->product_id . '">';
                                 echo '<input type="hidden" name="Orders[OrderItems][' . $key . '][variant_image]" value="' . $orderItem->product->image_path . '">';
-                                echo '<img src="' ."/". $orderItem->product->image_path . '" alt="' . $orderItem->product->image_path . '" class="img-thumbnail w-40">';
+                                echo '<img src="' . "/" . $orderItem->product->image_path . '" alt="' . $orderItem->product->image_path . '" class="img-thumbnail w-40">';
                                 echo '</div>';
                                 echo '<div class="col-4">';
                                 echo '<input type="text" class="form-control" name="Orders[OrderItems][' . $key . '][variant_name]" value="' . $orderItem->product->name . '" readonly>';

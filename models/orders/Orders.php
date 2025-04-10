@@ -24,6 +24,14 @@ use Yii;
  * @property float $profit
  * @property float $discount
  * @property int $shipping_id
+ * @property int $payment_id
+ * @property int $region_id
+ * @property int $country_id
+ * @property string $full_name
+ * @property string $phone
+ * @property string $delivery_status
+ * @property string $address
+ * @property string $status_order
  * @property string|null $note
  * @property string|null $status_order
  * @property string|null $created_at
