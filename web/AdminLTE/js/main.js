@@ -385,3 +385,19 @@ function calculateSubtotal() {
 }
 
 
+
+$(document).on('click', '#delivery-status-dropdown', function (e) {
+    var deliveryStatus = $(this).val();
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('urlParams', urlParams);
+    const id = urlParams.get('id');
+    $.post(`${SITE_URL}/orders/update-delivery-status?id=${id}`, {delivery_status: deliveryStatus}, function (response) {
+        if (response.success) {
+            alert('Delivery status updated successfully.');
+            location.reload();
+        } else {
+            alert('Failed to update delivery status.');
+        }
+    });
+});
+
