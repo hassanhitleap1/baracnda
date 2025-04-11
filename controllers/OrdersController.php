@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\orderItems\OrderItems;
 use app\models\orders\Orders;
 use app\models\orders\OrdersSearch;
+use app\models\variants\Variants;
 use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -417,5 +418,41 @@ class OrdersController extends BaseController
         }
 
         return ['success' => false, 'message' => 'Failed to recalculate totals.'];
+    }
+
+    public function actionAddVariantToOrder($id)
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $variantId = Yii::$app->request->post('variant_id');
+        $quantity = Yii::$app->request->post('variant_quantity');
+        $variant = Variants::findOne($variantId);
+        if (!$variant) {
+            return ['success' => false, 'message' => 'Variant not found.'];
+        }
+        $order = Orders::findOne($id);
+        
+        if (!$order) {
+            return ['success' => false, 'message' => 'Order not found.'];
+        }
+      
+
+        $orderItem = new OrderItems();
+        $orderItem->order_id = $order->id;
+        $orderItem->variant_id = $variant->id;
+        $orderItem->quantity = $quantity;
+        $orderItem->price = $variant->price;
+        $orderItem->product_id = $variant->product_id;
+       
+        if ($orderItem->save()) {
+            $order->calculateSubTotalFromOrderItems();
+            $order->setShippingPrice();
+            $order->calculateProfit();
+            $order->calculateTotal();
+
+            return ['success' => true, 'data' => ['order' => $order->toArray(), 'orderItem' => $orderItem->with(['products']) ->toArray()]];
+        }
+
+        return ['success' => false, 'message' => 'Failed to add variant to order.'];
     }
 }

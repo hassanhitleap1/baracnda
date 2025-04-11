@@ -70,11 +70,33 @@ $this->params['breadcrumbs'][] = $this->title;
                                     ]
                                 ),
                             ],
-                            'total',
-                            'shipping_price',
-                            'sub_total',
-                            'profit',
-                            'discount',
+                            'payment_method',
+                            'payment.name',
+                            [
+                                'attribute' => 'shipping_price',
+                                'value' => $model->shipping_price,
+                                'contentOptions' => ['id' => 'shipping-price'], 
+                            ],
+                            [
+                                'attribute' => 'profit',
+                                'value' => $model->profit,
+                                'contentOptions' => ['id' => 'profit'], 
+                            ],
+                            [
+                                'attribute' => 'discount',
+                                'value' => $model->discount,
+                                'contentOptions' => ['id' => 'discount'], 
+                            ],
+                            [
+                                'attribute' => 'sub_total',
+                                'value' => $model->sub_total,
+                                'contentOptions' => ['id' => 'subtotal'], 
+                            ],
+                            [
+                                'attribute' => 'total',
+                                'value' => $model->total,
+                                'contentOptions' => ['id' => 'total'], 
+                            ],
                             [
                                 'label' => Yii::t('app', 'Shipping'),
                                 'value' => $model->shipping ? $model->shipping->name : null,
@@ -93,20 +115,27 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="card-header">
                     <h5 class="text-center"><?= Yii::t('app', 'Order Items') ?></h5>
                     <p>
-                    <?= Html::a(Yii::t('app', $model->status_order), ['', 'id' => $model->id, 'status' => Orders::STATUS_RESERVED], ['class' => 'btn btn-warning btn-block']) ?>
+                        <?= Html::a(Yii::t('app', $model->status_order), ['', 'id' => $model->id, 'status' => Orders::STATUS_RESERVED], ['class' => 'btn btn-warning btn-block']) ?>
                     </p>
-                  
+                    <div class="form-group">
+                        <label for="variantSearchInputInView"><?= Yii::t('app', 'Search Variants') ?></label>
+                        <input type="text" id="variantSearchInputInView" class="form-control" placeholder="<?= Yii::t('app', 'Enter variant name...') ?>">
+                        <div id="variantSearchResultsView" class="dropdown-menu show" style="width: 100%;"></div>
+                    </div>
+                    <div id="orderItems" class="mt-3">
+                    </div>
+
                 </div>
                 <div class="card-body">
                     <?php if ($model->orderItems): ?>
-                        <ul class="list-group">
+                        <ul class="list-group list-group-item">
                             <?php foreach ($model->orderItems as $item): ?>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <?= Html::img($item->product->imageUrl, ['alt' => $item->product->name, 'style' => 'width:50px; height:auto;']) ?>
                                     <?= Html::encode($item->product->name . ' (Qty: ' . $item->quantity . ')') ?>
                                     <?php if (in_array($model->status_order, [Orders::STATUS_PROCESSING, Orders::STATUS_RESERVED])): ?>
-                                        <?= Html::button('Delete', [ 'class' => 'btn btn-danger btn-sm delete-item-btn' ,'data-id' => $item->id]) ?>
-                                 
+                                        <?= Html::button('Delete', ['class' => 'btn btn-danger btn-sm delete-item-btn', 'data-id' => $item->id]) ?>
+
                                     <?php endif; ?>
                                 </li>
                             <?php endforeach; ?>
@@ -151,41 +180,3 @@ Modal::begin([
     ]) ?>
 </div>
 <?php Modal::end(); ?>
-
-<?php
-$changeStatusUrl = Url::to(['change-status']);
-$changeDeliveryStatusUrl = Url::to(['change-delivery-status']);
-$deleteItemUrl = Url::to(['delete-item']);
-$recalculateTotalsUrl = Url::to(['recalculate-totals']);
-$script = <<<JS
-    // Change status via AJAX
-    $('#save-status-btn').on('click', function () {
-        var statusId = $('#status-dropdown').val();
-        $.post('$changeStatusUrl', {id: {$model->id}, status_id: statusId}, function (response) {
-            if (response.success) {
-                alert('Status updated successfully.');
-                location.reload();
-            } else {
-                alert('Failed to update status.');
-            }
-        });
-    });
-
-    // Change delivery status via AJAX
-    $('#delivery-status-dropdown').on('change', function () {
-        var deliveryStatus = $(this).val();
-        $.post('$changeDeliveryStatusUrl', {id: {$model->id}, delivery_status: deliveryStatus}, function (response) {
-            if (response.success) {
-                alert('Delivery status updated successfully.');
-                location.reload();
-            } else {
-                alert('Failed to update delivery status.');
-            }
-        });
-    });
-
-    // Delete item via AJAX and recalculate totals
-
-JS;
-$this->registerJs($script);
-?>

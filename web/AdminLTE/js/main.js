@@ -401,3 +401,131 @@ $(document).on('click', '#delivery-status-dropdown', function (e) {
     });
 });
 
+
+
+ // Prevent form submission on "Enter" in the search input
+ 
+$(document).on('input', '#variantSearchInputInView', function (event) {
+    event.preventDefault(); // Prevent form submission
+    const searchTerm = $(this).val();
+    if (searchTerm.length < 2) {
+        $('#variantSearchResultsView').html('');
+        return;
+    }
+
+    $.ajax({
+        url: SITE_URL + '/variants/search', // Adjust the URL to your endpoint
+        method: 'GET',
+        data: { term: searchTerm },
+        success: function (data) {
+            let resultsHtml = '';
+            data.forEach(variant => {
+                const isAdded = $(`#orderItems .variant-item[data-id="${variant.id}"]`).length > 0;
+                resultsHtml += `
+                    <div class="dropdown-item d-flex align-items-center">
+                        <img src="${variant.image}" alt="${variant.name}" class="img-thumbnail" style="width: 30px; height: 30px; margin-right: 10px;">
+                        <span>${variant.name}</span>
+                        <button class="btn btn-primary btn-sm ml-auto add-variant-btn-view" data-id="${variant.id}" data-product-id="${variant.product_id}" data-name="${variant.name}" data-image="${variant.image}" data-price="${variant.price}" ${isAdded ? 'disabled' : ''}>
+                            ${isAdded ? 'Added' : 'Add'}
+                        </button>
+                    </div>
+                `;
+            });
+            $('#variantSearchResultsView').html(resultsHtml);
+        }
+    });
+});
+
+
+$(document).on('click', '.add-variant-btn-view', function (event) {
+    event.preventDefault(); // Prevent form submission
+    const variantId = $(this).data('id');
+    const variantName = $(this).data('name');
+    const variantImage = $(this).data('image');
+    const variantPrice = $(this).data('price');
+    const product_id = $(this).data('product-id');
+
+    // Check if the variant is already added
+    if ($(`#orderItems .variant-item[data-id="${variantId}"]`).length > 0) {
+        return; // Do nothing if the variant is already added
+    }
+
+    const variantHtml = `
+        <div class="row mb-3 variant-item" data-id="${variantId}">
+            <div class="col-2">
+                <input type="hidden" name="Orders[OrderItems][${variantId}][variant_id]" value="${variantId}">
+                 <input type="hidden" name="Orders[OrderItems][${variantId}][product_id]" value="${product_id}">
+                <input type="hidden" name="Orders[OrderItems][${variantId}][variant_image]" value="${variantImage}">
+                <img src="${variantImage}" alt="${variantName}" class="img-thumbnail w-40">
+            </div>
+            <div class="col-4">
+                <input type="text" class="form-control" name="Orders[OrderItems][${variantId}][variant_name]" value="${variantName}" readonly>
+            </div>
+            <div class="col-2">
+                <input type="number" class="form-control variant-quantity" name="Orders[OrderItems][${variantId}][variant_quantity]" value="1" min="1">
+            </div>
+            <div class="col-2">
+                <input type="text" class="form-control variant-price" name="Orders[OrderItems][${variantId}][variant_price]" value="${variantPrice}" readonly>
+            </div>
+            <div class="col-2">
+                <button class="btn btn-primary btn-sm save-variant-btn">Save</button>
+            </div>
+        </div>
+    `;
+
+    $('#orderItems').append(variantHtml);
+
+    // Disable the "Add" button and mark it as checked
+    $(this).prop('disabled', true).text('Added');
+
+    $('#variantSearchInputView').val('');
+    $('#variantSearchResultsView').html('');
+});
+
+
+$(document).on('click', '.save-variant-btn', function (event) {
+    event.preventDefault(); // Prevent form submission
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('urlParams', urlParams);
+    const id = urlParams.get('id');
+    const variantId = $(this).closest('.variant-item').data('id');
+    const variantQuantity = $(this).closest('.variant-item').find('.variant-quantity').val();
+    const variantPrice = $(this).closest('.variant-item').find('.variant-price').val();
+    const product_id = $(this).closest('.variant-item').data('product-id');
+    const variantName = $(this).closest('.variant-item').find('.variant-name').val();
+    const variantImage = $(this).closest('.variant-item').find('.variant-image').val();
+
+    // Update the variant quantity and price in the database
+    $.ajax({
+        url: `${SITE_URL}/orders/add-variant-to-order?id=${id}`,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            variant_id: variantId,
+            variant_quantity: variantQuantity,
+        },
+        success: function (response) {
+            // Display a success message or perform any other action
+            if(response.success){
+               $(this).closest('.variant-item').html('');
+               const html = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <img src="${variantImage}"  style="width:50px; height:auto;">                                   
+                                    <span>${variantName} (Qty: ${variantQuantity})</span>`;
+               $(".list-group-item").append(html)
+               $("#total").text(response.data.order.total)
+               $("#subtotal").text(response.data.order.subTotal)
+               $('#discount').text(response.data.order.discount)
+               $("#shipping-price").text(response.data.order.shippingPrice)
+               $("#profit").text(response.data.order.profit)
+               $(this).closest('.variant-item').html('');
+            }else{
+                alert(response.message);
+            }
+          
+        },
+        error: function (xhr, status, error) {
+            // Handle the error
+            console.error('Error updating variant price:', error);
+        },
+    });
+});
