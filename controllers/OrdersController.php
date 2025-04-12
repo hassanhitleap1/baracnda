@@ -443,6 +443,7 @@ class OrdersController extends BaseController
         $orderItem->quantity = $quantity;
         $orderItem->price = $variant->price;
         $orderItem->product_id = $variant->product_id;
+        $orderItem->cost = $variant->cost;
        
         if ($orderItem->save()) {
             $order->calculateSubTotalFromOrderItems();

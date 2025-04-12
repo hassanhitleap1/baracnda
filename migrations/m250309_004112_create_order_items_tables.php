@@ -17,6 +17,7 @@ class m250309_004112_create_order_items_tables extends Migration
             'variant_id' => $this->integer()->notNull(),
             'quantity' => $this->integer()->notNull()->defaultValue(1),
             'price' => $this->decimal(10,2)->notNull(),
+            'cost' => $this->decimal(10,2)->notNull(),
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ]);

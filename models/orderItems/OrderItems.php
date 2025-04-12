@@ -16,6 +16,7 @@ use Yii;
  * @property int $variant_id
  * @property int $quantity
  * @property float $price
+ * @property float $cost
  * @property string|null $created_at
  * @property string|null $updated_at
  *
@@ -44,9 +45,9 @@ class OrderItems extends \yii\db\ActiveRecord
     {
         return [
             [['quantity'], 'default', 'value' => 1],
-            [['order_id', 'product_id', 'variant_id', 'price'], 'required'],
+            [['order_id', 'product_id', 'variant_id', 'price','cost'], 'required'],
             [['order_id', 'product_id', 'variant_id', 'quantity'], 'integer'],
-            [['price'], 'number'],
+            [['price', 'cost'], 'number'],
             [['created_at', 'updated_at'], 'safe'],
             [['order_id'], 'exist', 'skipOnError' => true, 'targetClass' => Orders::class, 'targetAttribute' => ['order_id' => 'id']],
             [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Products::class, 'targetAttribute' => ['product_id' => 'id']],
@@ -66,6 +67,7 @@ class OrderItems extends \yii\db\ActiveRecord
             'variant_id' => Yii::t('app', 'Variant ID'),
             'quantity' => Yii::t('app', 'Quantity'),
             'price' => Yii::t('app', 'Price'),
+            'cost' => Yii::t('app', 'Cost'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
