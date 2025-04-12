@@ -206,6 +206,28 @@ class OrdersController extends BaseController
         return $this->redirect(['index']);
     }
 
+    
+    /**
+     * Deletes an existing Orders model.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param int $id ID
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionProcess($id)
+    {
+        $order =$this->findModel($id);
+        $order->scenario =Orders::SCENARIO_UPDATE;
+        $order->status_order = Orders::STATUS_PROCESSING;
+        if(!$order->save(false)){
+            Yii::$app->session->setFlash('error',  $this->getErrorMessages($order));
+            return $this->redirect(['view', 'id' => $id]);
+        }
+  
+      
+        return $this->redirect(['view', 'id' => $id]);
+    }
+
     /**
      * Finds the Orders model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.

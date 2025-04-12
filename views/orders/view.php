@@ -69,6 +69,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                         'id' => 'delivery-status-dropdown',
                                     ]
                                 ),
+                                'visible' =>  $model->status_order === Orders::STATUS_PROCESSING,
                             ],
                             'payment_method',
                             'payment.name',
@@ -157,6 +158,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 'class' => 'btn btn-danger',
                 'data' => [
                     'confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),
+                    'method' => 'post',
+                ],
+            ]) ?>
+               <?= Html::a(Yii::t('app', 'START PROCESS'), ['process', 'id' => $model->id], [
+                'class' => 'btn btn-warning',
+                'data' => [
+                    'confirm' => Yii::t('app', 'Are you sure you want to start processing this order?'),
                     'method' => 'post',
                 ],
             ]) ?>
