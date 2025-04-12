@@ -449,8 +449,7 @@ class OrdersController extends BaseController
             $order->setShippingPrice();
             $order->calculateProfit();
             $order->calculateTotal();
-
-            return ['success' => true, 'data' => ['order' => $order->toArray(), 'orderItem' => $orderItem->with(['products']) ->toArray()]];
+            return ['success' => true, 'data' => ['order' => $order->toArray(), 'orderItem' => $orderItem->toArray(),'product' => $orderItem->product->toArray()]]; 
         }
 
         return ['success' => false, 'message' => 'Failed to add variant to order.'];
