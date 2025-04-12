@@ -433,7 +433,7 @@ $(document).on('input', '#variantSearchInputInView', function (event) {
                     <div class="dropdown-item d-flex align-items-center">
                         <img src="${variant.image}" alt="${variant.name}" class="img-thumbnail" style="width: 30px; height: 30px; margin-right: 10px;">
                         <span>${variant.name}</span>
-                        <button class="btn btn-primary btn-sm ml-auto add-variant-btn-view" data-id="${variant.id}" data-product-id="${variant.product_id}" data-name="${variant.name}" data-image="${variant.image}" data-price="${variant.price}" ${isAdded ? 'disabled' : ''}>
+                        <button class="btn btn-primary btn-sm ml-auto add-variant-btn-view" data-id="${variant.id}" data-product-id="${variant.product_id}" data-name="${variant.name}" data-image="${variant.image}" data-price="${variant.price}" data-cost="${variant.cost}" ${isAdded ? 'disabled' : ''}>
                             ${isAdded ? 'Added' : 'Add'}
                         </button>
                     </div>
@@ -451,6 +451,7 @@ $(document).on('click', '.add-variant-btn-view', function (event) {
     const variantName = $(this).data('name');
     const variantImage = $(this).data('image');
     const variantPrice = $(this).data('price');
+    const  variantCost = $(this).data('cost');
     const product_id = $(this).data('product-id');
 
     // Check if the variant is already added

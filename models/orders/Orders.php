@@ -332,7 +332,7 @@ class Orders extends \yii\db\ActiveRecord
     public function calculateSubTotal($items){
         $subtotal = 0;
         foreach ($items as $item) {
-            $subtotal += $item['variant_quantity'] * $item['variant_price'];
+            $subtotal += (int) $item['variant_quantity'] * (float) $item['variant_price'];
         }
 
         return $this->sub_total =  $subtotal;
