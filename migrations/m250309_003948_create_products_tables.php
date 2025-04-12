@@ -25,6 +25,7 @@ class m250309_003948_create_products_tables extends Migration
             'quantity' => $this->integer()->notNull()->defaultValue(0),
             'category_id' => $this->integer()->notNull()->defaultValue(1),
             'warehouse_id' => $this->integer()->notNull()->defaultValue(1),
+            'sold'=>$this->integer()->notNull()->defaultValue(0),
             'image_path' => $this->string()->null(),
             'type' => "ENUM('simple', 'variant') NOT NULL DEFAULT 'simple'",
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),

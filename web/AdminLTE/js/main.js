@@ -163,7 +163,7 @@ $(document).ready(function () {
                         <div class="dropdown-item d-flex align-items-center">
                             <img src="${variant.image}" alt="${variant.name}" class="img-thumbnail" style="width: 30px; height: 30px; margin-right: 10px;">
                             <span>${variant.name}</span>
-                            <button class="btn btn-primary btn-sm ml-auto add-variant-btn" data-id="${variant.id}" data-product-id="${variant.product_id}" data-name="${variant.name}" data-image="${variant.image}" data-price="${variant.price}" ${isAdded ? 'disabled' : ''}>
+                            <button class="btn btn-primary btn-sm ml-auto add-variant-btn" data-id="${variant.id}" data-product-id="${variant.product_id}" data-name="${variant.name}" data-image="${variant.image}" data-price="${variant.price}" data-cost="${variant.cost}"  ${isAdded ? 'disabled' : ''}>
                                 ${isAdded ? 'Added' : 'Add'}
                             </button>
                         </div>
@@ -181,8 +181,9 @@ $(document).ready(function () {
         const variantName = $(this).data('name');
         const variantImage = $(this).data('image');
         const variantPrice = $(this).data('price');
+        const  variantCost = $(this).data('cost');
         const product_id = $(this).data('product-id');
-
+    
         // Check if the variant is already added
         if ($(`#orderItems .variant-item[data-id="${variantId}"]`).length > 0) {
             return; // Do nothing if the variant is already added
@@ -196,14 +197,21 @@ $(document).ready(function () {
                     <input type="hidden" name="Orders[OrderItems][${variantId}][variant_image]" value="${variantImage}">
                     <img src="${variantImage}" alt="${variantName}" class="img-thumbnail w-40">
                 </div>
-                <div class="col-4">
+                <div class="col-2">
+                    <label class="control-label">Variant Name</label>
                     <input type="text" class="form-control" name="Orders[OrderItems][${variantId}][variant_name]" value="${variantName}" readonly>
                 </div>
                 <div class="col-2">
+                    <label class="control-label">Variant Quantity</label>
                     <input type="number" class="form-control variant-quantity" name="Orders[OrderItems][${variantId}][variant_quantity]" value="1" min="1">
                 </div>
                 <div class="col-2">
-                    <input type="text" class="form-control variant-price" name="Orders[OrderItems][${variantId}][variant_price]" value="${variantPrice}" readonly>
+                    <label class="control-label">Variant Cost</label>
+                    <input type="number" class="form-control variant-cost" name="Orders[OrderItems][${variantId}][variant_cost]" value="${variantCost}" required>
+                </div>
+                <div class="col-2">
+                    <label class="control-label">Variant Price</label>
+                    <input type="number" class="form-control variant-price" name="Orders[OrderItems][${variantId}][variant_price]" value="${variantPrice}" >
                 </div>
                 <div class="col-2">
                     <button class="btn btn-danger btn-sm delete-variant-btn">Delete</button>
@@ -458,14 +466,17 @@ $(document).on('click', '.add-variant-btn-view', function (event) {
                 <input type="hidden" class="variant-image" name="variant_image" value="${variantImage}">
                 <img src="${variantImage}" alt="${variantName}" class="img-thumbnail w-40">
             </div>
-            <div class="col-4">
+            <div class="col-3">
                 <input type="text" class="form-control variant-name" name="variant_name" value="${variantName}" readonly>
             </div>
             <div class="col-2">
                 <input type="number" class="form-control variant-quantity" name="variant_quantity" value="1" min="1">
             </div>
             <div class="col-2">
-                <input type="text" class="form-control variant-price" name="variant_price" value="${variantPrice}" readonly>
+                <input type="text" class="form-control variant-cost" name="variant_cost" value="${variantCost}" >
+            </div>
+            <div class="col-2">
+                <input type="number" class="form-control variant-price" name="variant_price" value="${variantPrice}" readonly>
             </div>
             <div class="col-2">
                 <button class="btn btn-primary btn-sm save-variant-btn">Save</button>
@@ -590,3 +601,17 @@ $(document).on('click', '.save-variant-btn', function (event) {
         }
     });
 });
+
+
+$(document).on('click change input', '.variant-price', function (event) {
+    event.preventDefault();
+    updateOrderSummary();
+});
+
+
+
+$(document).on('click change input', '.variant-quantity', function (event) {
+    event.preventDefault();
+    updateOrderSummary();
+});
+

@@ -157,6 +157,7 @@ class VariantsController extends BaseController
                 'name' => $variant->name,
                 'image' => $variant->product->imageUrl ,
                 'price' => $variant->price,
+                'cost' => $variant->cost,
                 'product_id' => $variant->product_id,
             ];
         }, $variants);

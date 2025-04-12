@@ -25,6 +25,7 @@ class m250309_003949_create_variants_tables  extends Migration
             'name' => $this->string()->notNull(),
             'price' => $this->decimal(10,2)->notNull(),
             'cost'=>  $this->decimal(10,2)->notNull(),
+            'sold'=>$this->integer()->notNull()->defaultValue(0),
             'quantity' => $this->integer()->notNull()->defaultValue(1),
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
