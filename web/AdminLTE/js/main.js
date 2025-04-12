@@ -467,15 +467,19 @@ $(document).on('click', '.add-variant-btn-view', function (event) {
                 <img src="${variantImage}" alt="${variantName}" class="img-thumbnail w-40">
             </div>
             <div class="col-3">
+                <label class="control-label">Variant Name</label>
                 <input type="text" class="form-control variant-name" name="variant_name" value="${variantName}" readonly>
             </div>
             <div class="col-2">
+                <label class="control-label">Variant Quantity</label>
                 <input type="number" class="form-control variant-quantity" name="variant_quantity" value="1" min="1">
             </div>
             <div class="col-2">
+                <label class="control-label">Variant Cost</label>
                 <input type="text" class="form-control variant-cost" name="variant_cost" value="${variantCost}" >
             </div>
             <div class="col-2">
+                <label class="control-label">Variant Price</label>
                 <input type="number" class="form-control variant-price" name="variant_price" value="${variantPrice}" readonly>
             </div>
             <div class="col-2">
