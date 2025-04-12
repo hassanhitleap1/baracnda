@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div class="orders-view">
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1 id="order-id" data-id="<?= $model->id ?>"><?= Html::encode($this->title) ?></h1>
 
     <div class="row">
         <div class="col-md-6">
@@ -128,7 +128,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
                 <div class="card-body">
                     <?php if ($model->orderItems): ?>
-                        <ul class="list-group list-group-item">
+                        <ul class="list-group list-group-products">
                             <?php foreach ($model->orderItems as $item): ?>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <?= Html::img($item->product->imageUrl, ['alt' => $item->product->name, 'style' => 'width:50px; height:auto;']) ?>

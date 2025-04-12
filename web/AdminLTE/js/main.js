@@ -451,21 +451,21 @@ $(document).on('click', '.add-variant-btn-view', function (event) {
     }
 
     const variantHtml = `
-        <div class="row mb-3 variant-item" data-id="${variantId}">
+        <div class="row mb-3 variant-item" data-variant-id="${variantId}">
             <div class="col-2">
-                <input type="hidden" name="Orders[OrderItems][${variantId}][variant_id]" value="${variantId}">
-                 <input type="hidden" name="Orders[OrderItems][${variantId}][product_id]" value="${product_id}">
-                <input type="hidden" name="Orders[OrderItems][${variantId}][variant_image]" value="${variantImage}">
+                <input type="hidden" class="variant-id" name="variant_id"  value="${variantId}">
+                 <input type="hidden" class="product-id" name="product_id" value="${product_id}">
+                <input type="hidden" class="variant-image" name="variant_image" value="${variantImage}">
                 <img src="${variantImage}" alt="${variantName}" class="img-thumbnail w-40">
             </div>
             <div class="col-4">
-                <input type="text" class="form-control" name="Orders[OrderItems][${variantId}][variant_name]" value="${variantName}" readonly>
+                <input type="text" class="form-control variant-name" name="variant_name" value="${variantName}" readonly>
             </div>
             <div class="col-2">
-                <input type="number" class="form-control variant-quantity" name="Orders[OrderItems][${variantId}][variant_quantity]" value="1" min="1">
+                <input type="number" class="form-control variant-quantity" name="variant_quantity" value="1" min="1">
             </div>
             <div class="col-2">
-                <input type="text" class="form-control variant-price" name="Orders[OrderItems][${variantId}][variant_price]" value="${variantPrice}" readonly>
+                <input type="text" class="form-control variant-price" name="variant_price" value="${variantPrice}" readonly>
             </div>
             <div class="col-2">
                 <button class="btn btn-primary btn-sm save-variant-btn">Save</button>
@@ -483,17 +483,71 @@ $(document).on('click', '.add-variant-btn-view', function (event) {
 });
 
 
-$(document).on('click', '.save-variant-btn', function (event) {
+
+$(document).on('click', '.save-variant-btn-view', function (event) {
     event.preventDefault(); // Prevent form submission
-    const urlParams = new URLSearchParams(window.location.search);
-    urlParams.set('urlParams', urlParams);
-    const id = urlParams.get('id');
-    const variantId = $(this).closest('.variant-item').data('id');
-    const variantQuantity = $(this).closest('.variant-item').find('.variant-quantity').val();
-    const variantPrice = $(this).closest('.variant-item').find('.variant-price').val();
-    const product_id = $(this).closest('.variant-item').data('product-id');
-    const variantName = $(this).closest('.variant-item').find('.variant-name').val();
-    const variantImage = $(this).closest('.variant-item').find('.variant-image').val();
+   
+    const id = $("#order-id").attr("data-id");
+    const variantItem = $(this).closest('.variant-item');
+    const variantId = variantItem.find('.variant-id').val();
+    console.log("variantId", variantId);
+    
+    const variantQuantity = variantItem.find('.variant-quantity').val();
+    console.log("variantQuantity", variantQuantity);
+    
+    const variantPrice = variantItem.find('.variant-price').val();
+    console.log("variantPrice", variantPrice);
+    
+    const product_id = variantItem.find('.product-id').val();
+    console.log("product_id", product_id);
+    
+    const variantName = variantItem.find('.variant-name').val();
+    console.log("variantName", variantName);
+    
+    const variantImage = variantItem.find('.variant-image').val();
+    console.log("variantImage", variantImage);
+
+    // Create the HTML for the saved item
+    const html = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                    <img src="${variantImage}" alt="${variantName}" style="width:50px; height:auto;">
+                    ${variantName} (Qty: ${variantQuantity})
+                    <button type="button" class="btn btn-danger btn-sm delete-item-btn" data-id="${variantId}">Delete</button>
+                </li>`;
+    
+    // Clear the search input and append the new item
+    $("#variantSearchInputInView").val('');
+    $(".list-group-products").append(html);
+    
+    // Optionally hide or remove the variant item
+    variantItem.remove(); // or variantItem.hide() if you want to keep it in DOM
+});
+
+
+
+$(document).on('click', '.save-variant-btn', function (event) {
+    event.preventDefault();
+    
+    // Store the clicked button reference for use in AJAX callback
+    const $button = $(this);
+    const $variantItem = $button.closest('.variant-item');
+    
+    // Get all required data
+    const id = $("#order-id").attr("data-id");
+    const variantId = $variantItem.find('.variant-id').val();
+    const variantQuantity = $variantItem.find('.variant-quantity').val();
+    const variantPrice = $variantItem.find('.variant-price').val();
+    const product_id = $variantItem.find('.product-id').val();
+    const variantName = $variantItem.find('.variant-name').val();
+    const variantImage = $variantItem.find('.variant-image').val();
+
+    console.log({
+        variantId,
+        variantQuantity,
+        variantPrice,
+        product_id,
+        variantName,
+        variantImage
+    });
 
     // Update the variant quantity and price in the database
     $.ajax({
@@ -503,29 +557,36 @@ $(document).on('click', '.save-variant-btn', function (event) {
         data: {
             variant_id: variantId,
             variant_quantity: variantQuantity,
+            variant_price: variantPrice,
+            product_id: product_id,
+            variant_name: variantName,
+            variant_image: variantImage
         },
         success: function (response) {
-            // Display a success message or perform any other action
-            if(response.success){
-               $(this).closest('.variant-item').html('');
-               const html = `<li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <img src="${variantImage}"  style="width:50px; height:auto;">                                   
-                                    <span>${variantName} (Qty: ${variantQuantity})</span>`;
-               $(".list-group-item").append(html)
-               $("#total").text(response.data.order.total)
-               $("#subtotal").text(response.data.order.subTotal)
-               $('#discount').text(response.data.order.discount)
-               $("#shipping-price").text(response.data.order.shippingPrice)
-               $("#profit").text(response.data.order.profit)
-               $(this).closest('.variant-item').html('');
-            }else{
+            if(response.success) {
+                // Create the HTML for the saved item
+                const html = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                                <img src="${variantImage}" alt="${variantName}" style="width:50px; height:auto;">
+                                ${variantName} (Qty: ${variantQuantity})
+                                <button type="button" class="btn btn-danger btn-sm delete-item-btn" data-id="${variantId}">Delete</button>
+                            </li>`;
+                
+                // Update the UI
+                $("#total").text(response.data.order.total);
+                $("#subtotal").text(response.data.order.sub_total);
+                $('#discount').text(response.data.order.discount);
+                $("#shipping-price").text(response.data.order.shipping_price);
+                $("#profit").text(response.data.order.profit);
+                $("#variantSearchInputInView").val('');
+                $(".list-group-products").append(html);
+                $variantItem.remove(); // Remove the variant item from the form
+            } else {
                 alert(response.message);
             }
-          
         },
         error: function (xhr, status, error) {
-            // Handle the error
-            console.error('Error updating variant price:', error);
-        },
+            console.error('Error updating variant:', error);
+            alert('An error occurred while saving the variant. Please try again.');
+        }
     });
 });
