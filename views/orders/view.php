@@ -60,16 +60,47 @@ $this->params['breadcrumbs'][] = $this->title;
                             [
                                 'label' => Yii::t('app', 'Delivery Status'),
                                 'format' => 'raw',
-                                'value' => Html::dropDownList(
-                                    'delivery_status',
-                                    $model->delivery_status,
-                                    ['delivered' => 'Delivered', 'shipped' => 'Shipped'],
-                                    [
-                                        'class' => 'form-control',
-                                        'id' => 'delivery-status-dropdown',
-                                    ]
-                                ),
-                                'visible' =>  $model->status_order === Orders::STATUS_PROCESSING,
+                                'value' => function($model) {
+                                    // Define allowed status transitions
+                                    $statusTransitions = [
+                                        Orders::DELIVERY_PENDING => [
+                                            Orders::DELIVERY_PENDING => Yii::t('app', 'Pending'),
+                                            Orders::DELIVERY_DELIVERED => Yii::t('app', 'Delivered'),
+                                            Orders::DELIVERY_REFUNDED => Yii::t('app', 'Refunded'),
+                                            // Add other allowed transitions from pending status
+                                        ],
+                                        Orders::DELIVERY_DELIVERED => [
+                                            Orders::DELIVERY_PENDING => Yii::t('app', 'Pending'),
+                                            Orders::DELIVERY_DELIVERED => Yii::t('app', 'Delivered'),
+                                            Orders::DELIVERY_REFUNDED => Yii::t('app', 'Refunded'),
+                                            // Add other allowed transitions from delivered status
+                                        ],
+                                        // Add other status transitions as needed
+                                    ];
+                                    
+                                    $currentStatus = $model->delivery_status;
+                                    $availableOptions = $statusTransitions[$currentStatus] ?? [];
+                                    
+                                    if (empty($availableOptions)) {
+                                        // Display current status as read-only if no transitions available
+                                        return Html::tag('span', 
+                                            Yii::t('app', ucfirst($currentStatus)), 
+                                            ['class' => 'label label-info']
+                                        );
+                                    }
+                                    
+                                    return Html::dropDownList(
+                                        'delivery_status',
+                                        $currentStatus,
+                                        $availableOptions,
+                                        [
+                                            'class' => 'form-control',
+                                            'id' => 'delivery-status-dropdown-'.$model->id,
+                                            'data-url' => Url::to(['order/update-delivery-status', 'id' => $model->id]),
+                                        ]
+                                    );
+                                },
+                                'visible' => $model->status_order === Orders::STATUS_PROCESSING,
                             ],
                             'payment_method',
                             'payment.name',
@@ -118,6 +149,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <p>
                         <?= Html::a(Yii::t('app', $model->status_order), ['', 'id' => $model->id, 'status' => Orders::STATUS_RESERVED], ['class' => 'btn btn-warning btn-block']) ?>
                     </p>
+                    <?php if ($model->status_order === Orders::STATUS_CANCELED): ?>
                     <div class="form-group">
                         <label for="variantSearchInputInView"><?= Yii::t('app', 'Search Variants') ?></label>
                         <input type="text" id="variantSearchInputInView" class="form-control" placeholder="<?= Yii::t('app', 'Enter variant name...') ?>">
@@ -125,7 +157,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div>
                     <div id="orderItems" class="mt-3">
                     </div>
-
+                    <?php endif; ?>
                 </div>
                 <div class="card-body">
                     <?php if ($model->orderItems): ?>

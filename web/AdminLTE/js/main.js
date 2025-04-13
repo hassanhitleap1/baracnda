@@ -620,3 +620,49 @@ $(document).on('click change input', '.variant-quantity', function (event) {
     updateOrderSummary();
 });
 
+$(document).on('change', '#delivery-status-dropdown-1', function () {
+    var selectedValue = $(this).val();
+    const id = $("#order-id").attr("data-id");
+    $.ajax({
+        url: `${SITE_URL}/orders/set-delivery-status?id=${id}`,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            delivery_status: selectedValue,
+        },
+        success: function (response) {
+            if(response.success) {
+                alert(response.message);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('Error updating delivery status:', error);
+            alert('An error occurred while updating delivery status. Please try again.');
+        }
+    });
+});
+
+
+$(document).on('click', '#save-status-btn', function () {
+    const id = $("#order-id").attr("data-id");
+    var status_id = $("#status-dropdown").val();
+    $.ajax({
+        url: `${SITE_URL}/orders/change-status?id=${id}`,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            status_id: status_id,
+        },
+        success: function (response) {
+            if(response.success) {
+                $("#change-status-btn").text(response.data.name)
+              $('#status-modal').modal('hide');
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('Error updating delivery status:', error);
+            alert('An error occurred while updating delivery status. Please try again.');
+        }
+    });
+});
+

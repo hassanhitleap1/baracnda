@@ -264,15 +264,32 @@ class OrdersController extends BaseController
         return $this->render('print', ['orders' => $orders]);
     }
 
+
+
+
+    public  function actionSetDeliveryStatus($id){
+        $order = $this->findModel($id);
+        // change Delivery Status
+        $deliveryStatus = Yii::$app->request->post('delivery_status');
+       
+        $order->delivery_status = $deliveryStatus;
+        if($order->save(false)){
+            return ['success' => true, 'message' => 'Delivery status updated successfully.'];
+        }
+ 
+        return ['success' => false, 'message' => 'Failed to update delivery status.'];
+    }
+
+
+
     /**
      * Change the status of selected orders.
      * @return \yii\web\Response
      */
-    public function actionChangeStatus()
+    public function actionChangeStatus($id)
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
-        $id = Yii::$app->request->post('id');
         $statusId = Yii::$app->request->post('status_id');
 
         $order = Orders::findOne($id);
@@ -281,8 +298,8 @@ class OrdersController extends BaseController
         }
 
         $order->status_id = $statusId;
-        if ($order->save()) {
-            return ['success' => true];
+        if ($order->save(false)) {
+            return ['success' => true ,'data'=> $order->status] ;
         }
 
         return ['success' => false, 'message' => 'Failed to update status.'];
