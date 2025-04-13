@@ -34,10 +34,13 @@ $this->params['breadcrumbs'][] = $this->title;
             'username',
             'email:email',
             'phone',
-            'password_hash',
+            'full_name',
+            [
+                'attribute' => 'birth_date',
+                'format' => ['date', 'php:Y-m-d'],
+            ],
+            //'password_hash',
             //'auth_key',
-            //'full_name',
-            //'birth_date',
             //'role_id',
             //'address_id',
             //'created_at',
@@ -46,7 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'class' => ActionColumn::className(),
                 'urlCreator' => function ($action, Users $model, $key, $index, $column) {
                     return Url::toRoute([$action, 'id' => $model->id]);
-                 }
+                }
             ],
         ],
     ]); ?>

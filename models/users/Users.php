@@ -41,6 +41,8 @@ class Users extends \yii\db\ActiveRecord
     const ROLE_SELLER = 4;
     const ROLE_GUEST = 5;
 
+    public $password;
+
     /**
      * {@inheritdoc}
      */
@@ -56,7 +58,7 @@ class Users extends \yii\db\ActiveRecord
     {
         return [
             [['username', 'email', 'auth_key', 'full_name', 'birth_date', 'address_id'], 'default', 'value' => null],
-            [['phone', 'password_hash', 'role_id'], 'required'],
+            [['phone', 'role_id'], 'required'],
             [['birth_date', 'created_at', 'updated_at'], 'safe'],
             [['role_id', 'address_id'], 'integer'],
             [['username', 'email', 'password_hash', 'full_name'], 'string', 'max' => 255],
@@ -65,8 +67,8 @@ class Users extends \yii\db\ActiveRecord
             [['phone'], 'unique'],
             [['username'], 'unique'],
             [['email'], 'unique'],
-            [['address_id'], 'exist', 'skipOnError' => true, 'targetClass' => Addresses::class, 'targetAttribute' => ['address_id' => 'id']],
-            [['role_id'], 'exist', 'skipOnError' => true, 'targetClass' => Role::class, 'targetAttribute' => ['role_id' => 'id']],
+            // [['address_id'], 'exist', 'skipOnError' => true, 'targetClass' => Addresses::class, 'targetAttribute' => ['address_id' => 'id']],
+            // [['role_id'], 'exist', 'skipOnError' => true, 'targetClass' => Role::class, 'targetAttribute' => ['role_id' => 'id']],
         ];
     }
 
@@ -150,4 +152,19 @@ class Users extends \yii\db\ActiveRecord
         return new UsersQuery(get_called_class());
     }
 
+
+    public function beforeSave($insert)
+    {
+        
+        $this->auth_key = Yii::$app->security->generateRandomString();
+        if($this->password){
+            $this->password_hash  = Yii::$app->security->generatePasswordHash($this->password);
+        }else{
+            $this->password_hash = Yii::$app->security->generatePasswordHash("123456789");
+        }
+
+        return parent::beforeSave($insert);;
+    }
+        
 }
+

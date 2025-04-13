@@ -70,7 +70,10 @@ class UsersController extends BaseController
         $model = new Users();
 
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
+            if ($model->load($this->request->post()) && $model->validate()) {
+                if(!$model->save()) {
+                   dd($model->errors);
+                }
                 return $this->redirect(['view', 'id' => $model->id]);
             }
         } else {
