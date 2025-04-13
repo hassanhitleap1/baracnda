@@ -131,4 +131,46 @@ class RolesController extends BaseController
 
         throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
+
+    /**
+     * Manages roles and permissions.
+     *
+     * @return string|\yii\web\Response
+     */
+    public function actionPermissions()
+    {
+        $auth = Yii::$app->authManager;
+
+        $roles = $auth->getRoles();
+        $permissions = $auth->getPermissions();
+
+        $rolePermissions = [];
+        foreach ($roles as $role) {
+            $rolePermissions[$role->name] = array_keys($auth->getPermissionsByRole($role->name));
+        }
+
+        if ($this->request->isPost) {
+            $post = $this->request->post('rolePermissions', []);
+            foreach ($roles as $role) {
+                $auth->removeChildren($role);
+                if (isset($post[$role->name])) {
+                    foreach ($post[$role->name] as $permissionName) {
+                        $permission = $auth->getPermission($permissionName);
+                        if ($permission) {
+                            $auth->addChild($role, $permission);
+                        }
+                    }
+                }
+            }
+            Yii::$app->session->setFlash('success', 'Permissions updated successfully.');
+            return $this->refresh();
+        }
+
+        return $this->render('permissions', [
+            'auth' => $auth,
+            'roles' => $roles,
+            'permissions' => $permissions,
+            'rolePermissions' => $rolePermissions,
+        ]);
+    }
 }

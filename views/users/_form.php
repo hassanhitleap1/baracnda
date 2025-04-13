@@ -43,7 +43,12 @@ use yii\widgets\ActiveForm;
 
     <div class="row">
         <div class="col-6">
-            <?= $form->field($model, 'role_id')->dropDownList(ArrayHelper::map(Roles::find()->all(), 'id', 'name'), ['prompt' => 'Select Role']) ?>
+            <?php if (Yii::$app->user->can('assignRoles')): ?>
+                <?= $form->field($model, 'role_id')->dropDownList(
+                    ArrayHelper::map(Roles::find()->all(), 'id', 'name'),
+                    ['prompt' => 'Select Role']
+                ) ?>
+            <?php endif; ?>
         </div>
         <div class="col-6">
            <?= $form->field($model, 'address_id')->textInput(['placeholder' => 'Enter address ID']) ?>

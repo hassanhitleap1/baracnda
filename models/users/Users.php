@@ -144,6 +144,19 @@ class Users extends \yii\db\ActiveRecord
     }
 
     /**
+     * Checks if the user has a specific role.
+     *
+     * @param string $roleName
+     * @return bool
+     */
+    public function hasRole($roleName)
+    {
+        $auth = Yii::$app->authManager;
+        $roles = $auth->getRolesByUser($this->id);
+        return isset($roles[$roleName]);
+    }
+
+    /**
      * {@inheritdoc}
      * @return UsersQuery the active query used by this AR class.
      */

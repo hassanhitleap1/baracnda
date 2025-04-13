@@ -146,8 +146,6 @@ class AdminController extends BaseController
                 'totalProducts' => $countProducts,
             ]);
         }
-
-        throw new \yii\web\ForbiddenHttpException('You do not have permission to view this page.');
     }
 
     public function actionPermissions()

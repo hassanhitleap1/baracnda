@@ -89,7 +89,7 @@ use yii\bootstrap5\Html;
                     <?php endif; ?>
 
                     <!-- Users -->
-                    <?php if (Yii::$app->user->can('users/index')): ?>
+                    <?php if (Yii::$app->user->can('viewUsers')): ?>
                         <li class="nav-item">
                             <a href="<?= Url::to(['users/index']) ?>"
                                 class="nav-link <?= Yii::$app->controller->id == 'users' ? 'active' : '' ?>">
@@ -196,6 +196,26 @@ use yii\bootstrap5\Html;
                                 class="nav-link <?= Yii::$app->controller->id == 'warehouses' ? 'active' : '' ?>">
                                 <i class="nav-icon fas fa-warehouse"></i>
                                 <p>Warehouses</p>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+
+                    <?php if (Yii::$app->user->can('roles/index')): ?>
+                        <li class="nav-item">
+                            <a href="<?= Url::to(['roles/index']) ?>"
+                                class="nav-link <?= Yii::$app->controller->id == 'roles' ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-user-shield"></i>
+                                <p>Roles</p>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+
+                    <?php if (Yii::$app->user->can('roles/permissions')): ?>
+                        <li class="nav-item">
+                            <a href="<?= Url::to(['roles/permissions']) ?>"
+                                class="nav-link <?= Yii::$app->controller->action->id == 'permissions' ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-key"></i>
+                                <p>Permissions</p>
                             </a>
                         </li>
                     <?php endif; ?>
