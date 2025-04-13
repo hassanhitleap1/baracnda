@@ -112,17 +112,21 @@ class RbacController extends Controller
         }
 
         // Create roles
-        $dataEntry = $auth->createRole('ROLE_DATA_ENTRY');
-        $auth->add($dataEntry);
 
-        $manager = $auth->createRole('ROLE_MANAGER');
+        $superAdmin = $auth->createRole('super-admin');
+        $auth->add($superAdmin);
+
+    
+        $manager = $auth->createRole('manager');
         $auth->add($manager);
 
-        $seller = $auth->createRole('ROLE_SELLER');
+        $seller = $auth->createRole('seller');
         $auth->add($seller);
 
-        $superAdmin = $auth->createRole('ROLE_SUPER_ADMIN');
-        $auth->add($superAdmin);
+        $dataEntry = $auth->createRole('dataEntry');
+        $auth->add($dataEntry);
+
+     
 
         // Create viewOwnOrders permission
         if (!$auth->getPermission('viewOwnOrders')) {
