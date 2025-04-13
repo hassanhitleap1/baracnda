@@ -41,63 +41,113 @@ class AdminController extends BaseController
      */
     public function actionIndex()
     {
-        $countProduct = Products::find()->count();
-        $countCategories = Categories::find()->count();
-        $countRequastUnreaded = Contactus::find()->where(['readed' => 0])->count();
-        $countUsers = Users::find()->count();
-        $countOrders = Orders::find()->count();
+        $userRole = Yii::$app->user->identity->role_id;
 
-        // Example data for charts (replace with actual queries)
-        $ordersData = [
-            'labels' => ['January', 'February', 'March', 'April'],
-            'datasets' => [
-                [
-                    'label' => 'Orders',
-                    'data' => [10, 20, 30, 40],
-                    'backgroundColor' => 'rgba(54, 162, 235, 0.2)',
-                    'borderColor' => 'rgba(54, 162, 235, 1)',
-                    'borderWidth' => 1,
-                ],
-            ],
-        ];
+        if ($userRole == Users::ROLE_SUPER_ADMIN) {
+            // Super Admin Reports
+            $countUsers = Users::find()->count();
+            $countOrders = Orders::find()->count();
+            $countProducts = Products::find()->count();
 
-        $productsData = [
-            'labels' => ['Electronics', 'Clothing', 'Home Appliances'],
-            'datasets' => [
-                [
-                    'label' => 'Products',
-                    'data' => [50, 30, 20],
-                    'backgroundColor' => ['#FF6384', '#36A2EB', '#FFCE56'],
-                ],
-            ],
-        ];
-
-        $usersData = [
-            'labels' => ['Admin', 'Manager', 'Client'],
-            'datasets' => [
-                [
-                    'label' => 'Users',
-                    'data' => [
-                        Users::find()->where(['role_id' => Users::ROLE_SUPER_ADMIN])->count(),
-                        Users::find()->where(['role_id' => Users::ROLE_MANAGER])->count(),
-                        Users::find()->where(['role_id' => Users::ROLE_CLIENT])->count(),
+            $ordersData = [
+                'labels' => ['Last Month'],
+                'datasets' => [
+                    [
+                        'label' => 'Orders',
+                        'data' => [Orders::find()->where(['>=', 'created_at', date('Y-m-d', strtotime('-1 month'))])->count()],
+                        'backgroundColor' => 'rgba(54, 162, 235, 0.2)',
+                        'borderColor' => 'rgba(54, 162, 235, 1)',
+                        'borderWidth' => 1,
                     ],
-                    'backgroundColor' => ['#FF6384', '#36A2EB', '#FFCE56'],
                 ],
-            ],
-        ];
+            ];
 
-        return $this->render('index', [
-            'countProduct' => $countProduct,
-            'countCategories' => $countCategories,
-            'countRequastUnreaded' => $countRequastUnreaded,
-            'totalUsers' => $countUsers,
-            'totalOrders' => $countOrders,
-            'totalProducts' => $countProduct,
-            'ordersData' => $ordersData,
-            'productsData' => $productsData,
-            'usersData' => $usersData,
-        ]);
+            $productsData = [
+                'labels' => ['Last Month'],
+                'datasets' => [
+                    [
+                        'label' => 'Products',
+                        'data' => [Products::find()->where(['>=', 'created_at', date('Y-m-d', strtotime('-1 month'))])->count()],
+                        'backgroundColor' => ['#FF6384'],
+                    ],
+                ],
+            ];
+
+            $profitsData = [
+                'labels' => ['Last Month'],
+                'datasets' => [
+                    [
+                        'label' => 'Profits',
+                        'data' => [Orders::find()->where(['>=', 'created_at', date('Y-m-d', strtotime('-1 month'))])->sum('profit')],
+                        'backgroundColor' => 'rgba(75, 192, 192, 0.2)',
+                        'borderColor' => 'rgba(75, 192, 192, 1)',
+                        'borderWidth' => 1,
+                    ],
+                ],
+            ];
+
+            $salesData = [
+                'labels' => ['Last Month'],
+                'datasets' => [
+                    [
+                        'label' => 'Sales',
+                        'data' => [Orders::find()->where(['>=', 'created_at', date('Y-m-d', strtotime('-1 month'))])->sum('total')],
+                        'backgroundColor' => 'rgba(255, 206, 86, 0.2)',
+                        'borderColor' => 'rgba(255, 206, 86, 1)',
+                        'borderWidth' => 1,
+                    ],
+                ],
+            ];
+
+            $usersData = [
+                'labels' => ['Admin', 'Manager', 'Client'],
+                'datasets' => [
+                    [
+                        'label' => 'Users',
+                        'data' => [
+                            Users::find()->where(['role_id' => Users::ROLE_SUPER_ADMIN])->count(),
+                            Users::find()->where(['role_id' => Users::ROLE_MANAGER])->count(),
+                            Users::find()->where(['role_id' => Users::ROLE_CLIENT])->count(),
+                        ],
+                        'backgroundColor' => ['#FF6384', '#36A2EB', '#FFCE56'],
+                    ],
+                ],
+            ];
+
+            return $this->render('index', [
+                'totalUsers' => $countUsers,
+                'totalOrders' => $countOrders,
+                'totalProducts' => $countProducts,
+                'ordersData' => $ordersData,
+                'productsData' => $productsData,
+                'profitsData' => $profitsData,
+                'salesData' => $salesData,
+                'usersData' => $usersData,
+            ]);
+        } elseif ($userRole == Users::ROLE_SELLER) {
+            // Seller Reports
+            $sellerId = Yii::$app->user->id;
+            $products = Products::find()->where(['creator_id' => $sellerId])->all();
+            $orders = Orders::find()->where(['creator_id' => $sellerId])->all();
+            $profit = Orders::find()->where(['creator_id' => $sellerId])->sum('profit');
+
+            return $this->render('seller', [
+                'products' => $products,
+                'orders' => $orders,
+                'profit' => $profit,
+            ]);
+        } elseif ($userRole == Users::ROLE_MANAGER) {
+            // Manager Reports
+            $countOrders = Orders::find()->count();
+            $countProducts = Products::find()->count();
+
+            return $this->render('manager', [
+                'totalOrders' => $countOrders,
+                'totalProducts' => $countProducts,
+            ]);
+        }
+
+        throw new \yii\web\ForbiddenHttpException('You do not have permission to view this page.');
     }
 
     public function actionPermissions()

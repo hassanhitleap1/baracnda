@@ -10,6 +10,8 @@ $this->params['breadcrumbs'][] = $this->title;
 $ordersData = json_encode($ordersData);
 $productsData = json_encode($productsData);
 $usersData = json_encode($usersData);
+$profitsData = json_encode($profitsData);
+$salesData = json_encode($salesData);
 
 ?>
 <div class="admin-index">
@@ -61,6 +63,17 @@ $usersData = json_encode($usersData);
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-md-6">
+            <h3><?= Yii::t('app', 'Profits Chart') ?></h3>
+            <canvas id="profitsChart"></canvas>
+        </div>
+        <div class="col-md-6">
+            <h3><?= Yii::t('app', 'Sales Chart') ?></h3>
+            <canvas id="salesChart"></canvas>
+        </div>
+    </div>
+
 </div>
 
 <?php
@@ -68,6 +81,8 @@ $this->registerJs(new JsExpression("
     const ordersCtx = document.getElementById('ordersChart').getContext('2d');
     const productsCtx = document.getElementById('productsChart').getContext('2d');
     const usersCtx = document.getElementById('usersChart').getContext('2d');
+    const profitsCtx = document.getElementById('profitsChart').getContext('2d');
+    const salesCtx = document.getElementById('salesChart').getContext('2d');
 
     new Chart(ordersCtx, {
         type: 'line',
@@ -101,6 +116,30 @@ $this->registerJs(new JsExpression("
             plugins: {
                 legend: { display: true },
                 title: { display: true, text: 'Users by Role' }
+            }
+        }
+    });
+
+    new Chart(profitsCtx, {
+        type: 'line',
+        data: $profitsData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true },
+                title: { display: true, text: 'Profits Over Time' }
+            }
+        }
+    });
+
+    new Chart(salesCtx, {
+        type: 'line',
+        data: $salesData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true },
+                title: { display: true, text: 'Sales Over Time' }
             }
         }
     });
