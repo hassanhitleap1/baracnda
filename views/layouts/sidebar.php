@@ -46,7 +46,7 @@ use yii\bootstrap5\Html;
                             <p>Dashboard</p>
                         </a>
                     </li>
-
+                    <?php if (Yii::$app->user->can('admin/permissions')): ?>
                     <li class="nav-item">
                         <a href="<?= Url::to(['admin/permissions']) ?>"
                             class="nav-link <?= Yii::$app->controller->id == 'site' ? 'active' : '' ?>">
@@ -54,7 +54,7 @@ use yii\bootstrap5\Html;
                             <p>Permissions</p>
                         </a>
                     </li>
-
+                    <?php endif; ?>
                     <!-- Orders -->
                     <?php if (Yii::$app->user->can('orders/index')): ?>
                         <li class="nav-item">

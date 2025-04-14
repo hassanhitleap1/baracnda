@@ -13,6 +13,11 @@ class BaseController extends Controller
 {
     public function behaviors()
     {
+        $action = Yii::$app->controller->action;
+        $permissionName = $action->controller->id . '/' . $action->id;
+       
+        // return 
+        // dd(  $permissionName = $action->controller->id . '/' . $action->id);
         return [
             'access' => [
                 'class' => AccessControl::class,
@@ -25,7 +30,7 @@ class BaseController extends Controller
                         'roles' => ['@'], // Allow authenticated users
                         'matchCallback' => function ($rule, $action) {
                             $permissionName = $action->controller->id . '/' . $action->id;
-                            return Yii::$app->user->can($permissionName) || Yii::$app->user->identity->role_id == \app\models\users\Users::ROLE_ADMIN;
+                            return Yii::$app->user->can($permissionName) ;
                         },
                     ],
                 ],

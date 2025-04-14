@@ -35,6 +35,11 @@ class RbacController extends Controller
         // Clear existing data
         $auth->removeAll();
         $permissions = [
+            //
+            // Dashboard
+            'admin/index' => 'View Dashboard',
+            'admin/permissions' => 'View permissions',
+            
             // Orders
             'orders/index' => 'View Orders',
             'orders/view' => 'View Order Details',

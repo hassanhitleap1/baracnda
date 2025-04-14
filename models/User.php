@@ -22,7 +22,8 @@ use yii\web\IdentityInterface;
  * @property integer $created_at
  * @property integer $updated_at
  * @property string $avatar
- * * @property string $password write-only password
+ * @property string $password write-only password
+ * @property int $role_id Role ID of the user
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -33,6 +34,9 @@ class User extends ActiveRecord implements IdentityInterface
     const SUPER_ADMIN = 1;
     
     const ROLE_SUPER_ADMIN = 1;
+
+    public $role_id;
+
     /**
      * {@inheritdoc}
      */

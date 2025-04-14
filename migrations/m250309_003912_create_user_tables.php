@@ -66,7 +66,7 @@ class m250309_003912_create_user_tables extends Migration
                 'phone' => '0799263493',
                 'password_hash' => Yii::$app->security->generatePasswordHash("0799263493"),              
                 'auth_key' => Yii::$app->security->generateRandomString(),
-                'full_name' => "Admin2",
+                'full_name' => "Saller",
                 'birth_date' => null,
                 'address_id' => null,
                 'status' => 10
