@@ -1,8 +1,10 @@
 <?php 
 namespace app\commands;
 
+use app\models\User;
 use Yii;
 use yii\console\Controller;
+use yii\console\Application;
 
 class RbacController extends Controller
 {
@@ -10,14 +12,28 @@ class RbacController extends Controller
     {
         $auth = Yii::$app->authManager;
 
+        // run this command php yii migrate --migrationPath=@yii/rbac/migrations
+        $oldApp = Yii::$app;
+        
+        // Create a console application instance
+        $config = require Yii::getAlias('@app/config/console.php');
+        $consoleApp = new Application($config);
+        
+        // Run the migrations
+        $result = $consoleApp->runAction('migrate', [
+            'migrationPath' => '@yii/rbac/migrations',
+            'interactive' => false, // Set to true if you want interactive prompts
+        ]);
+        
+        // Restore the web application
+        Yii::$app = $oldApp;
+
         if ($auth === null) {
             throw new \Exception('The authManager component is not configured.');
         }
-
+        
         // Clear existing data
         $auth->removeAll();
-
-        // Create permissions for all controllers and actions
         $permissions = [
             // Orders
             'orders/index' => 'View Orders',
@@ -111,13 +127,11 @@ class RbacController extends Controller
             }
         }
 
-        // Create roles
-
+     
         $superAdmin = $auth->createRole('super-admin');
         $auth->add($superAdmin);
-
     
-        $manager = $auth->createRole('manager');
+        $manager = $auth->createRole('manager'); 
         $auth->add($manager);
 
         $seller = $auth->createRole('seller');
@@ -126,7 +140,9 @@ class RbacController extends Controller
         $dataEntry = $auth->createRole('dataEntry');
         $auth->add($dataEntry);
 
-     
+
+   
+  
 
         // Create viewOwnOrders permission
         if (!$auth->getPermission('viewOwnOrders')) {
@@ -134,7 +150,7 @@ class RbacController extends Controller
             $viewOwnOrders->description = 'View Own Orders';
             $auth->add($viewOwnOrders);
         }
-
+      
         // Assign specific permissions to ROLE_DATA_ENTRY
         $this->assignPermission($auth, $dataEntry, 'products/create');
         $this->assignPermission($auth, $dataEntry, 'products/update');
@@ -168,8 +184,8 @@ class RbacController extends Controller
         // Assign roles to users (adjust user IDs as needed)
         $auth->assign($superAdmin, 1); // Assign super admin role to user ID 1
         $auth->assign($manager, 2); // Assign manager role to user ID 2
-        $auth->assign($dataEntry, 3); // Assign data entry role to user ID 3
-        $auth->assign($seller, 4); // Assign seller role to user ID 4
+        $auth->assign($seller, 3); // Assign seller role to user ID 3
+        $auth->assign($dataEntry, 4); // Assign data entry role to user ID 4
     }
 
     /**

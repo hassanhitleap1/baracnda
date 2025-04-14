@@ -25,14 +25,13 @@ class m250309_003912_create_user_tables extends Migration
             'auth_key' => $this->string(32)->notNull()->defaultValue(null),
             'full_name' => $this->string()->null(),
             'birth_date' => $this->date()->null(),
-            'role_id' => $this->integer()->notNull(),
             'address_id' => $this->integer()->null(),
             'status' => $this->smallInteger()->notNull()->defaultValue(10),
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
         ], $tableOptions);
 
-       $this->addForeignKey('fk_users_role', 'users', 'role_id', 'roles', 'id', 'CASCADE');
+
        
         $this->addForeignKey('fk_users_address', 'users', 'address_id', 'addresses', 'id', 'CASCADE');
 
@@ -43,9 +42,8 @@ class m250309_003912_create_user_tables extends Migration
             'phone' => '0799263494',
             'password_hash' => Yii::$app->security->generatePasswordHash("0799263494"),              
             'auth_key' => Yii::$app->security->generateRandomString(),
-            'full_name' => "Admin",
+            'full_name' => "superAdmin",
             'birth_date' => null,
-            'role_id' => 1,
             'address_id' => null,
             'status' => 10
  
@@ -56,13 +54,36 @@ class m250309_003912_create_user_tables extends Migration
                 'phone' => '0799263492',
                 'password_hash' => Yii::$app->security->generatePasswordHash("0799263492"),              
                 'auth_key' => Yii::$app->security->generateRandomString(),
-                'full_name' => "Admin2",
+                'full_name' => "Admin",
                 'birth_date' => null,
-                'role_id' => 2,
                 'address_id' => null,
                 'status' => 10
      
-                ]
+            ],
+            [
+                'username' =>'0799263493',
+                'email' => '0799263493',
+                'phone' => '0799263493',
+                'password_hash' => Yii::$app->security->generatePasswordHash("0799263493"),              
+                'auth_key' => Yii::$app->security->generateRandomString(),
+                'full_name' => "Admin2",
+                'birth_date' => null,
+                'address_id' => null,
+                'status' => 10
+     
+            ],
+            [
+                'username' =>'0799263495',
+                'email' => '0799263495',
+                'phone' => '0799263495',
+                'password_hash' => Yii::$app->security->generatePasswordHash("0799263495"),              
+                'auth_key' => Yii::$app->security->generateRandomString(),
+                'full_name' => "dataEntry",
+                'birth_date' => null,
+                'address_id' => null,
+                'status' => 10
+     
+            ]
         ];
 
 
@@ -78,7 +99,6 @@ class m250309_003912_create_user_tables extends Migration
                     'auth_key' ,
                     'full_name' ,
                     'birth_date',
-                    'role_id',
                     'address_id' ,
                     'status'
                 ],
