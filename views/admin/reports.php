@@ -17,7 +17,7 @@ $model = new OrdersSearch();
 ?>
 
 <?php $form = ActiveForm::begin([
-    'action' => ['index'],
+    'action' => ['reports'],
     'method' => 'get',
     'options' => [
         'data-pjax' => 1
