@@ -195,8 +195,10 @@ class SeedController extends Controller
     }
     private function seedOrdersAndOrderItems($faker)
     {
+        $date = new \DateTime();
+        for ($i = 1; $i <= 50; $i++) {
 
-        for ($i = 1; $i <= 20; $i++) {       
+            $crated_at = $date->modify("-$i days")->format('Y-m-d H:i:s');
             Yii::$app->db->createCommand()->insert('orders', [
                 'user_id' => $faker->randomElement(Users::find()->select('id')->limit(50)->column()),
                 'creator_id' => $faker->randomElement(Users::find()->select('id')->limit(50)->column()),
@@ -212,6 +214,8 @@ class SeedController extends Controller
                 'status_order'=>$faker->randomElement(["reserved","canceled","processing","refunded","completed"]),
                 'delivery_status'=>$faker->randomElement(['delivered','pending','refunded']),
                 'payment_status'=>$faker->randomElement(['paid','unpaid']),
+                'note' => $faker->text(400),
+                'created_at' =>  $crated_at,
 
             ])->execute();
             $orderId = Yii::$app->db->createCommand('SELECT MAX(id) FROM orders')->queryScalar();
