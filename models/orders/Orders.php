@@ -35,6 +35,7 @@ use Yii;
  * @property string|null $note
  * @property string|null $status_order
  * @property string $delivery_status
+ * @property string $payment_status
  * @property string|null $created_at
  * @property string|null $updated_at
  * @property Addresses $addresses

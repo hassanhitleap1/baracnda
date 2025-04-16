@@ -43,6 +43,16 @@ $salesData = json_encode($salesData);
                 </div>
             </div>
         </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-body">
+                    <h5 class="card-title"><?= Yii::t('app', 'Total Profits') ?></h5>
+                    <p class="card-text"><?= Html::encode( $totalProfits) ?></p>
+                </div>
+            </div>
+        </div>
+
+       
     </div>
 
     <div class="row">

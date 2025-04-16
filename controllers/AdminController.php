@@ -44,6 +44,7 @@ class AdminController extends BaseController
         $countUsers = Users::find()->count();
         $countOrders = Orders::find()->count();
         $countProducts = Products::find()->count();
+        $totalProfits = Orders::find()->where(['payment_status' => 'paid'])->sum('profit')??0;
 
         $ordersData = [
             'labels' => ['Last Month'],
@@ -119,6 +120,7 @@ class AdminController extends BaseController
             'profitsData' => $profitsData,
             'salesData' => $salesData,
             'usersData' => $usersData,
+            'totalProfits' => $totalProfits
         ]);
     }
 
