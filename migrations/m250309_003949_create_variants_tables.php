@@ -34,32 +34,6 @@ class m250309_003949_create_variants_tables  extends Migration
         $this->addForeignKey('fk_variants_product', 'variants', 'product_id', 'products', 'id', 'CASCADE');
 
 
-        for($i = 1; $i < 20; $i++) { 
-
-            Yii::$app->db->createCommand()->insert('products', [
-                'name' => "Test Product $i",
-                'type' => Products::SIMPLE,
-                'price' => rand(1, 100),
-                'cost' => rand(1, 100) / 2,
-                'quantity' => 10,
-                'warehouse_id' => 1,
-                'creator_id' => 1,
-                'category_id' => 1,
-                'description' => 'Test Product Description',
-                'image_path'=>"product-empty.webp",
-            ])->execute();
-
-            Yii::$app->db->createCommand()->insert('variants', [
-                'product_id' => $i ,
-                'is_default' => 1,
-                'name' => 'Test Variant',
-                'price' => rand(1, 100),
-                'cost' => rand(1, 100) / 2,
-                'quantity' => 10,
-            ])->execute();
-
-        }
-     
     
     }
 

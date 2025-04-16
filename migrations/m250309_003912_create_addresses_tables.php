@@ -21,7 +21,7 @@ class m250309_003912_create_addresses_tables extends Migration
             'country_id' => $this->integer()->notNull()->defaultValue(1),
             'region_id' => $this->integer()->notNull()->defaultValue(1),
             'full_name' => $this->string()->notNull(),
-            'phone' => $this->string()->notNull(),
+            'phone' => $this->string(50)->notNull(),
             'address' => $this->string()->notNull(),
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
