@@ -1,6 +1,8 @@
 <?php
 
+use app\models\orders\OrdersSearch;
 use yii\helpers\Html;
+use yii\widgets\ActiveForm;
 
 /** @var yii\web\View $this */
 /** @var app\models\orders\OrdersSearch $searchModel */
@@ -9,10 +11,46 @@ use yii\helpers\Html;
 $this->title = Yii::t('app', 'Reports');
 $this->params['breadcrumbs'][] = $this->title;
 
+use kartik\daterange\DateRangePicker;
+
+$model = new OrdersSearch();
 ?>
 
+<?php $form = ActiveForm::begin([
+    'action' => ['index'],
+    'method' => 'get',
+    'options' => [
+        'data-pjax' => 1
+    ],
+]); ?>
+
+<?= $form->field($model, 'date_range')->widget(DateRangePicker::classname(), [
+    'convertFormat' => true,
+    'useWithAddon' => true, // Allows the widget to be used with an addon like a button
+    'pluginOptions' => [
+        'locale' => [
+            'format' => 'yyyy-MM-dd', // Format for the date picker
+            'separator' => ' + ', // Separator between start and end dates
+        ],
+        'opens' => 'left', // Opens the picker to the left side
+    ],
+    'options' => [
+        'autocomplete' => 'off', // Disable autocomplete
+    ],
+])->label("Date Range");
+
+?>
+
+<div class="form-group">
+    <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
+    <?= Html::a(Yii::t('app', 'Reset'), ['admin/reports'], ['class' => 'btn btn-outline-secondary']) ?>
+</div>
+
+<?php ActiveForm::end(); ?>
 <div class="admin-reports">
     <h1><?= Html::encode($this->title) ?></h1>
+
+
 
     <div class="row">
         <div class="col-md-6">

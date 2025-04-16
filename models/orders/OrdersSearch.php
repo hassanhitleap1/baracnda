@@ -13,13 +13,15 @@ class OrdersSearch extends Orders
 {
     /**
      * {@inheritdoc}
-     */
+     */    
+    public $date_range;
+
     public function rules()
     {
         return [
             [['id', 'user_id', 'creator_id', 'address_id', 'status_id', 'shipping_id'], 'integer'],
             [['total', 'shipping_price', 'sub_total', 'profit', 'discount'], 'number'],
-            [['note', 'created_at', 'updated_at'], 'safe'],
+            [['note', 'created_at', 'updated_at'.'date_range'], 'safe'],
         ];
     }
 
@@ -56,6 +58,12 @@ class OrdersSearch extends Orders
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
             return $dataProvider;
+        }
+
+        if ($this->date_range) {
+            list($start_date, $end_date) = explode(' - ', $this->date_range);
+            $query->andFilterWhere(['>=', 'purchase_date', $start_date])
+                ->andFilterWhere(['<=', 'purchase_date', $end_date]);
         }
 
         // grid filtering conditions

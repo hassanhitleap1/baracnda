@@ -134,19 +134,26 @@ class AdminController extends BaseController
     
         $totalProfits = Orders::find()->where(['order_status' => 'completed'])->where(['payment_status' => 'paid'])->sum('profit')??0;
         $countOrders = Orders::find()->where(['order_status' => 'completed'])->where(['payment_status' => 'paid'])->count();
+
+
+        $filteredProfits = Orders::find()
+        ->andWhere(['payment_status' => 'paid']);
+
+        $filteredCountOrders = Orders::find();
+
+        if (Yii::$app->request->get('date_range')) {
+            list($start_date, $end_date) = explode(' - ', Yii::$app->request->get('date_range'));
+            $filteredProfits = $filteredProfits->where(['>=', 'created_at', $start_date])->andWhere(['<=', 'created_at', $end_date]);
+            $filteredCountOrders = $filteredCountOrders->where(['>=', 'created_at', $start_date])->andWhere(['<=', 'created_at', $end_date]);
+
+        }
+
+
+        $filteredProfits = $filteredProfits ->sum('profit')??0;
+        $filteredCountOrders= $filteredCountOrders ->count();
+       
     
-        $fromDate = Yii::$app->request->get('from_date', date('Y-m-d', strtotime('-1 month')));
-        $toDate = Yii::$app->request->get('to_date', date('Y-m-d'));
-    
-        $filteredProfits = Orders::find()->where(['>=', 'created_at', $fromDate])
-            ->andWhere(['<=', 'created_at', $toDate])
-            ->andWhere(['payment_status' => 'paid'])
-            ->sum('profit')??0;
-    
-        $filteredCountOrders = Orders::find()->where(['>=', 'created_at', $fromDate])
-            ->andWhere(['<=', 'created_at', $toDate])
-            ->count();
-    
+       
         return $this->render('reports', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
