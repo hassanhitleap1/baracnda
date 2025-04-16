@@ -43,16 +43,18 @@ class AdminController extends BaseController
     public function actionIndex()
     {
         $countUsers = Users::find()->count();
-        $countOrders = Orders::find()->count();
+        $countOrders = Orders::find()->byAuthedUser()->count();
         $countProducts = Products::find()->count();
-        $totalProfits = Orders::find()->where(['payment_status' => 'paid'])->sum('profit')??0;
+        $totalProfits = Orders::find()->byAuthedUser()->paid()->completed()->sum('profit')??0;
 
+       
+        
         $ordersData = [
             'labels' => ['Last Month'],
             'datasets' => [
                 [
                     'label' => 'Orders',
-                    'data' => [Orders::find()->where(['>=', 'created_at', date('Y-m-d', strtotime('-1 month'))])->count()],
+                    'data' => [Orders::find()->byDateRange( strtotime('-1 month'),date('Y-m-d' ))->count()],
                     'backgroundColor' => 'rgba(54, 162, 235, 0.2)',
                     'borderColor' => 'rgba(54, 162, 235, 1)',
                     'borderWidth' => 1,
@@ -65,7 +67,7 @@ class AdminController extends BaseController
             'datasets' => [
                 [
                     'label' => 'Products',
-                    'data' => [Products::find()->where(['>=', 'created_at', date('Y-m-d', strtotime('-1 month'))])->count()],
+                    'data' => [Products::find()->count()],
                     'backgroundColor' => ['#FF6384'],
                 ],
             ],
@@ -76,7 +78,7 @@ class AdminController extends BaseController
             'datasets' => [
                 [
                     'label' => 'Profits',
-                    'data' => [Orders::find()->where(['>=', 'created_at', date('Y-m-d', strtotime('-1 month'))])->sum('profit')],
+                    'data' => [Orders::find()->byDateRange( strtotime('-1 month'),date('Y-m-d' ))->sum('profit')],
                     'backgroundColor' => 'rgba(75, 192, 192, 0.2)',
                     'borderColor' => 'rgba(75, 192, 192, 1)',
                     'borderWidth' => 1,
@@ -89,7 +91,7 @@ class AdminController extends BaseController
             'datasets' => [
                 [
                     'label' => 'Sales',
-                    'data' => [Orders::find()->where(['>=', 'created_at', date('Y-m-d', strtotime('-1 month'))])->sum('total')],
+                    'data' => [Orders::find()->byDateRange( strtotime('-1 month'),date('Y-m-d' ))->sum('total')],
                     'backgroundColor' => 'rgba(255, 206, 86, 0.2)',
                     'borderColor' => 'rgba(255, 206, 86, 1)',
                     'borderWidth' => 1,

@@ -314,20 +314,6 @@ class Orders extends \yii\db\ActiveRecord
     public static function find()
     {
         $query = new OrdersQuery(get_called_class());
-
-        if (Yii::$app->user->can('orders/view')) {
-            if (\Yii::$app->authManager->checkAccess(Yii::$app->user->id, 'super-admin')
-            || \Yii::$app->authManager->checkAccess(Yii::$app->user->id, 'manager')
-            || \Yii::$app->authManager->checkAccess(Yii::$app->user->id, 'dataEntry')
-            
-            ) {
-                return $query; 
-            }else{
-                return $query->andWhere(['creator_id' => Yii::$app->user->id]); 
-            }
-        }
-        
-
         return $query; // Deny access by default
     }
 
