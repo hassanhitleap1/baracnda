@@ -22,6 +22,8 @@ use app\models\payments\Payments;
 use app\models\regions\Regions;
 use app\models\shippings\Shippings;
 use app\models\status\Status;
+use app\models\User;
+use app\models\users\Users;
 use kartik\select2\Select2;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -193,6 +195,19 @@ $total = $model->isNewRecord ? null : $model->total;
                                     'allowClear' => true
                                 ],
                             ]); ?>
+                        </div>
+                        <div class="col-6">
+                            <?php   if (\Yii::$app->authManager->checkAccess(Yii::$app->user->id, 'super-admin')
+                                        || \Yii::$app->authManager->checkAccess(Yii::$app->user->id, 'manager')
+                                        || \Yii::$app->authManager->checkAccess(Yii::$app->user->id, 'dataEntry')) :?>
+                                <?= $form->field($model, 'creator_id')->widget(Select2::classname(), [
+                                    'data' => ArrayHelper::map(Users::find()->all(), 'id', 'full_name'),
+                                    'options' => ['placeholder' => 'Select a creator'],
+                                    'pluginOptions' => [
+                                        'allowClear' => true
+                                    ],
+                                ]); ?>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>

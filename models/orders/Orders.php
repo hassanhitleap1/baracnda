@@ -94,7 +94,7 @@ class Orders extends \yii\db\ActiveRecord
             [['phone','full_name','region_id'],'required', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
             [['user_id', 'note'], 'default', 'value' => null, 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
             [['shipping_id'], 'default', 'value' => 1, 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
-            [[ 'status_id', 'shipping_id'], 'integer', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
+            [[ 'status_id', 'shipping_id','creator_id'], 'integer', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
             [['address'], 'string', 'max' => 255, 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
             [['total', 'shipping_price', 'sub_total', 'profit', 'discount'], 'number', 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
             [['discount'], 'default', 'value' => 0.00, 'on' => [self::SCENARIO_CREATE, self::SCENARIO_UPDATE]],
@@ -137,8 +137,13 @@ class Orders extends \yii\db\ActiveRecord
 
     public function setCreator()
     {
+        if (\Yii::$app->authManager->checkAccess(Yii::$app->user->id, 'super-admin')
+        || \Yii::$app->authManager->checkAccess(Yii::$app->user->id, 'manager')
+        || \Yii::$app->authManager->checkAccess(Yii::$app->user->id, 'dataEntry')) {
+            $this->creator_id = $this->creator_id;   
+        }else {
         $this->creator_id = Yii::$app->user->id;
-
+        }
         return true;
     }
 
@@ -310,7 +315,7 @@ class Orders extends \yii\db\ActiveRecord
         $query = new OrdersQuery(get_called_class());
 
         if (Yii::$app->user->can('orders/view')) {
-            if (\Yii::$app->authManager->checkAccess(Yii::$app->user->id, 'super_admin')
+            if (\Yii::$app->authManager->checkAccess(Yii::$app->user->id, 'super-admin')
             || \Yii::$app->authManager->checkAccess(Yii::$app->user->id, 'manager')
             || \Yii::$app->authManager->checkAccess(Yii::$app->user->id, 'dataEntry')
             
@@ -320,6 +325,7 @@ class Orders extends \yii\db\ActiveRecord
                 return $query->andWhere(['creator_id' => Yii::$app->user->id]); 
             }
         }
+        
 
         return $query; // Deny access by default
     }
