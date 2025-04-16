@@ -43,7 +43,8 @@ $config = [
         ],
         'db' => $db,
         'authManager' => [
-            'class' => 'yii\rbac\DbManager', // Use DbManager for RBAC
+            'class' => 'yii\rbac\DbManager',
+            // 'class' => 'yii\rbac\PhpManager', // Use DbManager for RBAC
             'defaultRoles' => ['guest'], // Optional: Define default roles
         ],
         'urlManager' => [

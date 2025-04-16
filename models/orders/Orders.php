@@ -50,7 +50,7 @@ class Orders extends \yii\db\ActiveRecord
 
     public $country_id = null;
 
-    public $region_id = null;
+    public $region_id ;
 
     public $full_name = null;
 
@@ -216,7 +216,7 @@ class Orders extends \yii\db\ActiveRecord
         $orderItem->price = $item->variant_price;
         $orderItem->cost = $item->variant_cost ?? 0 ;
     
-        if (!$orderItem->save()) {
+        if (!$orderItem->save(false)) {
             Yii::$app->session->setFlash('error', $orderItem->getFirstErrors());
             return false;
         }
@@ -234,7 +234,6 @@ class Orders extends \yii\db\ActiveRecord
             $user->phone = $this->phone;
             $user->password_hash = Yii::$app->security->generatePasswordHash($this->phone);
             $user->auth_key = Yii::$app->security->generateRandomString();
-            $user->role_id = Users::ROLE_CLIENT;
             if (!$user->save(false)) {
                 Yii::$app->session->setFlash('error', $user->getFirstErrors());
                 return false;
@@ -310,15 +309,19 @@ class Orders extends \yii\db\ActiveRecord
     {
         $query = new OrdersQuery(get_called_class());
 
-        if (Yii::$app->user->can('viewAllOrders') || Yii::$app->user->identity->role_id == \app\models\users\Users::ROLE_SUPER_ADMIN || Yii::$app->user->identity->role_id == \app\models\users\Users::ROLE_MANAGER) {
-            return $query; // Super Admin and Manager can view all orders
+        if (Yii::$app->user->can('orders/view')) {
+            if (\Yii::$app->authManager->checkAccess(Yii::$app->user->id, 'super_admin')
+            || \Yii::$app->authManager->checkAccess(Yii::$app->user->id, 'manager')
+            || \Yii::$app->authManager->checkAccess(Yii::$app->user->id, 'dataEntry')
+            
+            ) {
+                return $query; 
+            }else{
+                return $query->andWhere(['creator_id' => Yii::$app->user->id]); 
+            }
         }
 
-        if (Yii::$app->user->can('viewOwnOrders')) {
-            return $query->andWhere(['creator_id' => Yii::$app->user->id]); // Other roles can view only their own orders
-        }
-
-        return $query->andWhere('0=1'); // Deny access by default
+        return $query; // Deny access by default
     }
 
 

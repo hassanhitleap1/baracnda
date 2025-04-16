@@ -17,11 +17,12 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="products-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
-
+  
+    <?php if (Yii::$app->user->can('products/index')): ?>   
     <p>
         <?= Html::a(Yii::t('app', 'Create Products'), ['create'], ['class' => 'btn btn-success']) ?>
     </p>
-
+    <?php endif; ?>
     <?php Pjax::begin(); ?>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -102,7 +103,18 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]),
             ],
             'updated_at',
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{update} {delete}',
+                'buttons' => [
+                    'update' => function ($url, $model, $key) {
+                        return Yii::$app->user->can('products/update') ? Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, ['class' => 'btn btn-primary']) : '';
+                    },
+                    'delete' => function ($url, $model, $key) {
+                        return Yii::$app->user->can('products/delete') ? Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, ['class' => 'btn btn-danger']) : '';
+                    },
+                ],
+            ],
         ],
     ]); ?>
 
