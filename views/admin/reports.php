@@ -25,21 +25,21 @@ $model = new OrdersSearch();
 ]); ?>
 
 <?= $form->field($model, 'date_range')->widget(DateRangePicker::classname(), [
-    'convertFormat' => true,
-    'useWithAddon' => true, // Allows the widget to be used with an addon like a button
-    'pluginOptions' => [
-        'locale' => [
-            'format' => 'yyyy-MM-dd', // Format for the date picker
-            'separator' => ' + ', // Separator between start and end dates
-        ],
-        'opens' => 'left', // Opens the picker to the left side
-    ],
-    'options' => [
-        'autocomplete' => 'off', // Disable autocomplete
-    ],
-])->label("Date Range");
+            'convertFormat' => true,
+            'useWithAddon' => true,
+            'pluginOptions' => [
+                'locale' => [
+                    'format' => 'YYYY-MM-DD',
+                    'separator' => ' to ',
+                ],
+                'opens' => 'left',
+            ],
+            'options' => [
+                'autocomplete' => 'off',
+            ],
+        ])->label("Date Range"); ?>
 
-?>
+
 
 <div class="form-group">
     <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
