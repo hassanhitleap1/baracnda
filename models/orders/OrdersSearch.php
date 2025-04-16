@@ -15,13 +15,15 @@ class OrdersSearch extends Orders
      * {@inheritdoc}
      */    
     public $date_range;
+    public $start_date;
+    public $end_date;
 
     public function rules()
     {
         return [
             [['id', 'user_id', 'creator_id', 'address_id', 'status_id', 'shipping_id'], 'integer'],
             [['total', 'shipping_price', 'sub_total', 'profit', 'discount'], 'number'],
-            [['note', 'created_at', 'updated_at'.'date_range'], 'safe'],
+            [['note', 'created_at', 'updated_at'.'date_range','start_date','end_date'], 'safe'],
         ];
     }
 

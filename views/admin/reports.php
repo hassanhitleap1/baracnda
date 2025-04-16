@@ -11,66 +11,90 @@ use yii\widgets\ActiveForm;
 $this->title = Yii::t('app', 'Reports');
 $this->params['breadcrumbs'][] = $this->title;
 
-use kartik\daterange\DateRangePicker;
-
 $model = new OrdersSearch();
 ?>
 
-<?php $form = ActiveForm::begin([
-    'action' => ['reports'],
-    'method' => 'get',
-    'options' => [
-        'data-pjax' => 1
-    ],
-]); ?>
-
-<?= $form->field($model, 'date_range')->widget(DateRangePicker::classname(), [
-            'convertFormat' => true,
-            'useWithAddon' => true,
-            'pluginOptions' => [
-                'locale' => [
-                    'format' => 'YYYY-MM-DD',
-                    'separator' => ' to ',
-                ],
-                'opens' => 'left',
-            ],
-            'options' => [
-                'autocomplete' => 'off',
-            ],
-        ])->label("Date Range"); ?>
-
-
-
-<div class="form-group">
-    <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
-    <?= Html::a(Yii::t('app', 'Reset'), ['admin/reports'], ['class' => 'btn btn-outline-secondary']) ?>
-</div>
-
-<?php ActiveForm::end(); ?>
 <div class="admin-reports">
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1 class="text-center"><?= Html::encode($this->title) ?></h1>
 
-
-
-    <div class="row">
-        <div class="col-md-6">
-            <h3><?= Yii::t('app', 'Total Profits') ?></h3>
-            <p><?= Html::encode($totalProfits) ?></p>
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0"><?= Yii::t('app', 'Filter by Date Range') ?></h4>
         </div>
-        <div class="col-md-6">
-            <h3><?= Yii::t('app', 'Total Orders') ?></h3>
-            <p><?= Html::encode($countOrders) ?></p>
+        <div class="card-body">
+            <?php $form = ActiveForm::begin([
+                'action' => ['reports'],
+                'method' => 'get',
+                'options' => ['data-pjax' => 1],
+            ]); ?>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <?= $form->field($model, 'start_date')->input('date', [
+                        'placeholder' => Yii::t('app', 'Start Date'),
+                        'class' => 'form-control',
+                    ])->label(Yii::t('app', 'Start Date')) ?>
+                </div>
+                <div class="col-md-6">
+                    <?= $form->field($model, 'end_date')->input('date', [
+                        'placeholder' => Yii::t('app', 'End Date'),
+                        'class' => 'form-control',
+                    ])->label(Yii::t('app', 'End Date')) ?>
+                </div>
+            </div>
+
+            <div class="form-group text-center">
+                <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
+                <?= Html::a(Yii::t('app', 'Reset'), ['admin/reports'], ['class' => 'btn btn-outline-secondary']) ?>
+            </div>
+
+            <?php ActiveForm::end(); ?>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-6">
-            <h3><?= Yii::t('app', 'Filtered Profits') ?></h3>
-            <p><?= Html::encode($filteredProfits) ?></p>
+            <div class="card text-center">
+                <div class="card-header bg-success text-white">
+                    <h5><?= Yii::t('app', 'Total Profits') ?></h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text display-4"><?= Html::encode($totalProfits) ?></p>
+                </div>
+            </div>
         </div>
         <div class="col-md-6">
-            <h3><?= Yii::t('app', 'Filtered Orders') ?></h3>
-            <p><?= Html::encode($filteredCountOrders) ?></p>
+            <div class="card text-center">
+                <div class="card-header bg-info text-white">
+                    <h5><?= Yii::t('app', 'Total Orders') ?></h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text display-4"><?= Html::encode($countOrders) ?></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card text-center">
+                <div class="card-header bg-warning text-white">
+                    <h5><?= Yii::t('app', 'Filtered Profits') ?></h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text display-4"><?= Html::encode($filteredProfits) ?></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card text-center">
+                <div class="card-header bg-danger text-white">
+                    <h5><?= Yii::t('app', 'Filtered Orders') ?></h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text display-4"><?= Html::encode($filteredCountOrders) ?></p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
