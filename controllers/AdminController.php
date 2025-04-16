@@ -7,6 +7,7 @@ use app\models\contactus\Contactus;
 use app\models\products\Products;
 use app\models\users\Users;
 use app\models\orders\Orders;
+use app\models\orders\OrdersSearch;
 use yii\filters\VerbFilter;
 use Yii;
 
@@ -124,6 +125,37 @@ class AdminController extends BaseController
         ]);
     }
 
+
+    public function actionReports()
+    {
+     
+        $searchModel = new OrdersSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+    
+        $totalProfits = Orders::find()->where(['order_status' => 'completed'])->where(['payment_status' => 'paid'])->sum('profit')??0;
+        $countOrders = Orders::find()->where(['order_status' => 'completed'])->where(['payment_status' => 'paid'])->count();
+    
+        $fromDate = Yii::$app->request->get('from_date', date('Y-m-d', strtotime('-1 month')));
+        $toDate = Yii::$app->request->get('to_date', date('Y-m-d'));
+    
+        $filteredProfits = Orders::find()->where(['>=', 'created_at', $fromDate])
+            ->andWhere(['<=', 'created_at', $toDate])
+            ->andWhere(['payment_status' => 'paid'])
+            ->sum('profit')??0;
+    
+        $filteredCountOrders = Orders::find()->where(['>=', 'created_at', $fromDate])
+            ->andWhere(['<=', 'created_at', $toDate])
+            ->count();
+    
+        return $this->render('reports', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'totalProfits' => $totalProfits,
+            'countOrders' => $countOrders,
+            'filteredProfits' => $filteredProfits,
+            'filteredCountOrders' => $filteredCountOrders,
+        ]);
+    }
     public function actionPermissions()
     {
         $auth = Yii::$app->authManager;

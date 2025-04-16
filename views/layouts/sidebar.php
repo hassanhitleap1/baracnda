@@ -46,6 +46,15 @@ use yii\bootstrap5\Html;
                             <p>Dashboard</p>
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a href="<?= Url::to(['admin/reports']) ?>"
+                            class="nav-link <?= Yii::$app->controller->id == 'admin' ? 'active' : '' ?>">
+                            <i class="nav-icon fas fa-tachometer-alt"></i>
+                            <p>Reports</p>
+                        </a>
+                    </li>
+
                     <?php if (Yii::$app->user->can('admin/permissions')): ?>
                     <li class="nav-item">
                         <a href="<?= Url::to(['admin/permissions']) ?>"
