@@ -38,7 +38,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
 <link href="<?= Url::to('@web/AdminLTE/css/main.css') ?>" rel="stylesheet">
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <?php $this->head() ?>
 </head>

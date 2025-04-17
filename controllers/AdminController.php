@@ -46,35 +46,59 @@ class AdminController extends BaseController
         $countOrders = Orders::find()->byAuthedUser()->count();
         $countProducts = Products::find()->count();
         $totalProfits = Orders::find()->byAuthedUser()->paid()->completed()->sum('profit')??0;
-
-       
-        $startDate = Carbon::now()->subMonth()->firstOfMonth();
+        $startDate = Carbon::now()->firstOfMonth();
         $endDate = Carbon::parse($startDate)->endOfMonth();
-     
-        $ordersLastMonth = Orders::find()
-            ->select([
-                'DATE(created_at) as day',
-                'COUNT(*) as total_orders',
-            ])
-            ->where(['between', 'DATE(created_at)',  $startDate , $endDate])
+        $dates = [];
+        $dataOrdersNumber=[];
+        $dataOrdersProfit = [];
+        $dataTotalSales = [];
+
+        $ordersLastMonth = Orders::find()->select([
+            'DATE(created_at) as day',
+            'COUNT(*) as number_order',
+            "SUM(profit) as total_profit",
+            "SUM(total) as total_sales",
+        ])
+        ->thisMonth()
+        ->byAuthedUser()
+        ->completed()
             ->groupBy('DATE(created_at)')
             ->orderBy('day')
             ->asArray()
             ->all();
-       
-            $labelsOrdersLastMonth = ArrayHelper::getColumn($ordersLastMonth, 'day');
-            $dataOrdersLastMonth = ArrayHelper::getColumn($ordersLastMonth, function ($item) {
-                return (int)$item['total_orders'];
-            });
 
+        for ($date = $startDate; $date->lte($endDate); $date->addDay()) {
+            $dates[] = $date->format('Y-m-d');
+            $order = array_values(array_filter($ordersLastMonth, function ($item) use ($date) {
+                return $item['day'] === $date->format('Y-m-d');
+            }));
+           
+            if(count($order)){
+                $dataOrdersNumber[]=(int)$order[0]['number_order'];
+                $dataOrdersProfit[]=(float)$order[0]['total_profit'];
+                $dataTotalSales[]=(float)$order[0]['total_sales'];
+            }else{
+                $dataOrdersNumber[] = 0;
+                $dataOrdersProfit[] = 0;
+                $dataTotalSales[] = 0;
+            }
+         
+
+        }
+
+       
+           
+           
         return $this->render('index', [
             'totalUsers' => $countUsers,
             'totalOrders' => $countOrders,
             'totalProducts' => $countProducts,
             'totalProfits' => $totalProfits,
-            'labelsOrdersLastMonth'=>  $labelsOrdersLastMonth,
-            'dataOrdersLastMonth'=>  $dataOrdersLastMonth,
-    
+            'dates'=>  $dates,
+            'dataOrdersNumber'=>$dataOrdersNumber,
+            'dataOrdersProfit'=>$dataOrdersProfit,
+            'dataTotalSales'=>$dataTotalSales
+         
         ]);
     }
 
