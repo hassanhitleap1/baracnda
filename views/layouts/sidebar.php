@@ -41,7 +41,7 @@ use yii\bootstrap5\Html;
                     <!-- Dashboard -->
                     <li class="nav-item">
                         <a href="<?= Url::to(['admin/index']) ?>"
-                            class="nav-link <?= Yii::$app->controller->id == 'site' ? 'active' : '' ?>">
+                            class="nav-link <?= Yii::$app->controller->id == 'admin' && Yii::$app->controller->action->id == 'index' ? 'active' : '' ?>">
                             <i class="nav-icon fas fa-tachometer-alt"></i>
                             <p>Dashboard</p>
                         </a>
@@ -49,7 +49,7 @@ use yii\bootstrap5\Html;
 
                     <li class="nav-item">
                         <a href="<?= Url::to(['admin/reports']) ?>"
-                            class="nav-link <?= Yii::$app->controller->id == 'admin' ? 'active' : '' ?>">
+                            class="nav-link <?= Yii::$app->controller->action->id == 'reports'  ? 'active' : '' ?>">
                             <i class="nav-icon fas fa-tachometer-alt"></i>
                             <p>Reports</p>
                         </a>

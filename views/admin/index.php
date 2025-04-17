@@ -6,12 +6,7 @@ use yii\web\JsExpression;
 $this->title = Yii::t('app', 'Admin Dashboard');
 $this->params['breadcrumbs'][] = $this->title;
 
-// Example data for charts (replace with actual data from the controller)
-$ordersData = json_encode($ordersData);
-$productsData = json_encode($productsData);
-$usersData = json_encode($usersData);
-$profitsData = json_encode($profitsData);
-$salesData = json_encode($salesData);
+
 
 ?>
 <div class="admin-index">
@@ -47,18 +42,18 @@ $salesData = json_encode($salesData);
             <div class="card text-white bg-warning mb-3">
                 <div class="card-body">
                     <h5 class="card-title"><?= Yii::t('app', 'Total Profits') ?></h5>
-                    <p class="card-text"><?= Html::encode( $totalProfits) ?></p>
+                    <p class="card-text"><?= Html::encode($totalProfits) ?></p>
                 </div>
             </div>
         </div>
 
-       
+
     </div>
 
     <div class="row">
         <div class="col-md-6">
-            <h3><?= Yii::t('app', 'Orders Chart') ?></h3>
-            <canvas id="ordersChart"></canvas>
+            <h3><?= Yii::t('app', 'Orders Last Month') ?></h3>
+            <canvas id="orders-last-month"></canvas>
         </div>
         <div class="col-md-6">
             <h3><?= Yii::t('app', 'Products Chart') ?></h3>
@@ -86,72 +81,44 @@ $salesData = json_encode($salesData);
 
 </div>
 
-<?php
-$this->registerJs(new JsExpression("
-    const ordersCtx = document.getElementById('ordersChart').getContext('2d');
-    const productsCtx = document.getElementById('productsChart').getContext('2d');
-    const usersCtx = document.getElementById('usersChart').getContext('2d');
-    const profitsCtx = document.getElementById('profitsChart').getContext('2d');
-    const salesCtx = document.getElementById('salesChart').getContext('2d');
-
-    new Chart(ordersCtx, {
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var ctx = document.getElementById('orders-last-month').getContext('2d');
+    const labelsOrdersLastMonth = <?= json_encode($labelsOrdersLastMonth) ?>;
+    const dataOrdersLastMonth = <?= json_encode($dataOrdersLastMonth) ?>;
+    new Chart(ctx, {
         type: 'line',
-        data: $ordersData,
+        data: {
+            labels: labelsOrdersLastMonth, // Use the correct labels
+            datasets: [{
+                label: 'Orders Last Month',
+                data: dataOrdersLastMonth, // Use the correct data
+                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderWidth: 2,
+                fill: true,
+            }]
+        },
         options: {
             responsive: true,
             plugins: {
-                legend: { display: true },
-                title: { display: true, text: 'Orders Over Time' }
+                legend: {
+                    display: true,
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Orders Over the Last Month'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
             }
         }
     });
 
-    new Chart(productsCtx, {
-        type: 'bar',
-        data: $productsData,
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { display: true },
-                title: { display: true, text: 'Products by Category' }
-            }
-        }
-    });
 
-    new Chart(usersCtx, {
-        type: 'pie',
-        data: $usersData,
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { display: true },
-                title: { display: true, text: 'Users by Role' }
-            }
-        }
-    });
 
-    new Chart(profitsCtx, {
-        type: 'line',
-        data: $profitsData,
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { display: true },
-                title: { display: true, text: 'Profits Over Time' }
-            }
-        }
-    });
-
-    new Chart(salesCtx, {
-        type: 'line',
-        data: $salesData,
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { display: true },
-                title: { display: true, text: 'Sales Over Time' }
-            }
-        }
-    });
-"));
-?>
+</script>

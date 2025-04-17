@@ -2,15 +2,15 @@
 
 namespace app\controllers;
 
-use app\models\categories\Categories;
-use app\models\contactus\Contactus;
+
 use app\models\products\Products;
 use app\models\users\Users;
 use app\models\orders\Orders;
 use app\models\orders\OrdersSearch;
+use Carbon\Carbon;
 use yii\filters\VerbFilter;
 use Yii;
-
+use yii\helpers\ArrayHelper;
 
 /**
  * CategoriesController implements the CRUD actions for Categories model.
@@ -48,82 +48,33 @@ class AdminController extends BaseController
         $totalProfits = Orders::find()->byAuthedUser()->paid()->completed()->sum('profit')??0;
 
        
-        
-        $ordersData = [
-            'labels' => ['Last Month'],
-            'datasets' => [
-                [
-                    'label' => 'Orders',
-                    'data' => [Orders::find()->byDateRange( strtotime('-1 month'),date('Y-m-d' ))->count()],
-                    'backgroundColor' => 'rgba(54, 162, 235, 0.2)',
-                    'borderColor' => 'rgba(54, 162, 235, 1)',
-                    'borderWidth' => 1,
-                ],
-            ],
-        ];
-
-        $productsData = [
-            'labels' => ['Last Month'],
-            'datasets' => [
-                [
-                    'label' => 'Products',
-                    'data' => [Products::find()->count()],
-                    'backgroundColor' => ['#FF6384'],
-                ],
-            ],
-        ];
-
-        $profitsData = [
-            'labels' => ['Last Month'],
-            'datasets' => [
-                [
-                    'label' => 'Profits',
-                    'data' => [Orders::find()->byDateRange( strtotime('-1 month'),date('Y-m-d' ))->sum('profit')],
-                    'backgroundColor' => 'rgba(75, 192, 192, 0.2)',
-                    'borderColor' => 'rgba(75, 192, 192, 1)',
-                    'borderWidth' => 1,
-                ],
-            ],
-        ];
-
-        $salesData = [
-            'labels' => ['Last Month'],
-            'datasets' => [
-                [
-                    'label' => 'Sales',
-                    'data' => [Orders::find()->byDateRange( strtotime('-1 month'),date('Y-m-d' ))->sum('total')],
-                    'backgroundColor' => 'rgba(255, 206, 86, 0.2)',
-                    'borderColor' => 'rgba(255, 206, 86, 1)',
-                    'borderWidth' => 1,
-                ],
-            ],
-        ];
-
-        $usersData = [
-            'labels' => ['Admin', 'Manager', 'Client'],
-            'datasets' => [
-                [
-                    'label' => 'Users',
-                    'data' => [
-                        Users::find()->count(),
-                        Users::find()->count(),
-                        Users::find()->count(),
-                    ],
-                    'backgroundColor' => ['#FF6384', '#36A2EB', '#FFCE56'],
-                ],
-            ],
-        ];
+        $startDate = Carbon::now()->subMonth()->firstOfMonth();
+        $endDate = Carbon::parse($startDate)->endOfMonth();
+     
+        $ordersLastMonth = Orders::find()
+            ->select([
+                'DATE(created_at) as day',
+                'COUNT(*) as total_orders',
+            ])
+            ->where(['between', 'DATE(created_at)',  $startDate , $endDate])
+            ->groupBy('DATE(created_at)')
+            ->orderBy('day')
+            ->asArray()
+            ->all();
+       
+            $labelsOrdersLastMonth = ArrayHelper::getColumn($ordersLastMonth, 'day');
+            $dataOrdersLastMonth = ArrayHelper::getColumn($ordersLastMonth, function ($item) {
+                return (int)$item['total_orders'];
+            });
 
         return $this->render('index', [
             'totalUsers' => $countUsers,
             'totalOrders' => $countOrders,
             'totalProducts' => $countProducts,
-            'ordersData' => $ordersData,
-            'productsData' => $productsData,
-            'profitsData' => $profitsData,
-            'salesData' => $salesData,
-            'usersData' => $usersData,
-            'totalProfits' => $totalProfits
+            'totalProfits' => $totalProfits,
+            'labelsOrdersLastMonth'=>  $labelsOrdersLastMonth,
+            'dataOrdersLastMonth'=>  $dataOrdersLastMonth,
+    
         ]);
     }
 
