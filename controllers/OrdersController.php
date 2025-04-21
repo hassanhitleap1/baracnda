@@ -73,7 +73,7 @@ class OrdersController extends BaseController
     {
         $model = Orders::findOne($id);
 
-        if (!$model || (!Yii::$app->user->can('viewAllOrders') && $model->creator_id !== Yii::$app->user->id)) {
+        if (!$model || (!Yii::$app->user->can('orders/view') && $model->creator_id !== Yii::$app->user->id)) {
             throw new \yii\web\ForbiddenHttpException('You are not allowed to view this order.');
         }
 
