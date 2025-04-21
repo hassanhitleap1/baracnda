@@ -82,6 +82,26 @@ class OrdersController extends BaseController
         ]);
     }
 
+
+
+      /**
+     * Displays a single Orders model.
+     * @param int $id ID
+     * @return string
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionInvoice($id)
+    {
+        $model = Orders::findOne($id);
+        $this->layout = 'invoice';
+        if (!$model || (!Yii::$app->user->can('orders/view') && $model->creator_id !== Yii::$app->user->id)) {
+            throw new \yii\web\ForbiddenHttpException('You are not allowed to view this order.');
+        }
+
+        return $this->render('invoice', [
+            'model' => $model,
+        ]);
+    }
     /**
      * Creates a new Orders model.
      * If creation is successful, the browser will be redirected to the 'view' page.

@@ -43,6 +43,7 @@ class RbacController extends Controller
             // Orders
             'orders/index' => 'View Orders',
             'orders/view' => 'View Order Details',
+            'orders/invoice' => 'invoice Order Details',
             'orders/create' => 'Create Orders',
             'orders/update' => 'Update Orders',
             'orders/delete' => 'Delete Orders',
