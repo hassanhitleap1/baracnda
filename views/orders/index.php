@@ -49,6 +49,32 @@ $columns = [
         'width' => '200px',
     ],
     [
+        'attribute' => 'status_order',
+        'label' => Yii::t('app', 'Status Order'),
+        'value' => 'status_order',
+        'filter' => ['completed' => 'Completed', 'pending' => 'Pending', 'canceled' => 'Canceled','refunded' => 'refunded'],
+        'vAlign' => 'middle',
+        'width' => '100px',
+    ],
+
+    [
+        'attribute' => 'delivery_status',
+        'label' => Yii::t('app', 'delivery status'),
+        'value' => 'delivery_status',
+        'filter' => ['delivered' => 'delivered', 'undelivered' => 'undelivered', 'pending' => 'pending'],
+        'vAlign' => 'middle',
+        'width' => '100px',
+    ],
+
+    [
+        'attribute' => 'payment_status',
+        'label' => Yii::t('app', 'payment status'),
+        'value' => 'payment_status',
+        'filter' => ['pending' => 'pending', 'paid' => 'paid', 'unpaid' => 'unpaid'],
+        'vAlign' => 'middle',
+        'width' => '100px',
+    ],
+    [
         'attribute' => 'status_id',
         'label' => Yii::t('app', 'Status'),
         'value' => 'status.name',
