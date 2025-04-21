@@ -782,3 +782,64 @@ $(document).on('click', '#save-address', function (e)  {
         },
     });
 });
+
+
+
+
+$(document).on('click', '.open_model', function(e){
+    e.preventDefault();
+
+    url = $(this).attr('href');
+
+    $('#model').modal('show')
+        .find('#modelContent')
+        .load(url);
+});
+
+$(document).on('click', '.fast_order', function(e){
+    e.preventDefault();
+    url = $(this).attr('href');
+    $('#model').modal('show')
+        .find('#modelContent')
+        .load(url);
+});
+
+
+$(document).on('click', '.modelbutton', function(e){
+    e.preventDefault();
+    url = $(this).attr('href');
+    $('#model').modal('show')
+        .find('#modelContent')
+        .load(url);
+});
+
+$('#model').on('hidden.bs.modal', function () {
+    $('#modelContent').html("");
+});
+
+$(document).on('click', '.change-status', function(e){
+    e.preventDefault();
+    var id= $(this).attr("att_id");
+    var status_id= $(this).attr("att_status_id");
+    var name_status= $(this).attr("name_status");
+    let url= `${SITE_URL}/orders/change-status-id?id=${id}`;
+    $.ajax({
+        url: url,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            status_id: status_id,
+        },
+        success: function (json) {
+            if(json.code==201){
+                $(".column_status_"+id).text(name_status);
+                $('#model').modal('hide');
+                $('#modelContent').html("");
+
+            }else {
+                alert("sumthing  error");
+            }
+        }
+    });
+
+});

@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\orderItems\OrderItems;
 use app\models\orders\Orders;
 use app\models\orders\OrdersSearch;
+use app\models\status\Status;
 use app\models\variants\Variants;
 use Yii;
 use yii\web\Controller;
@@ -514,5 +515,28 @@ class OrdersController extends BaseController
         }
 
         return ['success' => false, 'message' => 'Failed to add variant to order.'];
+    }
+
+
+
+
+    public function actionGetStatus($id)
+    {
+        $model=$this->findModel($id);
+        $status=Status::find()->all();
+        return $this->renderAjax('get_status',['model'=> $model,'status'=>$status]);
+    }
+
+
+
+
+    public function actionChangeStatusId($id){
+        $model = $this->findModel($id);
+
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $status_id= Yii::$app->request->post('status_id');
+        $model->status_id = $status_id;
+        $model->save(false);
+         return ['code'=>201];  
     }
 }

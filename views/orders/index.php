@@ -48,13 +48,47 @@ $columns = [
         'vAlign' => 'middle',
         'width' => '200px',
     ],
+    // [
+    //     'attribute' => 'status_order',
+    //     'label' => Yii::t('app', 'Status Order'),
+    //     'value' => 'status_order',
+    //     'filter' => ['completed' => 'Completed', 'pending' => 'Pending', 'canceled' => 'Canceled','refunded' => 'refunded'],
+    //     'vAlign' => 'middle',
+    //     'width' => '100px',
+    // ],
     [
-        'attribute' => 'status_order',
-        'label' => Yii::t('app', 'Status Order'),
-        'value' => 'status_order',
-        'filter' => ['completed' => 'Completed', 'pending' => 'Pending', 'canceled' => 'Canceled','refunded' => 'refunded'],
+        // 'class' => 'kartik\grid\EditableColumn',
+        'attribute' => 'status_id',
         'vAlign' => 'middle',
-        'width' => '100px',
+        'width' => '30px',
+        'value' => function ($model, $key, $index, $widget) {
+            return Html::a($model->status->name, ['orders/get-status', 'id' => $model->id], ['class' => 'modelbutton column_status_' . $model->id]);
+
+        },
+        // 'filterType'=>GridView::FILTER_SELECT2,
+        'filter' => ArrayHelper::map(Status::find()->orderBy('name')->asArray()->all(), 'id', 'name_ar'),
+        'filterWidgetOptions' => [
+            'pluginOptions' => ['allowClear' => true],
+        ],
+        //'filterInputOptions' => ['placeholder' => 'select status'],
+        'format' => 'html',
+        'visible' => true,
+        'contentOptions' => ['class' => 'skip-export'],
+        'headerOptions' => ['class' => 'skip-export'],
+        'footerOptions' => ['class' => 'skip-export'],
+        // 'editableOptions'=> function ($model, $key, $index,$form) {
+        //     return [
+        //         'header'=>'status', 
+        //         'size'=>'md',
+        //         'inputType' => 'dropDownList',
+        //         'data'=>ArrayHelper::map(Status::find()->all(), 'id', 'name_ar'),
+        //         'formOptions'=>['action' => ['/orders/change-status','id'=>$model->id,'index'=>$index]],
+
+        //     ];
+
+        // },
+
+
     ],
 
     [
@@ -185,4 +219,3 @@ echo "<div id='modelContent'></div>";
 Modal::end();
 
 ?>
-
