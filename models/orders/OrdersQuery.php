@@ -71,6 +71,12 @@ class OrdersQuery extends \yii\db\ActiveQuery
     }
 
 
+    public function thisMonth()
+    {
+        return $this->andWhere(['>=', 'created_at', date('Y-m-01')])
+            ->andWhere(['<=', 'created_at', date('Y-m-t')]);
+    }
+
     public function un_paid()
     {
         return $this->andWhere(['payment_status' => 'unpaid']);
