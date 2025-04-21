@@ -108,14 +108,14 @@ $columns = [
         'vAlign' => 'middle',
         'width' => '100px',
     ],
-    [
-        'attribute' => 'status_id',
-        'label' => Yii::t('app', 'Status'),
-        'value' => 'status.name',
-        'filter' => ArrayHelper::map(\app\models\status\Status::find()->all(), 'id', 'name'),
-        'vAlign' => 'middle',
-        'width' => '100px',
-    ],
+    // [
+    //     'attribute' => 'status_id',
+    //     'label' => Yii::t('app', 'Status'),
+    //     'value' => 'status.name',
+    //     'filter' => ArrayHelper::map(\app\models\status\Status::find()->all(), 'id', 'name'),
+    //     'vAlign' => 'middle',
+    //     'width' => '100px',
+    // ],
     [
         'attribute' => 'shipping_price',
         'footer' => Yii::$app->formatter->asCurrency($dataProvider->query->sum('shipping_price')),
