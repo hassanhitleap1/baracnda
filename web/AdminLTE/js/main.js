@@ -684,3 +684,63 @@ $(document).on('click', '#revert-to-reserved-btn', function () {
         }
     });
 });
+
+$(document).on('click', '#edit-address-btn', function () {
+    const addressId = $(this).attr('data-id');
+    $.ajax({
+        url: `${SITE_URL}/addresses/ajax-form?id=${addressId}`,
+        type: 'GET',
+        success: function (response) {
+            $('#edit-address-modal-content').html(response);
+        },
+        error: function () {
+            alert('Failed to load address form.');
+        },
+    });
+});
+
+$(document).on('click', '#save-address-btn', function () {
+    const form = $('#edit-address-modal-content').find('form');
+    $.ajax({
+        url: form.attr('action'),
+        type: 'POST',
+        data: form.serialize(),
+        success: function (response) {
+            if (response.success) {
+                $('#edit-address-modal').modal('hide');
+                const updatedAddress = `${response.data.full_name}, ${response.data.address}, ${response.data.region_name}`;
+                $('#edit-address-btn').html(updatedAddress);
+                alert('Address updated successfully.');
+            } else {
+                alert('Failed to update address.');
+            }
+        },
+        error: function () {
+            alert('An error occurred while updating the address.');
+        },
+    });
+});
+
+
+$(document).on('click', '#save-address', function (e)  {
+    e.preventDefault();
+    const form = $("#address-form")
+    $.ajax({
+        url: form.attr('action'),
+        type: 'POST',
+        data: form.serialize(),
+        success: function (response) {
+            if (response.success) {
+                $('#edit-address-modal').modal('hide');
+                const updatedAddress = `${response.data.full_name}, ${response.data.address}, ${response.data.region_name}`;
+                $('#edit-address-btn').html(updatedAddress);
+    
+            } else {
+                alert('Failed to update address.');
+            }
+        },
+        error: function () {
+            alert('An error occurred while updating the address.');
+        },
+    });
+});

@@ -4,6 +4,8 @@ namespace app\controllers;
 
 use app\models\addresses\Addresses;
 use app\models\addresses\AddressesSearch;
+use app\models\orders\Orders;
+use Faker\Provider\ar_EG\Address;
 use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -159,5 +161,67 @@ class AddressesController extends BaseController
             return $this->asJson(['name' => $address->region->name]);
         }
         return $this->asJson(['name' => '']);
+    }
+
+    /**
+     * Fetches the address form based on the order ID.
+     * @return string
+     */
+    public function actionGetForm()
+    {
+        $orderId = Yii::$app->request->get('order_id');
+        $order = Orders::findOne($orderId);
+
+        if (!$order || !$order->addresses) {
+            return 'Address not found.';
+        }
+
+        return $this->renderAjax('_form', [
+            'model' => $order->addresses,
+        ]);
+    }
+
+
+
+        /**
+     * Fetches the address form based on the order ID.
+     * @return string
+     */
+    public function actionAjaxForm($id)
+    {
+    
+         $model = $this->findModel($id);
+     
+        return $this->renderAjax('ajax-form', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     * Updates an address based on its ID.
+     * @param int $id ID
+     * @return array
+     */
+    public function actionUpdateAddress($id)
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $address = Addresses::findOne($id);
+        if (!$address) {
+            return ['success' => false, 'message' => 'Address not found.'];
+        }
+
+        if ($address->load(Yii::$app->request->post()) && $address->save()) {
+            return [
+                'success' => true,
+                'data' => [
+                    'full_name' => $address->full_name,
+                    'address' => $address->address,
+                    'region_name' => $address->region->name,
+                ],
+            ];
+        }
+
+        return ['success' => false, 'message' => 'Failed to update address.'];
     }
 }

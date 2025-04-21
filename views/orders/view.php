@@ -41,7 +41,20 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             [
                                 'label' => Yii::t('app', 'Address'),
-                                'value' => $model->addresses ? $model->addresses->full_name . ', ' . $model->addresses->address . ', ' . $model->addresses->region->name : null,
+                                'format' => 'raw',
+                                'value' => $model->addresses 
+                                    ? Html::a(
+                                        $model->addresses->full_name . ', ' . $model->addresses->address . ', ' . $model->addresses->region->name,
+                                        '#',
+                                        [
+                                            'class' => 'btn btn-link',
+                                            'id' => 'edit-address-btn',
+                                            'data-bs-toggle' => 'modal',
+                                            'data-bs-target' => '#edit-address-modal',
+                                            'data-id' => $model->address_id,
+                                        ]
+                                    )
+                                    : null,
                             ],
                             [
                                 'label' => Yii::t('app', 'Status'),
@@ -222,5 +235,16 @@ Modal::begin([
         'class' => 'form-control',
         'id' => 'status-dropdown',
     ]) ?>
+</div>
+<?php Modal::end(); ?>
+
+<?php
+Modal::begin([
+    'id' => 'edit-address-modal',
+    'title' => Yii::t('app', 'Edit Address'),
+]);
+?>
+<div id="edit-address-modal-content">
+    <!-- Address form will be loaded here via AJAX -->
 </div>
 <?php Modal::end(); ?>
