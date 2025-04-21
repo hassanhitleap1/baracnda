@@ -59,18 +59,24 @@ $columns = [
     [
         'attribute' => 'shipping_price',
         'footer' => Yii::$app->formatter->asCurrency($dataProvider->query->sum('shipping_price')),
+        'pageSummary' => true, // Enable page summary
+        'pageSummaryFunc' => GridView::F_SUM, // Use SUM function for the summary
         'vAlign' => 'middle',
         'width' => '100px',
     ],
     [
         'attribute' => 'sub_total',
         'footer' => Yii::$app->formatter->asCurrency($dataProvider->query->sum('sub_total')),
+        'pageSummary' => true, // Enable page summary
+        'pageSummaryFunc' => GridView::F_SUM, // Use SUM function for the summary
         'vAlign' => 'middle',
         'width' => '100px',
     ],
     [
         'attribute' => 'total',
         'footer' => Yii::$app->formatter->asCurrency($dataProvider->query->sum('total')),
+        'pageSummary' => true, // Enable page summary
+        'pageSummaryFunc' => GridView::F_SUM, // Use SUM function for the summary
         'vAlign' => 'middle',
         'width' => '100px',
     ],
