@@ -113,7 +113,7 @@ $columns = [
     <h1><?= Html::encode($this->title) ?></h1>
 
 
-
+    <?php Pjax::begin(); ?>
     <?= DynaGrid::widget([
         'columns' => $columns,
         'storage' => DynaGrid::TYPE_COOKIE,
@@ -137,117 +137,6 @@ $columns = [
         'options' => ['id' => 'dynagrid'],  // a unique identifier is important
 
     ]); ?>
-
-    <?php Pjax::begin(); ?>
-
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'showFooter' => true, // Enable footer
-        'columns' => [
-            ['class' => 'kartik\grid\SerialColumn'],
-            [
-                'class' => 'yii\grid\CheckboxColumn',
-                'checkboxOptions' => function ($model) {
-                    return ['value' => $model->id];
-                },
-            ],
-            'id',
-            [
-                'attribute' => 'creator_id',
-                'label' => Yii::t('app', 'Creator'),
-                'value' => 'creator.full_name',
-                'filter' => ArrayHelper::map(\app\models\users\Users::find()->all(), 'id', 'full_name'),
-            ],
-            [
-                'attribute' => 'address_id',
-                'label' => Yii::t('app', 'Full Address'),
-                'value' => function ($model) {
-                    return $model->addresses ? $model->addresses->full_name . ', ' . $model->addresses->address . ', ' . $model->addresses->region->name : null;
-                },
-            ],
-            [
-                'attribute' => 'status_id',
-                'label' => Yii::t('app', 'Status'),
-                'value' => 'status.name',
-                'filter' => ArrayHelper::map(\app\models\status\Status::find()->all(), 'id', 'name'),
-            ],
-            [
-                'attribute' => 'shipping_price',
-                'footer' => Yii::$app->formatter->asCurrency($dataProvider->query->sum('shipping_price')),
-            ],
-            [
-                'attribute' => 'sub_total',
-                'footer' => Yii::$app->formatter->asCurrency($dataProvider->query->sum('sub_total')),
-            ],
-            [
-                'attribute' => 'profit',
-                'footer' => Yii::$app->formatter->asCurrency($dataProvider->query->sum('profit')),
-            ],
-            [
-                'attribute' => 'total',
-                'footer' => Yii::$app->formatter->asCurrency($dataProvider->query->sum('total')),
-            ],
-            [
-                'attribute' => 'orderItems',
-                'label' => Yii::t('app', 'Order Items'),
-                'format' => 'raw',
-                'value' => function ($model) {
-                    if ($model->orderItems) {
-                        $items = array_map(function ($item) {
-                            $image = Html::img($item->product->imageUrl, ['alt' => $item->product->name, 'style' => 'width:50px; height:auto;']);
-                            $details = Html::encode($item->product->name . ' (Qty: ' . $item->quantity . ')');
-                            return $image . '<br>' . $details;
-                        }, $model->orderItems);
-                        return implode('<br><br>', $items);
-                    }
-                    return null;
-                },
-            ],
-            'discount',
-            'status_order',
-            [
-                'attribute' => 'created_at',
-                'label' => Yii::t('app', 'Created At'),
-                'format' => 'datetime',
-                'filter' => DateRangePicker::widget([
-                    'model' => $searchModel,
-                    'attribute' => 'created_at',
-                    'convertFormat' => true,
-                    'pluginOptions' => [
-                        'timePicker' => true,
-                        'timePickerIncrement' => 30,
-                        'locale' => [
-                            'format' => 'Y-m-d H:i:s',
-                        ],
-                    ],
-                ]),
-            ],
-            'updated_at',
-            [
-                'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, $model, $key, $index) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                },
-                'visibleButtons' => [
-                    'view' => true,
-                    'delete' => function ($model) {
-                        return $model->status_order === 'reserved';
-                    },
-                    'update' => function ($model) {
-                        return $model->status_order === 'reserved'; // Allow editing only if status_order is 'reserved'
-                    },
-                ],
-            ],
-        ],
-        'responsive' => true,
-        'hover' => true,
-        'panel' => [
-            'type' => 'primary',
-            'heading' => Yii::t('app', 'Orders List'),
-        ],
-    ]); ?>
-
     <?php Pjax::end(); ?>
 
 </div>
@@ -265,43 +154,3 @@ Modal::end();
 
 ?>
 
-<?php
-$printUrl = Url::to(['orders/print-selected']);
-$changeStatusUrl = Url::to(['orders/change-status']);
-$script = <<<JS
-    $('#print-selected').on('click', function () {
-        var keys = $('#w0').yiiGridView('getSelectedRows');
-        if (keys.length === 0) {
-            alert('Please select at least one order.');
-            return;
-        }
-        window.location.href = '$printUrl' + '?ids=' + JSON.stringify(keys);
-    });
-
-    $('#change-status').on('click', function () {
-        $('#status-modal').modal('show');
-    });
-
-    $('#apply-status').on('click', function () {
-        var keys = $('#w0').yiiGridView('getSelectedRows');
-        var newStatus = $('#new-status').val();
-        if (keys.length === 0) {
-            alert('Please select at least one order.');
-            return;
-        }
-        if (!newStatus) {
-            alert('Please select a new status.');
-            return;
-        }
-        $.post('$changeStatusUrl', {ids: keys, status: newStatus}, function (response) {
-            if (response.success) {
-                alert('Status updated successfully.');
-                location.reload();
-            } else {
-                alert('Failed to update status.');
-            }
-        });
-    });
-JS;
-$this->registerJs($script);
-?>

@@ -318,7 +318,45 @@ $(document).ready(function () {
         updateOrderSummary();
     });
 
+    const printUrl = `${SITE_URL}/orders/print-selected`;
+    const changeStatusUrl = `${SITE_URL}/orders/change-status`;
 
+    // Handle "Print Selected" button click
+    $('#print-selected').on('click', function () {
+        const keys = $('#w0').yiiGridView('getSelectedRows');
+        if (keys.length === 0) {
+            alert('Please select at least one order.');
+            return;
+        }
+        window.location.href = `${printUrl}?ids=${JSON.stringify(keys)}`;
+    });
+
+    // Handle "Change Status" button click
+    $('#change-status').on('click', function () {
+        $('#status-modal').modal('show');
+    });
+
+    // Handle "Apply Status" button click
+    $('#apply-status').on('click', function () {
+        const keys = $('#w0').yiiGridView('getSelectedRows');
+        const newStatus = $('#new-status').val();
+        if (keys.length === 0) {
+            alert('Please select at least one order.');
+            return;
+        }
+        if (!newStatus) {
+            alert('Please select a new status.');
+            return;
+        }
+        $.post(changeStatusUrl, { ids: keys, status: newStatus }, function (response) {
+            if (response.success) {
+                alert('Status updated successfully.');
+                location.reload();
+            } else {
+                alert('Failed to update status.');
+            }
+        });
+    });
 });
 
 function generateCombinations(selectedAttributes) {
