@@ -201,7 +201,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
             ]) ?>
         <?php elseif ($model->status_order === Orders::STATUS_CANCELED): ?>
-            <?= Html::a(Yii::t('app', 'Revert to Reserved'), ['change-status', 'id' => $model->id, 'status' => Orders::STATUS_RESERVED], ['class' => 'btn btn-warning']) ?>
+            <?= Html::button(Yii::t('app', 'Revert to Reserved'), [
+                'class' => 'btn btn-warning',
+                'id' => 'revert-to-reserved-btn',
+                'data-id' => $model->id,
+            ]) ?>
         <?php endif; ?>
     </p>
 </div>

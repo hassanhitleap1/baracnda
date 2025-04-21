@@ -290,16 +290,17 @@ class OrdersController extends BaseController
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
-        $statusId = Yii::$app->request->post('status_id');
-
+        $order_status = Yii::$app->request->post('order_status');
+    
         $order = Orders::findOne($id);
         if (!$order) {
             return ['success' => false, 'message' => 'Order not found.'];
         }
 
-        $order->status_id = $statusId;
+
+        $order->status_order = $order_status === 'reserved' ? Orders::STATUS_RESERVED : $order->status_order;
         if ($order->save(false)) {
-            return ['success' => true ,'data'=> $order->status] ;
+            return ['success' => true, 'data' => $order->status_order];
         }
 
         return ['success' => false, 'message' => 'Failed to update status.'];

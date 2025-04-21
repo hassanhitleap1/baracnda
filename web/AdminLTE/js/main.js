@@ -666,3 +666,21 @@ $(document).on('click', '#save-status-btn', function () {
     });
 });
 
+$(document).on('click', '#revert-to-reserved-btn', function () {
+    const id = $("#order-id").attr("data-id");
+    $.ajax({
+        url: `${SITE_URL}/orders/change-status?id=${id}`,
+        type: 'POST',
+        data: {order_status: 'reserved'},
+        success: function (response) {
+            if (response.success) {
+                location.reload();
+            } else {
+                alert(response.message || 'Failed to update status.');
+            }
+        },
+        error: function () {
+            alert('An error occurred while processing your request.');
+        }
+    });
+});
