@@ -23,7 +23,7 @@ class OrdersSearch extends Orders
         return [
             [['id', 'user_id', 'creator_id', 'address_id', 'status_id', 'shipping_id'], 'integer'],
             [['total', 'shipping_price', 'sub_total', 'profit', 'discount'], 'number'],
-            [['note', 'created_at', 'updated_at'.'date_range','start_date','end_date'], 'safe'],
+            [['note', 'created_at', 'updated_at'.'date_range','delivery_status','payment_status','start_date','end_date'], 'safe'],
         ];
     }
 
@@ -46,7 +46,7 @@ class OrdersSearch extends Orders
      */
     public function search($params, $formName = null)
     {
-        $query = Orders::find()->joinWith(['user', 'creator', 'status']);
+        $query = Orders::find()->joinWith(['user', 'creator', 'status'])->byAuthedUser();
 
         // add conditions that should always apply here
 
@@ -81,6 +81,8 @@ class OrdersSearch extends Orders
             'profit' => $this->profit,
             'discount' => $this->discount,
             'shipping_id' => $this->shipping_id,
+            'delivery_status' => $this->delivery_status,
+            'payment_status' => $this->payment_status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);

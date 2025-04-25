@@ -3,11 +3,8 @@
 use app\models\status\Status;
 use kartik\grid\GridView;
 use yii\helpers\Html;
-use yii\helpers\Url;
-use yii\grid\ActionColumn;
 use yii\widgets\Pjax;
-use yii\bootstrap5\Modal; // Use Bootstrap 5 Modal
-use kartik\daterange\DateRangePicker;
+use yii\bootstrap5\Modal; 
 use yii\helpers\ArrayHelper;
 use kartik\dynagrid\DynaGrid;
 /** @var yii\web\View $this */
@@ -37,7 +34,7 @@ $columns = [
         'value' => 'creator.full_name',
         'filter' => ArrayHelper::map(\app\models\users\Users::find()->all(), 'id', 'full_name'),
         'vAlign' => 'middle',
-        'width' => '20px',
+        'width' => '150px',
     ],
     [
         'attribute' => 'address_id',
@@ -97,9 +94,6 @@ $columns = [
         'value' => 'delivery_status',
         'filter' => ['delivered' => 'delivered', 'undelivered' => 'undelivered', 'pending' => 'pending'],
         'vAlign' => 'middle',
-        'filterWidgetOptions' => [
-            'pluginOptions' => ['allowClear' => true],
-        ],
         'width' => '100px',
     ],
 

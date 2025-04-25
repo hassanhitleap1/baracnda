@@ -843,3 +843,13 @@ $(document).on('click', '.change-status', function(e){
     });
 
 });
+// select all on check box select and in aun check un slect all 
+$(document).on('change', '.select-on-check-all', function(e){
+    e.preventDefault();
+    var checked = $(this).is(':checked');
+    if(checked){
+        $('.kv-row-checkbox').prop('checked', true);
+    }else{
+        $('.kv-row-checkbox').prop('checked', false);
+    }
+});
