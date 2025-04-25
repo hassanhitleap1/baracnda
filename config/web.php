@@ -61,12 +61,8 @@ $config = [
         
     ],
     'modules' => [
-        'gridview' => [
-            'class' => '\kartik\grid\Module',
-        ],
-        'dynagrid' => [
-            'class' => '\kartik\dynagrid\Module',
-            // other module settings if needed
+        'api' => [
+            'class' => 'app\modules\api\Module',
         ],
     ],
     'params' => $params,
