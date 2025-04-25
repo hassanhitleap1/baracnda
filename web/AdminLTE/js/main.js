@@ -853,3 +853,61 @@ $(document).on('change', '.select-on-check-all', function(e){
         $('.kv-row-checkbox').prop('checked', false);
     }
 });
+
+
+$(document).on('click', '#change_status', function(e){
+    e.preventDefault();
+    // get all selected ids fro class kv-row-checkbox get value and make string of it
+    var selectedIds = [];
+    $('.kv-row-checkbox:checked').each(function() {
+        selectedIds.push($(this).val());
+    });
+    var selectedIdsString = selectedIds.join(',');
+    var url = `${SITE_URL}/orders/all-status`;
+    $('#model').modal('show')
+        .find('#modelContent')
+        .load(url);
+});
+
+
+
+
+
+
+$(document).on('click', '.change-all-status', function(e){
+    e.preventDefault();
+
+    var selectedIds = [];
+    $('.kv-row-checkbox:checked').each(function() {
+        selectedIds.push($(this).val());
+    });
+    if(selectedIds.length == 0) {
+        alert('Please select at least one order.');
+        return;
+    }
+    var status_id= $(this).attr("att_status_id");
+    var name_status= $(this).attr("name_status");
+    let url= `${SITE_URL}/orders/change-all-status`;
+    $.ajax({
+        url: url,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            status_id: status_id,
+            selectedIds: selectedIds
+        },
+        success: function (json) {
+            if(json.success == true){
+                selectedIds.forEach(function(id) {
+                    $(".column_status_"+id).text(name_status);
+                    $('#model').modal('hide');
+                    $('#modelContent').html("");
+
+                });
+            }else {
+                alert("sumthing  error");
+            }
+        }
+    });
+
+});

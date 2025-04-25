@@ -309,6 +309,7 @@ class OrdersController extends BaseController
      */
     public function actionChangeStatus($id)
     {
+        
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
         $order_status = Yii::$app->request->post('order_status');
@@ -527,6 +528,12 @@ class OrdersController extends BaseController
         return $this->renderAjax('get_status',['model'=> $model,'status'=>$status]);
     }
 
+    public function actionAllStatus()
+    {
+   
+        $status=Status::find()->all();
+        return $this->renderAjax('all_status',['status'=>$status]);
+    }
 
 
 
@@ -538,5 +545,30 @@ class OrdersController extends BaseController
         $model->status_id = $status_id;
         $model->save(false);
          return ['code'=>201];  
+    }
+
+
+
+    public function actionChangeAllStatus()
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $statusId = Yii::$app->request->post('status_id');
+        $orderIds = Yii::$app->request->post('selectedIds');
+
+        if (empty($orderIds)) {
+            return ['success' => false, 'message' => 'No orders selected.'];
+        }
+
+        $orders = Orders::find()->where(['id' => $orderIds])->all();
+
+        foreach ($orders as $order) {
+            $order->status_id = $statusId;
+            if (!$order->save(false)) {
+                return ['success' => false, 'message' => 'Failed to update order status.'];
+            }
+        }
+
+        return ['success' => true];
     }
 }
