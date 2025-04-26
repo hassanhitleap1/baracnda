@@ -64,6 +64,18 @@ $config = [
         'api' => [
             'class' => 'app\modules\api\Module',
         ],
+        'gridview' => [
+            'class' => '\kartik\grid\Module',
+            // Optional: Configure export settings
+            'downloadAction' => 'gridview/export/download',
+        ],
+        'dynagrid' => [
+            'class' => '\kartik\dynagrid\Module',
+            // Optional: Configure storage settings
+            'dbSettings' => [
+                'tableName' => 'dynagrid', // Name of the database table to store DynaGrid settings
+            ],
+        ],
     ],
     'params' => $params,
 ];
