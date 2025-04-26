@@ -11,7 +11,7 @@ class OrdersController extends Controller
     {
         // Use with() for eager loading
         $order = Orders::find()
-            ->with(['orderItems', 'addresses', 'creator'])
+            ->with(['orderItems', 'addresses' ,"addresses.region", 'creator',"status" ,"user"])
             ->where(['orders.id' => $id])
             ->one();
 
@@ -19,6 +19,6 @@ class OrdersController extends Controller
             throw new NotFoundHttpException('Order not found.');
         }
 
-        return $order->toArray([], ['orderItems', 'address', 'creator']);
+        return $order->toArray([], ['orderItems', 'addresses', 'creator','status','user']);
     }
 }
