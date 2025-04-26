@@ -25,24 +25,22 @@ $orderId = $model->id;
 
 <div class="orders-view" id="order-app">
     <h1>{{ title }}</h1>
-    <ul>
-
+    <!-- <ul>
         <li v-for="(value, key) in order" :key="key">
             <strong>{{ key }}:</strong> {{ value }}
         </li>
-    </ul>
+    </ul> -->
 
-    <div class="container">
-        <dl class="row">
+    <dl class="row">
             <dt class="col-sm-3">id</dt>
             <dd class="col-sm-9">{{ order.id }}</dd>
 
             <dt class="col-sm-3">user</dt>
-            <dd class="col-sm-9">{{ order.user?.name??""}}</dd>
+            <dd class="col-sm-9">{{ order.user?.name ?? "" }} </dd>
 
 
-            <dt class="col-sm-3">creator</dt>
-            <dd class="col-sm-9">{{ order.creator?.name??""}}</dd>
+            <dt class="col-sm-3"> creator </dt>
+            <dd class="col-sm-9">{{ order.creator?.name ?? ""}}</dd>
 
             <dt class="col-sm-3">status</dt>
             <dd class="col-sm-9">{{ order.status?.name??""}}</dd>
@@ -50,10 +48,6 @@ $orderId = $model->id;
 
             <dt class="col-sm-3">address</dt>
             <dd class="col-sm-9">{{ order.addresses ?   order.addresses.phone + "   "+ order.addresses.full_name + ', ' + order.addresses.address + ', ' + order.addresses.region?.name??""  : ""}}</dd>
-      
-
-
-
 
             <dt class="col-sm-3">shipping_price</dt>
             <dd class="col-sm-9">{{ order.shipping_price }}</dd>
@@ -61,16 +55,12 @@ $orderId = $model->id;
             <dd class="col-sm-9">{{ order.sub_total }}</dd>
             <dt class="col-sm-3">total</dt>
             <dd class="col-sm-9">{{ order.total }}</dd>
-
-
             <dt class="col-sm-3">created_at</dt>
             <dd class="col-sm-9">{{ order.created_at }}</dd>
             <dt class="col-sm-3">updated_at</dt>
             <dd class="col-sm-9">{{ order.updated_at }}</dd>
 
         </dl>
-    </div>
-
 
 </div>
 
