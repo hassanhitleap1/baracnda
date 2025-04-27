@@ -32,36 +32,43 @@ $orderId = $model->id;
     </ul> -->
 
     <dl class="row">
-            <dt class="col-sm-3">id</dt>
-            <dd class="col-sm-9">{{ order.id }}</dd>
+        <dt class="col-sm-3">id</dt>
+        <dd class="col-sm-9">{{ order.id }}</dd>
 
-            <dt class="col-sm-3">user</dt>
-            <dd class="col-sm-9">{{ order.user?.name ?? "" }} </dd>
-
-
-            <dt class="col-sm-3"> creator </dt>
-            <dd class="col-sm-9">{{ order.creator?.name ?? ""}}</dd>
-
-            <dt class="col-sm-3">status</dt>
-            <dd class="col-sm-9">{{ order.status?.name??""}}</dd>
+        <dt class="col-sm-3">user</dt>
+        <dd class="col-sm-9">{{ order.user?.name ?? "" }} </dd>
 
 
-            <dt class="col-sm-3">address</dt>
-            <dd class="col-sm-9">{{ order.addresses ?   order.addresses.phone + "   "+ order.addresses.full_name + ', ' + order.addresses.address + ', ' + order.addresses.region?.name??""  : ""}}</dd>
+        <dt class="col-sm-3"> creator </dt>
+        <dd class="col-sm-9">{{ order.creator?.name ?? ""}}</dd>
 
-            <dt class="col-sm-3">shipping_price</dt>
-            <dd class="col-sm-9">{{ order.shipping_price }}</dd>
-            <dt class="col-sm-3">subtotal</dt>
-            <dd class="col-sm-9">{{ order.sub_total }}</dd>
-            <dt class="col-sm-3">total</dt>
-            <dd class="col-sm-9">{{ order.total }}</dd>
-            <dt class="col-sm-3">created_at</dt>
-            <dd class="col-sm-9">{{ order.created_at }}</dd>
-            <dt class="col-sm-3">updated_at</dt>
-            <dd class="col-sm-9">{{ order.updated_at }}</dd>
+        <dt class="col-sm-3">status</dt>
+        <dd class="col-sm-9">{{ order.status?.name??""}}</dd>
 
-        </dl>
+        <dt class="col-sm-3">payment_status</dt>
+        <dd class="col-sm-9">{{ order.payment_status}}</dd>
+        <dt class="col-sm-3">delivery_status</dt>
+        <dd class="col-sm-9">{{ order.delivery_status}}</dd>
 
+
+
+        <dt class="col-sm-3">address</dt>
+        <dd class="col-sm-9">{{ order.addresses ?   order.addresses.phone + "   "+ order.addresses.full_name + ', ' + order.addresses.address + ', ' + order.addresses.region?.name??""  : ""}}</dd>
+
+        <dt class="col-sm-3">shipping_price</dt>
+        <dd class="col-sm-9">{{ order.shipping_price }}</dd>
+        <dt class="col-sm-3">subtotal</dt>
+        <dd class="col-sm-9">{{ order.sub_total }}</dd>
+        <dt class="col-sm-3">total</dt>
+        <dd class="col-sm-9">{{ order.total }}</dd>
+        <dt class="col-sm-3">created_at</dt>
+        <dd class="col-sm-9">{{ order.created_at }}</dd>
+        <dt class="col-sm-3">updated_at</dt>
+        <dd class="col-sm-9">{{ order.updated_at }}</dd>
+
+    </dl>
+
+    <button class="btn btn-primary" @click="processOrder">process order</button>
 </div>
 
 <?php
@@ -73,6 +80,7 @@ createApp({
         const order = reactive({});
         const title = ref('Loading...');
         const orderId = $model->id; // Safely pass PHP variable to JS
+    
 
         // Fetch order data using Axios
         const fetchOrder = async () => {
@@ -87,6 +95,18 @@ createApp({
             }
         };
 
+        const processOrder = async () => {
+            try {
+                console.log(orderId);
+                const response = await axios.post(`/api/orders/view?id=${orderId}`);
+                
+            } catch (error) {
+                console.error('Error fetching order data:', error);
+                title.value = 'Error loading order';
+            }
+        };
+  
+
         // Fetch data when the component is mounted
         onMounted(fetchOrder);
 
@@ -94,6 +114,8 @@ createApp({
             order,
             title
         };
+
+  
     }
 }).mount('#order-app');
 JS;
