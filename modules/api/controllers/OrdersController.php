@@ -11,16 +11,8 @@ class OrdersController extends Controller
     public function actionView($id)
     {
         // Use with() for eager loading
-        $order = Orders::find()
-            ->with(['orderItems', 'addresses' ,"addresses.region", 'creator',"status" ,"user"])
-            ->where(['orders.id' => $id])
-            ->one();
-
-        if (!$order) {
-            throw new NotFoundHttpException('Order not found.');
-        }
-
-        return $order->toArray([], ['orderItems', 'addresses', 'creator','status','user']);
+        $order = $this->findModel($id);
+        return  $this->toArray($order);
     }
 
 
@@ -41,7 +33,7 @@ class OrdersController extends Controller
      
 
         if($order->save(false)){
-            return ['success' => true, 'message' => 'Delivery status updated successfully.','data' => $order->toArray([], ['orderItems', 'addresses', 'creator','status','user'])];
+            return ['success' => true, 'message' => 'Delivery status updated successfully.','data' => $this->toArray($order)];
         }
  
         return ['success' => false, 'message' => 'Failed to update delivery status.'];
@@ -64,13 +56,20 @@ class OrdersController extends Controller
     protected function findModel($id)
     {
         if (($model = $order = Orders::find()
-        ->with(['orderItems', 'addresses' ,"addresses.region", 'creator',"status" ,"user"])
-        ->where(['orders.id' => $id])
-        ->one()) !== null) {
+            ->with(['orderItems', 'addresses' ,"addresses.region", 'creator',"status" ,"user",'orderItems.product','orderItems.variant'])
+            ->where(['orders.id' => $id])
+            ->one()) !== null) {
             return $model;
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+
+    protected function toArray($model)
+    {
+    
+        return $model->toArray([], ['orderItems', 'addresses', 'creator','status','user' ,'orderItems.product','orderItems.variant' ]);
     }
     
 }
