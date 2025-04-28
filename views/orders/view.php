@@ -42,6 +42,7 @@ $orderId = $model->id;
                 </div>
                 <div class="card-body">
                     <div v-if="order.orderItems?.length">
+                        
                         <div v-for="item in order.orderItems" :key="item.id" class="order-item mb-3 pb-3 border-bottom">
                             <div class="row">
                                 <div class="col-md-2">
@@ -138,13 +139,14 @@ $orderId = $model->id;
 
 <?php
 $js = <<<JS
-const { createApp, reactive, ref, onMounted } = Vue;
+const { createApp, reactive, ref, onMounted,computed } = Vue;
 
 createApp({
     setup() {
         const order = reactive({});
         const title = ref('Loading...');
         const orderId = $model->id; // Safely pass PHP variable to JS
+
     
 
         // Fetch order data using Axios
@@ -172,12 +174,22 @@ createApp({
         };
   
 
-        // Fetch data when the component is mounted
+        const isEditable = computed(() => {
+            return order.order_status !== 'processing';
+        });
+        
+        
         onMounted(fetchOrder);
+        // Computed property to check if the order can be edited
+        // canEdit: computed(() => order.status?.name !== 'processing'),
+   
+
 
         return {
             order,
-            title
+            title,
+            processOrder,
+            isEditable,
         };
 
   
