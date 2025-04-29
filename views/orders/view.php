@@ -198,16 +198,26 @@ createApp({
 
         const addVariantToOrder = async (variant) => {
             try {
-                const response = await axios.post(`/api/orders/add-variant?id=${orderId}`, {
-                    variantId: variant.id
-                });
-                if (response.data.success) {
+                const formData = new FormData();
+                formData.append('variantId', variant.id);
+                formData.append('price', variant.price);
+                formData.append('quantity', 1);
+                axios.post(`/api/orders/add-variant?id=${orderId}`,formData)
+                .then(response => {
+                    if (response.data.success) {
                     fetchOrder(); // Refresh order data
-                } else {
-                    console.error('Failed to add variant to order:', response.data.message);
-                    alert(response.data.message)
-                }
+                        } else {
+                            console.error('Failed to add variant to order:', response.data.message);
+                            alert(response.data.message)
+                        }
+                })
+                .catch(error => {
+                    console.error('Error adding variant to order:', error);
+                    alert('Error adding variant to order'); 
+                })
+
             } catch (error) {
+                alert('Error adding variant to order'); 
                 console.error('Error adding variant to order:', error);
             }
         };

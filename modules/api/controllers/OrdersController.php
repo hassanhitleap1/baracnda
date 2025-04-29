@@ -51,21 +51,23 @@ class OrdersController extends Controller
    
         // i am send orderId in requast and variantId but i am not able to get it
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        // Get the orderId and variantId from the request
-        $params = Yii::$app->request->getBodyParams();
-        dd($_POST , $params ,Yii::$app->request->post() );
-   
         $variantId = Yii::$app->request->post('variantId');
+        // $variantPrice = Yii::$app->request->post('price');
+        $variantModel = \app\models\variants\Variants::findOne($variantId);
+        if (!$variantModel) {
+            return ['success' => false, 'message' => 'Variant not found.'];
+        }
         
+        // $variantQuantity = Yii::$app->request->post('quantity');
         $order = Orders::findOne($id);
         if ($order) {
             $orderItem = new OrderItems();
             $orderItem->order_id = $id;
             $orderItem->variant_id = $variantId;
             $orderItem->quantity = 1; // Default quantity, you can change this as needed
-            $orderItem->price = $orderItem->variant->price; // Assuming you have a relation to get the price from the variant
-            $orderItem->cost = $orderItem->variant->cost; // Assuming you have a relation to get the cost from the variant
-            $orderItem->product_id = $orderItem->variant->product_id; // Assuming you have a relation to get the product ID from the variant
+            $orderItem->price =  $variantModel->price; // Assuming you have a relation to get the price from the variant
+            $orderItem->cost = $variantModel->cost; // Assuming you have a relation to get the cost from the variant
+            $orderItem->product_id = $variantModel->product_id; // Assuming you have a relation to get the product ID from the variant
             if ($orderItem->save(false)) {
                 $order->calculateSubTotalFromOrderItems();
                 $order->setShippingPrice();
