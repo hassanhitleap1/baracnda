@@ -25,7 +25,7 @@ $orderId = $model->id;
 
 <div class="orders-view" id="order-app">
     <h1>{{ title }}</h1>
-
+   <!-- Add this inside your form, typically near the submit button -->
     <!-- Order Status -->
     <div class="order-status mb-4">
         <span class="badge bg-primary">Order Status: {{ order.status?.name || 'N/A' }}</span>
@@ -48,7 +48,14 @@ $orderId = $model->id;
                         <li v-for="variant in searchResults" :key="variant.id" class="list-group-item d-flex justify-content-between align-items-center">
                             <img v-if="variant.image" :src="variant.image" class="img-fluid me-2" style="max-height: 50px;">
                             <span>{{ variant.name }}</span>
-                            <button class="btn btn-success btn-sm" @click="addVariantToOrder(variant)">Add</button>
+                            <button 
+                            class="btn btn-success btn-sm" 
+                            :class='isLoading ? "loader" : ""' 
+                            :disabled="order.orderItems.some(item => item.variant_id === variant.id) || isLoading" 
+                            @click="addVariantToOrder(variant)"
+                            >
+                            Add
+                            </button>
                         </li>
                     </ul>
                 </div>
@@ -172,6 +179,7 @@ createApp({
         const title = ref('Loading...');
         const orderId = $model->id;
         const variantSearch = ref('');
+        var isLoading = ref(false);
         const searchResults = reactive([]);
 
         const fetchOrder = async () => {
@@ -199,6 +207,8 @@ createApp({
         const addVariantToOrder = async (variant) => {
             try {
                 const formData = new FormData();
+                if (isLoading.value) return; // prevent multiple clicks
+                isLoading.value = true;
                 formData.append('variantId', variant.id);
                 formData.append('price', variant.price);
                 formData.append('quantity', 1);
@@ -214,7 +224,9 @@ createApp({
                 .catch(error => {
                     console.error('Error adding variant to order:', error);
                     alert('Error adding variant to order'); 
-                })
+                }).finally(() => {
+                    isLoading.value = false;
+                });
 
             } catch (error) {
                 alert('Error adding variant to order'); 

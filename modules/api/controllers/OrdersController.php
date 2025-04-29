@@ -82,6 +82,27 @@ class OrdersController extends Controller
         }
     }
 
+
+    public function actionRemoveVariant($id){
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $orderItemId = Yii::$app->request->post('orderItemId');
+        $orderItem = OrderItems::findOne($orderItemId);
+        if ($orderItem) {
+            $orderItem->delete();
+            $order = Orders::findOne($id);
+            if ($order) {
+                $order->calculateSubTotalFromOrderItems();
+                $order->setShippingPrice();
+                $order->calculateProfit();
+                $order->calculateTotal();
+                return ['success' => true, 'message' => 'Variant removed from order successfully.'];
+            } else {
+                return ['success' => false, 'message' => 'Order not found.'];
+            }
+        } else {
+            return ['success' => false, 'message' => 'Order item not found.'];
+        }
+    }
     /**
      * Finds the Orders model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
