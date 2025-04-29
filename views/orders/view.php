@@ -1,10 +1,6 @@
 <?php
 
-use app\models\orders\Orders;
-use yii\helpers\Html;
-use yii\widgets\DetailView;
-use yii\bootstrap5\Modal;
-use yii\helpers\Url;
+
 
 /** @var yii\web\View $this */
 /** @var app\models\orders\Orders $model */
@@ -18,13 +14,60 @@ $this->params['breadcrumbs'][] = $this->title;
 // Register Vue.js and Axios
 $this->registerJsFile('https://cdn.jsdelivr.net/npm/vue@3.2.47/dist/vue.global.min.js', ['position' => \yii\web\View::POS_HEAD]);
 $this->registerJsFile('https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js', ['position' => \yii\web\View::POS_HEAD]);
+$this->registerJsFile('https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js', ['position' => \yii\web\View::POS_HEAD]);
 
 // Pass the order ID to JavaScript
 $orderId = $model->id;
 ?>
 
 <div class="orders-view" id="order-app">
+    <!-- Shipping Address Modal -->
+<!-- <div class="modal fade" id="shippingAddressModal" tabindex="-1" aria-labelledby="shippingAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shippingAddressModalLabel">Edit Shipping Address</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="shippingAddressForm">
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="full_name" v-model="shippingAddress.full_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Address</label>
+                        <textarea class="form-control" id="address" v-model="shippingAddress.address" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" class="form-control" id="city" v-model="shippingAddress.city" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="region_id" class="form-label">Region</label>
+                        <select class="form-control" id="region_id" v-model="shippingAddress.region_id" required>
+                            <option v-for="region in regions" :value="region.id">{{ region.name }}</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="postal_code" class="form-label">Postal Code</label>
+                        <input type="text" class="form-control" id="postal_code" v-model="shippingAddress.postal_code" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Phone</label>
+                        <input type="text" class="form-control" id="phone" v-model="shippingAddress.phone" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" @click="saveShippingAddress">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div> -->
     <h1>{{ title }}</h1>
+    {{shippingAddress}}
    <!-- Add this inside your form, typically near the submit button -->
     <!-- Order Status -->
     <div class="order-status mb-4">
@@ -113,7 +156,7 @@ $orderId = $model->id;
             <!-- Shipping Address -->
             <div class="card mb-4" v-if="order.addresses">
                 <div class="card-header">
-                    <h3 class="card-title">Shipping Address</h3>
+                    <h3 class="card-title">Shipping Address</h3> <i class="fas fa-edit float-end" title="Edit Address" @click="editShippingAddress"></i>
                 </div>
                 <div class="card-body">
                     <address>
@@ -184,11 +227,18 @@ createApp({
         const variantSearch = ref('');
         var isLoading = ref(false);
         const searchResults = reactive([]);
+        const shippingAddress = reactive({});
+        const regions = reactive([]);
+        let shippingAddressModal = null;
 
         const fetchOrder = async () => {
             try {
                 const response = await axios.get(`/api/orders/view?id=${orderId}`);
                 Object.assign(order, response.data);
+
+                if (order.addresses) {
+                    Object.assign(shippingAddress, order.addresses);
+                }
                 title.value = `Order #${orderId}`;
             } catch (error) {
                 console.error('Error fetching order data:', error);
@@ -287,7 +337,49 @@ createApp({
                 });
         };    
 
-        onMounted(fetchOrder);
+        const editShippingAddress = () => {
+            if (!shippingAddressModal) {
+                shippingAddressModal = new bootstrap.Modal(document.getElementById('shippingAddressModal'));
+            }
+            shippingAddressModal.show();
+        };
+
+        const saveShippingAddress = async () => {
+            try {
+                isLoading.value = true;
+                const response = await axios.post(`/api/orders/update-address?id=${orderId}`, shippingAddress);
+                
+                if (response.data.success) {
+                    // Update the order data
+                    Object.assign(order.addresses, shippingAddress);
+                    if (shippingAddressModal) {
+                        shippingAddressModal.hide();
+                    }
+                } else {
+                    alert('Failed to update shipping address: ' + response.data.message);
+                }
+            } catch (error) {
+                console.error('Error updating shipping address:', error);
+                alert('Error updating shipping address');
+            } finally {
+                isLoading.value = false;
+            }
+        };
+
+
+        const fetchRegions = async () => {
+            try {
+                const response = await axios.get('/api/regions');
+                regions.splice(0, regions.length, ...response.data);
+            } catch (error) {
+                console.error('Error fetching regions:', error);
+            }
+        };
+
+        onMounted(() => {
+            fetchOrder();
+            fetchRegions();
+        });
 
         return {
             order,
@@ -298,7 +390,10 @@ createApp({
             addVariantToOrder,
             removeVariant,
             isLoading,
-            updateQuantity
+            updateQuantity,
+            editShippingAddress,
+            saveShippingAddress,
+            fetchRegions
         };
     }
 }).mount('#order-app');
