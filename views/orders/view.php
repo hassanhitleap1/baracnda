@@ -34,6 +34,29 @@ $orderId = $model->id;
     </div>
 
     <div class="row">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="card-title">Add Variants</h3>
+            </div>
+            <div class="card-body">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" v-model="variantSearch" placeholder="Search for variants">
+                    <button class="btn btn-primary" @click="searchVariants" @keyup.enter="searchVariants" >Search</button>
+                </div>
+                <div v-if="searchResults.length">
+                    <ul class="list-group">
+                        <li v-for="variant in searchResults" :key="variant.id" class="list-group-item d-flex justify-content-between align-items-center">
+                            <img v-if="variant.image" :src="variant.image" class="img-fluid me-2" style="max-height: 50px;">
+                            <span>{{ variant.name }}</span>
+                            <button class="btn btn-success btn-sm" @click="addVariantToOrder(variant)">Add</button>
+                        </li>
+                    </ul>
+                </div>
+                <div v-else class="text-muted">No variants found</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-8">
             <!-- Order Items -->
             <div class="card mb-4">
@@ -42,7 +65,7 @@ $orderId = $model->id;
                 </div>
                 <div class="card-body">
                     <div v-if="order.orderItems?.length">
-                        
+
                         <div v-for="item in order.orderItems" :key="item.id" class="order-item mb-3 pb-3 border-bottom">
                             <div class="row">
                                 <div class="col-md-2">
@@ -134,65 +157,71 @@ $orderId = $model->id;
             Back to Orders
         </a>
     </div>
+
+
 </div>
 
 
 <?php
 $js = <<<JS
-const { createApp, reactive, ref, onMounted,computed } = Vue;
+const { createApp, reactive, ref, onMounted, computed } = Vue;
 
 createApp({
     setup() {
         const order = reactive({});
         const title = ref('Loading...');
-        const orderId = $model->id; // Safely pass PHP variable to JS
+        const orderId = $model->id;
+        const variantSearch = ref('');
+        const searchResults = reactive([]);
 
-    
-
-        // Fetch order data using Axios
         const fetchOrder = async () => {
             try {
-                console.log(orderId);
                 const response = await axios.get(`/api/orders/view?id=${orderId}`);
                 Object.assign(order, response.data);
-                title.value = `Order #1`;
+                title.value = `Order #${orderId}`;
             } catch (error) {
                 console.error('Error fetching order data:', error);
                 title.value = 'Error loading order';
             }
         };
 
-        const processOrder = async () => {
+        const searchVariants = async () => {
             try {
-                console.log(orderId);
-                const response = await axios.post(`/api/orders/view?id=${orderId}`);
-                
+                const response = await axios.get(`/api/variants/search`, {
+                    params: { query: variantSearch.value }
+                });
+                searchResults.splice(0, searchResults.length, ...response.data);
             } catch (error) {
-                console.error('Error fetching order data:', error);
-                title.value = 'Error loading order';
+                console.error('Error searching variants:', error);
             }
         };
-  
 
-        const isEditable = computed(() => {
-            return order.order_status !== 'processing';
-        });
-        
-        
+        const addVariantToOrder = async (variant) => {
+            try {
+                const response = await axios.post(`/api/orders/add-variant?id=${orderId}`, {
+                    variantId: variant.id
+                });
+                if (response.data.success) {
+                    fetchOrder(); // Refresh order data
+                } else {
+                    console.error('Failed to add variant to order:', response.data.message);
+                    alert(response.data.message)
+                }
+            } catch (error) {
+                console.error('Error adding variant to order:', error);
+            }
+        };
+
         onMounted(fetchOrder);
-        // Computed property to check if the order can be edited
-        // canEdit: computed(() => order.status?.name !== 'processing'),
-   
-
 
         return {
             order,
             title,
-            processOrder,
-            isEditable,
+            variantSearch,
+            searchResults,
+            searchVariants,
+            addVariantToOrder
         };
-
-  
     }
 }).mount('#order-app');
 JS;

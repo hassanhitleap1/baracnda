@@ -1,6 +1,7 @@
 <?php
 namespace app\modules\api\controllers;
 
+use app\models\orderItems\OrderItems;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
 use app\models\orders\Orders;
@@ -45,6 +46,39 @@ class OrdersController extends Controller
 
 
 
+    public function actionAddVariant($id){
+        
+   
+        // i am send orderId in requast and variantId but i am not able to get it
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        // Get the orderId and variantId from the request
+        $params = Yii::$app->request->getBodyParams();
+        dd($_POST , $params ,Yii::$app->request->post() );
+   
+        $variantId = Yii::$app->request->post('variantId');
+        
+        $order = Orders::findOne($id);
+        if ($order) {
+            $orderItem = new OrderItems();
+            $orderItem->order_id = $id;
+            $orderItem->variant_id = $variantId;
+            $orderItem->quantity = 1; // Default quantity, you can change this as needed
+            $orderItem->price = $orderItem->variant->price; // Assuming you have a relation to get the price from the variant
+            $orderItem->cost = $orderItem->variant->cost; // Assuming you have a relation to get the cost from the variant
+            $orderItem->product_id = $orderItem->variant->product_id; // Assuming you have a relation to get the product ID from the variant
+            if ($orderItem->save(false)) {
+                $order->calculateSubTotalFromOrderItems();
+                $order->setShippingPrice();
+                $order->calculateProfit();
+                $order->calculateTotal();
+                return ['success' => true, 'message' => 'Variant added to order successfully.'];
+            } else {
+                return ['success' => false, 'message' => 'Failed to add variant to order.'];
+            }
+        } else {
+            return ['success' => false, 'message' => 'Order not found.'];
+        }
+    }
 
     /**
      * Finds the Orders model based on its primary key value.
