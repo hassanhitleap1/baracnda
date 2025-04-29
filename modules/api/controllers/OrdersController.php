@@ -103,6 +103,33 @@ class OrdersController extends Controller
             return ['success' => false, 'message' => 'Order item not found.'];
         }
     }
+
+
+    public function actionUpdateQuantity($id){
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $orderItemId = Yii::$app->request->post('orderItemId');
+        $quantity = Yii::$app->request->post('quantity');
+        $orderItem = OrderItems::findOne($orderItemId);
+        if ($orderItem) {
+            $orderItem->quantity = $quantity;
+            if ($orderItem->save(false)) {
+                $order = Orders::findOne($id);
+                if ($order) {
+                    $order->calculateSubTotalFromOrderItems();
+                    $order->setShippingPrice();
+                    $order->calculateProfit();
+                    $order->calculateTotal();
+                    return ['success' => true, 'message' => 'Quantity updated successfully.'];
+                } else {
+                    return ['success' => false, 'message' => 'Order not found.'];
+                }
+            } else {
+                return ['success' => false, 'message' => 'Failed to update quantity.'];
+            }
+        } else {
+            return ['success' => false, 'message' => 'Order item not found.'];
+        }
+    }
     /**
      * Finds the Orders model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.

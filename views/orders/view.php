@@ -40,8 +40,8 @@ $orderId = $model->id;
             </div>
             <div class="card-body">
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" v-model="variantSearch" placeholder="Search for variants">
-                    <button class="btn btn-primary" @click="searchVariants" @keyup.enter="searchVariants" >Search</button>
+                    <input type="text" class="form-control" v-model="variantSearch"  @input="searchVariants" placeholder="Search for variants">
+                    <button class="btn btn-primary" @click="searchVariants" >Search</button>
                 </div>
                 <div v-if="searchResults.length">
                     <ul class="list-group">
@@ -79,7 +79,7 @@ $orderId = $model->id;
                                     <img v-if="item.product?.image_path" :src="'/'+ item.product.image_path" class="img-fluid" style="max-height: 100px;">
                                     <div v-else class="bg-light text-center p-4">No Image</div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <h5>{{ item.product?.name || 'Product not found' }}</h5>
                                     <div v-if="item.variant">
                                         <small class="text-muted">Variant: {{ item.variant.name }}</small>
@@ -89,12 +89,15 @@ $orderId = $model->id;
                                 <div class="col-md-2">
                                     <div class="input-group">
                                         <span class="input-group-text">Qty</span>
-                                        <input type="number" class="form-control" v-model="item.quantity" min="1" disabled>
+                                        <input type="number" class="form-control" v-model="item.quantity" min="1" @change="updateQuantity(item.id, item.quantity)" :disabled="isLoading">
                                     </div>
                                 </div>
-                                <div class="col-md-2 text-end">
+                                <div class="col-md-2">
                                     <h5>${{ (item.price * item.quantity).toFixed(2) }}</h5>
                                     <small class="text-muted">${{ item.price }} each</small>
+                                </div>
+                                <div class="col-1 text-end">
+                                        <i class="fas fa-trash"  @click="removeVariant(item.id)" title="Remove Item"></i>
                                 </div>
                             </div>
                         </div>
@@ -226,6 +229,8 @@ createApp({
                     alert('Error adding variant to order'); 
                 }).finally(() => {
                     isLoading.value = false;
+                    variantSearch.value = []; // Clear the search input
+                    
                 });
 
             } catch (error) {
@@ -233,6 +238,54 @@ createApp({
                 console.error('Error adding variant to order:', error);
             }
         };
+
+     
+        const removeVariant = async (variantId) => {    
+            if (confirm('Are you sure you want to remove this variant from the order?')) {
+                if (isLoading.value) return; // prevent multiple clicks
+                isLoading.value = true;
+                const formData = new FormData();
+                formData.append('orderItemId', variantId);
+                axios.post(`/api/orders/remove-variant?id=${orderId}`, formData)
+                    .then(response => {
+                        if (response.data.success) {
+                            fetchOrder(); // Refresh order data
+                        } else {
+                            console.error('Failed to remove variant from order:', response.data.message);
+                            alert(response.data.message)
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error removing variant from order:', error);
+                        alert('Error removing variant from order'); 
+                    }).finally(() => {
+                        isLoading.value = false;
+                    });
+            }
+        }
+
+        const updateQuantity = async (orderItemId, quantity) => {
+            if (isLoading.value) return; // prevent multiple clicks
+            isLoading.value = true;
+            const formData = new FormData();
+            formData.append('orderItemId', orderItemId);
+            formData.append('quantity', quantity);
+            axios.post(`/api/orders/update-quantity?id=${orderId}`, formData)
+                .then(response => {
+                    if (response.data.success) {
+                        fetchOrder(); // Refresh order data
+                    } else {
+                        console.error('Failed to update quantity:', response.data.message);
+                        alert(response.data.message)
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating quantity:', error);
+                    alert('Error updating quantity'); 
+                }).finally(() => {
+                    isLoading.value = false;
+                });
+        };    
 
         onMounted(fetchOrder);
 
@@ -242,7 +295,10 @@ createApp({
             variantSearch,
             searchResults,
             searchVariants,
-            addVariantToOrder
+            addVariantToOrder,
+            removeVariant,
+            isLoading,
+            updateQuantity
         };
     }
 }).mount('#order-app');
