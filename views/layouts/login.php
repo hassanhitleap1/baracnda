@@ -15,6 +15,8 @@ $this->registerMetaTag(['charset' => Yii::$app->charset], 'charset');
 $this->registerMetaTag(['name' => 'viewport', 'content' => 'width=device-width, initial-scale=1, shrink-to-fit=no']);
 $this->registerMetaTag(['name' => 'description', 'content' => $this->params['meta_description'] ?? '']);
 $this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_keywords'] ?? '']);
+$this->registerCssFile('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap');
+$this->registerCssFile('@web/css/admin-theme.css', ['depends' => [ThemeAsset::class]]);
 $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii::getAlias('@web/favicon.ico')]);
 
 $categories = Categories::find()->all();
@@ -31,7 +33,7 @@ $settings = Settings::find()->one();
     <?php $this->head() ?>
 </head>
 
-<body class="d-flex flex-column h-100">
+<body class="auth-page">
     <?php $this->beginBody() ?>
 
 

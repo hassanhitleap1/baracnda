@@ -9,7 +9,7 @@ class AdminLteAsset extends AssetBundle
 {
     public $sourcePath = '@app/web/AdminLTE'; // adjust the path accordingly
     public $css = [
-        'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback',
+        'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap',
         'plugins/fontawesome-free/css/all.min.css',
         'https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css',
         'plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css',
@@ -37,7 +37,6 @@ class AdminLteAsset extends AssetBundle
         'plugins/summernote/summernote-bs4.min.js',
         'plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js',
         'dist/js/adminlte.js',
-        'dist/js/demo.js',
         // 'dist/js/pages/dashboard.js',
 
     ];
