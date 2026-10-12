@@ -2,60 +2,33 @@
 
 /** @var yii\web\View $this */
 /** @var yii\bootstrap5\ActiveForm $form */
-
 /** @var app\models\LoginForm $model */
 
 use yii\bootstrap5\ActiveForm;
 use yii\bootstrap5\Html;
-use yii\helpers\Url;
 
-$this->title = 'Login';
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = Yii::t('app', 'Sign in');
 ?>
-<div>
-    <div class="container my-5">
-        <!-- <div class="breadcrumbs mb-3">
-            <span>
-                <a href="/" title="Go to Neutron sys web" class="home">Home</a>
-            </span>
-            <span><i class="fa fa-angle-right"></i></span>
-            <span>
-                <?= Html::encode($this->title) ?>
-            </span>
-        </div> -->
-        <a href="<?= Url::to(['site/index']) ?>">
-            <?= Html::img(Yii::getAlias('@web') . '/logo.png', ['alt' => 'Neutron sys logo', 'class' => 'animation__shake']) ?>
-        </a>
-        <div class="row login-page">
-            <div class="col-12">
-                <h1 class="my-5">
-                    <?= Html::encode($this->title) ?>
-                </h1>
+<main class="auth-shell">
+    <div>
+        <div class="auth-card">
+            <?= Html::img(Yii::getAlias('@web') . '/logo.png', ['alt' => Yii::$app->name, 'class' => 'auth-logo']) ?>
 
-                <?php $form = ActiveForm::begin([
-                    'id' => 'login-form',
-                ]); ?>
+            <h1><?= Html::encode($this->title) ?></h1>
+            <p class="auth-sub"><?= Yii::t('app', 'Use your staff username and password.') ?></p>
 
-                <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
+            <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
 
-                <?= $form->field($model, 'password')->passwordInput() ?>
+            <?= $form->field($model, 'username')->textInput(['autofocus' => true, 'autocomplete' => 'username']) ?>
 
-                <?= $form->field($model, 'rememberMe')->checkbox([
-                    'template' => "<div class=\"custom-control custom-checkbox\">{input} {label}</div>\n<div class=\"col-lg-8\">{error}</div>",
-                ]) ?>
+            <?= $form->field($model, 'password')->passwordInput(['autocomplete' => 'current-password']) ?>
 
-                <div class="form-group">
-                    <div>
-                        <?= Html::submitButton('Login', ['class' => 'btn btn-primary btn-lg w-100', 'name' => 'login-button']) ?>
-                    </div>
-                </div>
+            <?= $form->field($model, 'rememberMe')->checkbox() ?>
 
-                <?php ActiveForm::end(); ?>
+            <?= Html::submitButton(Yii::t('app', 'Sign in'), ['class' => 'btn btn-primary btn-lg w-100 mt-2', 'name' => 'login-button']) ?>
 
-            </div>
-            <div class="text-center my-5">
-                Copyright © 2024 sys. All rights reserved.
-            </div>
+            <?php ActiveForm::end(); ?>
         </div>
+        <p class="auth-foot">&copy; <?= date('Y') ?> <?= Html::encode(Yii::$app->name) ?></p>
     </div>
-</div>
+</main>

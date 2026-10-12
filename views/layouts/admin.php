@@ -3,13 +3,13 @@
 /** @var yii\web\View $this */
 /** @var string $content */
 
-use app\assets\AdminLteAsset;
+use app\assets\AdminThemeAsset;
 use app\widgets\Alert;
 use yii\bootstrap5\Breadcrumbs;
 use yii\bootstrap5\Html;
 use yii\helpers\Url;
 
-AdminLteAsset::register($this);
+AdminThemeAsset::register($this);
 
 $this->registerCsrfMetaTags();
 $this->registerMetaTag(['charset' => Yii::$app->charset], 'charset');
@@ -60,7 +60,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-12">
-                            <h1 class="m-0">
+                            <h1 class="mb-0">
                                 <?= Html::encode($this->title) ?>
                             </h1>
                         </div><!-- /.col -->

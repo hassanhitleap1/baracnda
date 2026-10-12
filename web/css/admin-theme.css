@@ -1,0 +1,477 @@
+/*
+ * Admin theme — layered on top of AdminLTE 3.
+ * Loaded last so it wins without !important wherever possible.
+ */
+
+:root {
+    --ink: #1c2b30;
+    --muted: #5f7175;
+    --surface: #f3f5f4;
+    --paper: #ffffff;
+    --line: #dbe2e1;
+    --brand: #0f7c80;
+    --brand-ink: #0a5a5d;
+    --brand-wash: #e3f1f0;
+    --signal: #e8a33d;
+    --danger: #c2413b;
+    --success: #2f8a57;
+    --sidebar: #13363d;
+    --sidebar-ink: #b9cccd;
+    --sidebar-active: #1d4d55;
+
+    --radius-sm: 4px;
+    --radius: 8px;
+    --font: "IBM Plex Sans", "IBM Plex Sans Arabic", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* ---------- Base ---------- */
+body,
+.content-wrapper,
+.main-footer {
+    font-family: var(--font);
+    color: var(--ink);
+}
+
+.content-wrapper {
+    background: var(--surface);
+}
+
+table,
+.table,
+input,
+.card-text,
+.kpi-value {
+    font-variant-numeric: tabular-nums;
+}
+
+a {
+    color: var(--brand);
+}
+
+a:hover {
+    color: var(--brand-ink);
+}
+
+:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+}
+
+/* ---------- Page header ---------- */
+.content-header {
+    padding: 1.5rem 1.5rem .5rem;
+}
+
+.content-header h1 {
+    font-size: 1.625rem;
+    font-weight: 600;
+    letter-spacing: -.01em;
+}
+
+.content-header .breadcrumb {
+    background: none;
+    padding: 0;
+    margin: .25rem 0 0;
+    font-size: .875rem;
+}
+
+.content-header .breadcrumb-item,
+.content-header .breadcrumb-item a {
+    color: var(--muted);
+}
+
+.content {
+    padding: 0 1.5rem 2rem;
+}
+
+/* Views repeat the page title that the layout already prints — hide the duplicate. */
+.content > .container-fluid > div > h1:first-child {
+    display: none;
+}
+
+/* ---------- Navbar ---------- */
+.main-header.navbar {
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+    min-height: 56px;
+}
+
+.main-header .nav-link {
+    color: var(--muted);
+}
+
+.main-header .nav-link:hover {
+    color: var(--ink);
+}
+
+/* ---------- Sidebar ---------- */
+.main-sidebar,
+.main-sidebar .brand-link {
+    background: var(--sidebar);
+}
+
+.main-sidebar .brand-link {
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+    padding: .9rem .5rem;
+}
+
+.main-sidebar .brand-link img {
+    max-height: 32px;
+}
+
+.sidebar .user-panel {
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+    align-items: center;
+}
+
+.sidebar .user-panel .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--brand);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: .875rem;
+    margin-left: .6rem;
+}
+
+.sidebar .user-panel .info a {
+    color: #fff;
+    font-weight: 500;
+}
+
+.sidebar .nav-header {
+    color: #7f9a9d;
+    font-size: .75rem;
+    font-weight: 600;
+    padding: 1.1rem 1rem .4rem;
+    letter-spacing: .02em;
+}
+
+.nav-sidebar .nav-link {
+    color: var(--sidebar-ink);
+    border-radius: var(--radius-sm);
+    padding: .5rem .8rem;
+    margin-bottom: 1px;
+}
+
+.nav-sidebar .nav-link:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, .05);
+}
+
+.sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active {
+    background: var(--sidebar-active);
+    color: #fff;
+    box-shadow: inset 3px 0 0 var(--signal);
+}
+
+.nav-sidebar .nav-icon {
+    font-size: .95rem;
+    opacity: .85;
+}
+
+.nav-sidebar .logout {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+}
+
+.nav-sidebar .nav-link form {
+    display: inline-block;
+}
+
+/* ---------- Cards / panels ---------- */
+.card {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: none;
+}
+
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid var(--line);
+    font-weight: 600;
+}
+
+/* ---------- Tables (GridView / Kartik) ---------- */
+.grid-view,
+.kv-grid-container {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow-x: auto;
+}
+
+.grid-view .table,
+.kv-grid-table {
+    margin-bottom: 0;
+    border: 0;
+}
+
+.table thead th {
+    background: #f8faf9;
+    color: var(--muted);
+    font-size: .8125rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--line);
+    border-top: 0;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.table thead th a {
+    color: var(--ink);
+}
+
+.table td {
+    border-top: 1px solid #edf1f0;
+    vertical-align: middle;
+    font-size: .9rem;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background: transparent;
+}
+
+.table-hover tbody tr:hover,
+.table tbody tr:hover {
+    background: #f6faf9;
+}
+
+.table .filters input,
+.table .filters select {
+    font-size: .85rem;
+    height: calc(1.8em + .5rem + 2px);
+}
+
+.grid-view .summary {
+    padding: .75rem 1rem;
+    color: var(--muted);
+    font-size: .85rem;
+}
+
+.grid-view .pagination,
+.kv-panel-pager {
+    padding: .75rem 1rem;
+    margin: 0;
+}
+
+/* ---------- Forms ---------- */
+.form-control,
+.custom-select,
+.form-select {
+    border-color: var(--line);
+    border-radius: var(--radius-sm);
+}
+
+.form-control:focus,
+.custom-select:focus,
+.form-select:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px var(--brand-wash);
+}
+
+label,
+.control-label,
+.form-label {
+    font-weight: 500;
+    font-size: .875rem;
+    color: var(--ink);
+}
+
+.invalid-feedback,
+.help-block-error {
+    color: var(--danger);
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+}
+
+.btn-primary,
+.btn-success {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #fff;
+}
+
+.btn-primary:hover,
+.btn-success:hover,
+.btn-primary:focus,
+.btn-success:focus {
+    background: var(--brand-ink);
+    border-color: var(--brand-ink);
+    color: #fff;
+}
+
+.btn-danger {
+    background: var(--danger);
+    border-color: var(--danger);
+}
+
+.btn-warning {
+    background: var(--signal);
+    border-color: var(--signal);
+    color: var(--ink);
+}
+
+/* ---------- Pagination / badges / alerts ---------- */
+.page-item.active .page-link {
+    background: var(--brand);
+    border-color: var(--brand);
+}
+
+.page-link {
+    color: var(--brand);
+}
+
+.badge {
+    font-weight: 500;
+    border-radius: var(--radius-sm);
+}
+
+.alert {
+    border-radius: var(--radius);
+    border: 1px solid transparent;
+}
+
+/* ---------- Dashboard KPI ledger ---------- */
+.kpi-ledger {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    margin-bottom: 1.5rem;
+}
+
+.kpi {
+    padding: 1.25rem 1.5rem;
+    border-left: 1px solid var(--line);
+}
+
+.kpi:first-child {
+    border-left: 0;
+}
+
+.kpi-label {
+    color: var(--muted);
+    font-size: .875rem;
+    margin: 0 0 .35rem;
+}
+
+.kpi-value {
+    font-size: 2.25rem;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -.02em;
+    margin: 0;
+}
+
+.kpi-value.is-money {
+    color: var(--brand-ink);
+}
+
+.chart-panel {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.chart-panel h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 1rem;
+}
+
+@media (max-width: 575.98px) {
+    .kpi {
+        border-left: 0;
+        border-top: 1px solid var(--line);
+    }
+
+    .kpi:first-child {
+        border-top: 0;
+    }
+
+    .content,
+    .content-header {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+
+/* ---------- Login ---------- */
+body.auth-page {
+    background: var(--sidebar);
+    min-height: 100vh;
+    font-family: var(--font);
+}
+
+.auth-shell {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--paper);
+    border-radius: var(--radius);
+    padding: 2.25rem 2rem 1.75rem;
+}
+
+.auth-card .auth-logo {
+    max-height: 44px;
+    margin-bottom: 1.75rem;
+}
+
+.auth-card h1 {
+    font-size: 1.375rem;
+    font-weight: 600;
+    margin: 0 0 .25rem;
+    color: var(--ink);
+}
+
+.auth-card .auth-sub {
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+    font-size: .9rem;
+}
+
+.auth-foot {
+    color: var(--sidebar-ink);
+    font-size: .8rem;
+    text-align: center;
+    margin-top: 1.25rem;
+}
+
+/* ---------- Footer ---------- */
+.main-footer {
+    background: var(--paper);
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: .85rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        transition: none !important;
+        animation: none !important;
+    }
+}
